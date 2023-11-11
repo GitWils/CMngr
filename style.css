@@ -28,8 +28,9 @@ QTextEdit, QLineEdit {
     background-color: "#748cab";
     color: "#1d2d44"
 }
-
 .items {
+    border: 1px solid "#0d1321";
     color: "#1d2d44";
-    background-color: "#748cab";
+    background-color: "#f0ebd8";
+    alternate-background-color: "#fff";
 }

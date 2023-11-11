@@ -7,11 +7,11 @@ class Project(QtWidgets.QWidget):
         self.initUI()
 
     def initUI(self):
-        self.resize(950, 690)
-        self.setWindowOpacity(0.5)
+        #self.resize(950, 690)
+        #self.setWindowOpacity(0.5)
         ico = QtGui.QIcon("img/logo.png")
         self.setWindowIcon(ico)
-        #self.setGeometry(400, 400, 950, 690)
+        self.setGeometry(400, 400, 950, 690)
         self.center()
         self.initColors()
         self.initMenu()
@@ -19,7 +19,6 @@ class Project(QtWidgets.QWidget):
         self.show()
 
     def initMenu(self):
-        vMenu = QtWidgets.QVBoxLayout()
         self.initVMenu()
         #self.mainArea.setSpacing(20)
         self.__initLayout1()
@@ -83,7 +82,6 @@ class Project(QtWidgets.QWidget):
         table.setSortingEnabled(True)
         table.resize(700, 500)
 
-
         mainArea.addWidget(table)
         self.innerbox.addLayout(mainArea,  QtCore.Qt.AlignmentFlag.AlignCenter)
         pass
@@ -93,11 +91,10 @@ class Project(QtWidgets.QWidget):
 
     def initVMenu(self):
         #buttons
-        button1 = QtWidgets.QPushButton("Створити договір")
-        button2 = QtWidgets.QPushButton("Редагувати договір")
-        button3 = QtWidgets.QPushButton("3")
-        button3.setDisabled(True)
-        button4 = QtWidgets.QPushButton("4")
+        button1 = QtWidgets.QPushButton("Створити конфігурацію")
+        button2 = QtWidgets.QPushButton("Створити договір")
+        button3 = QtWidgets.QPushButton("Редагувати договір")
+        button4 = QtWidgets.QPushButton("Налаштування")
         button4.setDisabled(True)
         button5 = QtWidgets.QPushButton("Фільтр")
 
@@ -108,6 +105,8 @@ class Project(QtWidgets.QWidget):
         self.vMenu.addWidget(button4)
         self.vMenu.addWidget(button5)
         self.vMenu.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+        self.vMenu.setSpacing(20)
+        self.vMenu.setContentsMargins(10, 10, 10, 10)
         self.vMenu.addStretch(40)
 
     def initColors(self):
@@ -130,7 +129,7 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     ico = QtGui.QIcon("img/logo.png")
     app.setWindowIcon(ico)
-    with open("style.css", "r") as file:
+    with open("style0.css", "r") as file:
         app.setStyleSheet(file.read())
     pr = Project()
     sys.exit(app.exec())
