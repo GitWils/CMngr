@@ -1,32 +1,37 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 import sys
 
+class A:
+    def __init__(self):
+        self.init()
+
+    def init(self):
+        print("Class A is running...")
+
 class Project(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.initUI()
 
     def initUI(self):
-        #self.resize(950, 690)
         #self.setWindowOpacity(0.5)
         ico = QtGui.QIcon("img/logo.png")
         self.setWindowIcon(ico)
         self.setGeometry(400, 400, 950, 690)
         self.center()
-        self.initColors()
         self.initMenu()
         self.setWindowTitle('Облік договорів, комплектуючих')
         self.show()
+        a = A()
 
     def initMenu(self):
         self.initVMenu()
-        #self.mainArea.setSpacing(20)
         self.__initLayout1()
         self.__initLayout0()
 
     def __initLayout0(self):
         lblLog = QtWidgets.QLabel("<b>Журнал подій:</b>")
-        logArea = QtWidgets.QTextEdit('№1: <span style="color: #153">31.10.2023</span> створено договір ' +
+        logArea = QtWidgets.QTextEdit('№1: <span id = "date" class = "date">31.10.2023</span> створено договір ' +
                                            '<span style="text-decoration: underline">№171</span>', parent = self)
         logArea.setReadOnly(True)
         self.vbox = QtWidgets.QVBoxLayout()
@@ -68,7 +73,6 @@ class Project(QtWidgets.QWidget):
                 item4.setForeground(QtGui.QBrush(QtGui.QColor('#911')))
             item5 = QtGui.QStandardItem('№' + lst4[row])
             sti.appendRow([item1, item2, item3, item4, item5])
-            # sti.setProperty()
 
         sti.setHorizontalHeaderLabels(['Назва', 'Наявна\nкількість', 'Необхідна\nкількість', 'Залишок', 'Договір'])
         sti.setRowCount(15)
@@ -92,11 +96,16 @@ class Project(QtWidgets.QWidget):
     def initVMenu(self):
         #buttons
         button1 = QtWidgets.QPushButton("Створити конфігурацію")
+        button1.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
         button2 = QtWidgets.QPushButton("Створити договір")
+        button2.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
         button3 = QtWidgets.QPushButton("Редагувати договір")
+        button3.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
         button4 = QtWidgets.QPushButton("Налаштування")
+        button4.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
         button4.setDisabled(True)
         button5 = QtWidgets.QPushButton("Фільтр")
+        button5.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
 
         self.vMenu = QtWidgets.QVBoxLayout()
         self.vMenu.addWidget(button1)
@@ -108,16 +117,6 @@ class Project(QtWidgets.QWidget):
         self.vMenu.setSpacing(20)
         self.vMenu.setContentsMargins(10, 10, 10, 10)
         self.vMenu.addStretch(40)
-
-    def initColors(self):
-        #using colors: #0d1321, #1d2d44, #3e5c76, #748cab, #f0ebd8
-        self.bgndClr = QtGui.QColor('#1d2d44')
-        self.inctBgndClr = QtGui.QColor('#0d1321')
-        self.btnClr = QtGui.QColor('#3e5c76')
-        pal = self.palette()
-        pal.setColor(QtGui.QPalette.ColorGroup.Normal, QtGui.QPalette.ColorRole.Window, self.bgndClr)
-        pal.setColor(QtGui.QPalette.ColorGroup.Inactive, QtGui.QPalette.ColorRole.Window, self.inctBgndClr)
-        self.setPalette(pal)
 
     def center(self):
         qr = self.frameGeometry()

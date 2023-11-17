@@ -50,7 +50,7 @@ lblLog = QtWidgets.QLabel("<b>Журнал подій:</b>")
 #lblLog.resize(300, 10)
 
 #text editor for showing logs
-logArea = QtWidgets.QTextEdit('№1: <span style="color: #191">31.10.2023</span> створено договір ' +
+logArea = QtWidgets.QTextEdit('№1: <span class="date">31.10.2023</span> створено договір ' +
                               '<span style="text-decoration: underline">№171</span>', parent=window)
 cursor = QtGui.QTextCursor(logArea.document())
 cursor.setPosition(0)

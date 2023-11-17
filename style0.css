@@ -8,7 +8,7 @@ QPushButton {
     color: "#F0F5F9";
     background-color: "#52616B";
     border-radius: 7px;
-    min-height: 30px;
+    min-height: 40px;
     min-width: 200px
 }
 QPushButton:pressed {
@@ -17,16 +17,29 @@ QPushButton:pressed {
     background-color: "#52616B"
 }
 QPushButton:hover {
-    border: 1px solid "#fb8b24"
+    border: 2px solid "#fb8b24"
 }
 QPushButton:disabled {
     font-size: 16px;
     color: "#1E2022";
-    background-color: "#52616B"
+    background-color: "#32414B"
 }
 QTextEdit, QLineEdit {
     background-color: "#C9D6DF";
     color: "#1E2022"
+}
+QHeaderView {
+    background-color: "#52616B";
+    color: "#F0F5F9";
+}
+.date {
+    color: #071;
+}
+QTextEdit  {
+    color: #071;
+}
+SPAN {
+    color: #071;
 }
 .items {
     border: 1px solid "#0d1321";
