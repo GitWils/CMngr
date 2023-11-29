@@ -1,12 +1,7 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
+from PartsDesignerView import Designer
+from LoggerView import Logger
 import sys
-
-class A:
-    def __init__(self):
-        self.init()
-
-    def init(self):
-        print("Class A is running...")
 
 class Project(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -22,7 +17,7 @@ class Project(QtWidgets.QWidget):
         self.initMenu()
         self.setWindowTitle('Облік договорів, комплектуючих')
         self.show()
-        a = A()
+        self.designer = Designer(self)
 
     def initMenu(self):
         self.initVMenu()
@@ -31,9 +26,7 @@ class Project(QtWidgets.QWidget):
 
     def __initLayout0(self):
         lblLog = QtWidgets.QLabel("<b>Журнал подій:</b>")
-        logArea = QtWidgets.QTextEdit('№1: <span id = "date" class = "date">31.10.2023</span> створено договір ' +
-                                           '<span style="text-decoration: underline">№171</span>', parent = self)
-        logArea.setReadOnly(True)
+        logArea = Logger(parent=self)
         self.vbox = QtWidgets.QVBoxLayout()
         self.vbox.addLayout(self.innerbox)
         logs = QtWidgets.QVBoxLayout()
@@ -48,47 +41,9 @@ class Project(QtWidgets.QWidget):
         self.innerbox = QtWidgets.QHBoxLayout()
         self.innerbox.addLayout(self.vMenu)
         mainArea = QtWidgets.QVBoxLayout()
-
-        # Table
-        table = QtWidgets.QTableView(parent=self)
-        table.setProperty("class", "items")
-        sti = QtGui.QStandardItemModel(parent=self)
-        lst1 = ['Шайба', 'Втулка', 'Корпус', 'Тара', 'Перехідник']
-        lst2 = ['30', '100', '50', '120', '220']  #
-        lst3 = ['100', '100', '300', '150', '200']  # needed
-        lst4 = ['171', '171', '171', '171', '171']  # contract
-        for row in range(0, 5):
-            # if row == 2:
-            #    iconfile = 'logo.png'
-            # else:
-            #    iconfile = 'logo.png'
-            item1 = QtGui.QStandardItem(lst1[row])
-            item2 = QtGui.QStandardItem(lst2[row])
-            item3 = QtGui.QStandardItem(lst3[row])
-            val = int(lst2[row]) - int(lst3[row])
-            item4 = QtGui.QStandardItem(str(val))
-            if val >= 0:
-                item4.setForeground(QtGui.QBrush(QtGui.QColor('#191')))
-            else:
-                item4.setForeground(QtGui.QBrush(QtGui.QColor('#911')))
-            item5 = QtGui.QStandardItem('№' + lst4[row])
-            sti.appendRow([item1, item2, item3, item4, item5])
-
-        sti.setHorizontalHeaderLabels(['Назва', 'Наявна\nкількість', 'Необхідна\nкількість', 'Залишок', 'Договір'])
-        sti.setRowCount(15)
-        table.setModel(sti)
-        table.setColumnWidth(0, 200)
-        table.setColumnWidth(2, 100)
-        table.setColumnWidth(3, 100)
-        table.setColumnWidth(4, 100)
-        table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        table.setAlternatingRowColors(True)
-        table.setSortingEnabled(True)
-        table.resize(700, 500)
-
+        table = Designer(parent=self)
         mainArea.addWidget(table)
         self.innerbox.addLayout(mainArea,  QtCore.Qt.AlignmentFlag.AlignCenter)
-        pass
 
     def __initLayout2(self):
         pass
