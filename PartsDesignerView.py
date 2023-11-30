@@ -22,24 +22,23 @@ class Designer(QtWidgets.QTableView):
             val = int(lst2[row]) - int(lst3[row])
             item4 = QtGui.QStandardItem(str(val))
             if val >= 0:
-                item4.setForeground(QtGui.QBrush(QtGui.QColor('#191')))
+                item4.setForeground(QtGui.QBrush(QtGui.QColor('#f00')))
             else:
-                item4.setForeground(QtGui.QBrush(QtGui.QColor('#911')))
+                item4.setForeground(QtGui.QBrush(QtGui.QColor('#f00')))
             item5 = QtGui.QStandardItem('№' + lst4[row])
             sti.appendRow([item1, item2, item3, item4, item5])
 
         sti.setHorizontalHeaderLabels(['Назва', 'Наявна\nкількість', 'Необхідна\nкількість', 'Залишок', 'Договір'])
         sti.setRowCount(15)
         self.setModel(sti)
+        self.setColumnStyles()
+        self.setSortingEnabled(True)
+        self.resize(700, 500)
+
+    def setColumnStyles(self):
         self.setColumnWidth(0, 200)
         self.setColumnWidth(2, 100)
         self.setColumnWidth(3, 100)
         self.setColumnWidth(4, 100)
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.setAlternatingRowColors(True)
-        self.setSortingEnabled(True)
-        self.resize(700, 500)
-        #print("Class A is running...")
-
-    def widget(self):
-        return self
