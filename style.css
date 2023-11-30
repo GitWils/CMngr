@@ -1,12 +1,17 @@
-/*using palettes: #475c6c, #99afa3, #d3d6dd, #bbbbbb, #f7efd2*/
+/*using palettes: #475c6c, #8a8583, #eed7a1, #f7efd2, #cd8b62*/
 QWidget {
     background-color: "#475c6c";
     color: "#f7efd2";
 }
+
+QPushButton#mng:disabled {
+    background-color: "#475c6c";
+}
+
 QPushButton#vmenu {
     font-size: 16px;
     color: "#f0ebd8";
-    background-color: "#cd8b62";
+    background-color: "#867";
     border-radius: 7px;
     min-height: 30px;
     min-width: 200px
@@ -32,6 +37,17 @@ QTextEdit, QLineEdit {
 }
 
 QTableView {
+    color: '#162c3c';
+}
+
+QTableView::item {
     background-color: "#f7efd2";
-    color: black;
+}
+
+QTableView::item:alternate {
+    background-color: '#eed7a1';
+}
+
+QTableView::item:selected {
+    background-color: '#867';
 }

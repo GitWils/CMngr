@@ -1,5 +1,7 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PartsDesignerView import Designer
+from KitView import Kit
+from ContractView import Contract
 from LoggerView import Logger
 import sys
 
@@ -37,54 +39,98 @@ class Project(QtWidgets.QWidget):
         self.vbox.setStretch(1, 1)
         self.setLayout(self.vbox)
 
+    def addEditBtn(self, filename, active):
+        if(active):
+            btn = QtWidgets.QPushButton(QtGui.QIcon('img/act' + filename), '')
+        else:
+            btn = QtWidgets.QPushButton(QtGui.QIcon('img/inact' + filename), '')
+            btn.setDisabled(True)
+        btn.setIconSize(QtCore.QSize(40, 40))
+        btn.setObjectName("mng")
+        btn.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
+        return btn
+
+    def createContractTab(self):
+        tab = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        tab.setLayout(layout)
+        lbl = QtWidgets.QLabel("Немає активних договорів")
+        lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(lbl)
+        return tab
+
+    def createKitTab(self):
+        tab = QtWidgets.QWidget()
+        tab.setStyleSheet("border: 0px solid red")
+        layout = QtWidgets.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        tab.setLayout(layout)
+        kit = Kit()
+
+        if(kit.getSize()):
+            layout.addWidget(kit)
+        else:
+            lbl = QtWidgets.QLabel("Пустий список")
+            lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            layout.addWidget(lbl)
+
+        btns = QtWidgets.QTabWidget()
+        btnLayout = QtWidgets.QHBoxLayout()
+        btnLayout.setContentsMargins(40, 0, 0, 0)
+        new_btn = self.addEditBtn('new.png', True)
+        edit_btn = self.addEditBtn('edit.png', True)
+        del_btn = self.addEditBtn('del.png', True)
+        btnLayout.addWidget(new_btn)
+        btnLayout.addWidget(edit_btn)
+        btnLayout.addWidget(del_btn)
+        btns.setLayout(btnLayout)
+        btnLayout.addStretch(40)
+        btnLayout.setSpacing(40)
+
+        layout.addWidget(btns)
+        layout.setStretch(0, 7)
+        layout.setStretch(1, 1)
+        return tab
+
+    def createDesignerTab(self):
+        tab = QtWidgets.QWidget()
+        tab.setStyleSheet("border: 0px solid red")
+        layout = QtWidgets.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        tab.setLayout(layout)
+        #designer = Designer(parent=self)
+        designer = Designer(parent=self)
+
+        btns = QtWidgets.QTabWidget()
+        btnLayout = QtWidgets.QHBoxLayout()
+        btnLayout.setContentsMargins(40, 0, 0, 0)
+        new_btn = self.addEditBtn('new.png', True)
+        edit_btn = self.addEditBtn('edit.png', False)
+        del_btn = self.addEditBtn('del.png', False)
+        btnLayout.addWidget(new_btn)
+        btnLayout.addWidget(edit_btn)
+        btnLayout.addWidget(del_btn)
+        btns.setLayout(btnLayout)
+        btnLayout.addStretch(40)
+        btnLayout.setSpacing(40)
+
+        layout.addWidget(designer)
+        layout.addWidget(btns)
+        layout.setStretch(0, 7)
+        layout.setStretch(1, 1)
+        return tab;
+
     def __initLayout1(self):
         self.innerbox = QtWidgets.QHBoxLayout()
         self.innerbox.addLayout(self.vMenu)
         mainArea = QtWidgets.QVBoxLayout()
-        designer = Designer(parent=self)
-        t1_new_btn = QtWidgets.QPushButton(QtGui.QIcon('img/new.png'), '')
-        t1_new_btn.setIconSize(QtCore.QSize(40, 40))
-        t1_new_btn.setObjectName("mng")
-        t1_new_btn.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
-        t1_edit_btn = QtWidgets.QPushButton(QtGui.QIcon('img/editact.png'), '')
-        t1_edit_btn.setIconSize(QtCore.QSize(40, 40))
-        t1_edit_btn.setObjectName("mng")
-        t1_edit_btn.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
-        t1_del_btn = QtWidgets.QPushButton(QtGui.QIcon('img/delact.png'), '')
-        t1_del_btn.setIconSize(QtCore.QSize(40, 40))
-        t1_del_btn.setObjectName("mng")
-        t1_del_btn.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
-        tab1_btns = QtWidgets.QTabWidget()
-        tab1_btn_lt = QtWidgets.QHBoxLayout()
-        tab1_btn_lt.setContentsMargins(40, 0, 0, 0)
-        tab1_btn_lt.addWidget(t1_new_btn)
-        tab1_btn_lt.addWidget(t1_edit_btn)
-        tab1_btn_lt.addWidget(t1_del_btn)
-        tab1_btns.setLayout(tab1_btn_lt)
-        tab1_btn_lt.addStretch(40)
-        tab1_btn_lt.setSpacing(40)
-
         tab = QtWidgets.QTabWidget()
-        tab1 = QtWidgets.QWidget()
-        tab1.setStyleSheet("border: 0px solid red")
-        tab1_layout = QtWidgets.QVBoxLayout()
-        tab1_layout.setContentsMargins(0, 0, 0, 0)
-        tab1.setLayout(tab1_layout)
-        tab2 = QtWidgets.QWidget()
-        tab2_layout = QtWidgets.QVBoxLayout()
-        tab2.setLayout(tab2_layout)
-        tab3 = QtWidgets.QWidget()
-        tab3_layout = QtWidgets.QVBoxLayout()
-        tab3.setLayout(tab3_layout)
 
-        tab1_layout.addWidget(designer)
-        tab1_layout.addWidget(tab1_btns)
-        tab1_layout.setStretch(0, 7)
-        tab1_layout.setStretch(1, 1)
-
-        tab.addTab(tab1, "Конструктор виробів")
-        tab.addTab(QtWidgets.QLabel("друга вкладка"), "Договори")
-        tab.addTab(QtWidgets.QLabel("третя вкладка"), "Комплектуючі")
+        #designerTab = self.createDesignerTab()
+        tab.addTab(self.createDesignerTab(), "Конструктор виробів")
+        tab.addTab(self.createContractTab(), "Договори")
+        tab.addTab(self.createKitTab(), "Комплектуючі")
         mainArea.addWidget(tab)
         self.innerbox.addLayout(mainArea,  QtCore.Qt.AlignmentFlag.AlignCenter)
 

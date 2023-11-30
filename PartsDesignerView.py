@@ -5,7 +5,6 @@ class Designer(QtWidgets.QTableView):
         self.init()
 
     def init(self):
-        self.setProperty("class", "items")
         sti = QtGui.QStandardItemModel(parent=self)
         lst1 = ['Шайба', 'Втулка', 'Корпус', 'Тара', 'Перехідник']
         lst2 = ['30', '100', '50', '120', '220']  #
@@ -22,9 +21,9 @@ class Designer(QtWidgets.QTableView):
             val = int(lst2[row]) - int(lst3[row])
             item4 = QtGui.QStandardItem(str(val))
             if val >= 0:
-                item4.setForeground(QtGui.QBrush(QtGui.QColor('#f00')))
+                item4.setForeground(QtGui.QBrush(QtGui.QColor('#070')))
             else:
-                item4.setForeground(QtGui.QBrush(QtGui.QColor('#f00')))
+                item4.setForeground(QtGui.QBrush(QtGui.QColor('#a22')))
             item5 = QtGui.QStandardItem('№' + lst4[row])
             sti.appendRow([item1, item2, item3, item4, item5])
 
