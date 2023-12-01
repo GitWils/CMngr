@@ -32,7 +32,7 @@ class Kit(QtWidgets.QTableView):
         self.resize(700, 500)
 
     def getSize(self):
-        return 1
+        return 0
 
     def setColumnStyles(self):
         self.setColumnWidth(0, 200)

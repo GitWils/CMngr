@@ -1,5 +1,6 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PartsDesignerView import Designer
+from PartsDesignerDialog import PartsDialog
 from KitView import Kit
 from ContractView import Contract
 from LoggerView import Logger
@@ -20,6 +21,13 @@ class Project(QtWidgets.QWidget):
         self.setWindowTitle('Облік договорів, комплектуючих')
         self.show()
         self.designer = Designer(self)
+
+    def event(self, e):
+        if e.type() == QtCore.QEvent.Type.WindowDeactivate:
+            self.setWindowOpacity(0.5)
+        elif e.type() == QtCore.QEvent.Type.WindowActivate:
+            self.setWindowOpacity(1)
+        return QtWidgets.QWidget.event(self, e)
 
     def initMenu(self):
         self.initVMenu()
@@ -67,7 +75,6 @@ class Project(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(layout)
         kit = Kit()
-
         if(kit.getSize()):
             layout.addWidget(kit)
         else:
@@ -106,8 +113,11 @@ class Project(QtWidgets.QWidget):
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
         new_btn = self.addEditBtn('new.png', True)
-        edit_btn = self.addEditBtn('edit.png', False)
-        del_btn = self.addEditBtn('del.png', False)
+        new_btn.clicked.connect(PartsDialog())
+        edit_btn = self.addEditBtn('edit.png', True)
+        edit_btn.clicked.connect(self.editDesignClicked)
+        del_btn = self.addEditBtn('del.png', True)
+        del_btn.clicked.connect(self.delDesignClicked)
         btnLayout.addWidget(new_btn)
         btnLayout.addWidget(edit_btn)
         btnLayout.addWidget(del_btn)
@@ -119,7 +129,13 @@ class Project(QtWidgets.QWidget):
         layout.addWidget(btns)
         layout.setStretch(0, 7)
         layout.setStretch(1, 1)
-        return tab;
+        return tab
+
+    def editDesignClicked(self):
+        print("edit clicked")
+
+    def delDesignClicked(self):
+        print("del clicked")
 
     def __initLayout1(self):
         self.innerbox = QtWidgets.QHBoxLayout()
