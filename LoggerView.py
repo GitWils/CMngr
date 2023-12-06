@@ -9,3 +9,6 @@ class Logger(QtWidgets.QTextEdit):
         self.insertHtml('№1: <span id = "date" class = "date">31.10.2023</span> створено договір ' +
                         '<span style="text-decoration: underline">№171</span>')
         self.setReadOnly(True)
+
+    def addMessage(self):
+        print(self.textCursor().position())

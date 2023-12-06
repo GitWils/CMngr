@@ -60,12 +60,30 @@ class Project(QtWidgets.QWidget):
 
     def createContractTab(self):
         tab = QtWidgets.QWidget()
+        tab.setStyleSheet("border: 0px solid red")
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(layout)
         lbl = QtWidgets.QLabel("Немає активних договорів")
         lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(lbl)
+
+        btns = QtWidgets.QTabWidget()
+        btnLayout = QtWidgets.QHBoxLayout()
+        btnLayout.setContentsMargins(40, 0, 0, 0)
+        new_btn = self.addEditBtn('new.png', True)
+        edit_btn = self.addEditBtn('edit.png', True)
+        del_btn = self.addEditBtn('del.png', True)
+        btnLayout.addWidget(new_btn)
+        btnLayout.addWidget(edit_btn)
+        btnLayout.addWidget(del_btn)
+        btns.setLayout(btnLayout)
+        btnLayout.addStretch(40)
+        btnLayout.setSpacing(40)
+
+        layout.addWidget(btns)
+        layout.setStretch(0, 7)
+        layout.setStretch(1, 1)
         return tab
 
     def createKitTab(self):
@@ -106,14 +124,13 @@ class Project(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(layout)
-        #designer = Designer(parent=self)
         designer = Designer(parent=self)
 
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
         new_btn = self.addEditBtn('new.png', True)
-        new_btn.clicked.connect(PartsDialog())
+        new_btn.clicked.connect(self.newDesignClicked)
         edit_btn = self.addEditBtn('edit.png', True)
         edit_btn.clicked.connect(self.editDesignClicked)
         del_btn = self.addEditBtn('del.png', True)
@@ -130,6 +147,9 @@ class Project(QtWidgets.QWidget):
         layout.setStretch(0, 7)
         layout.setStretch(1, 1)
         return tab
+    def newDesignClicked(self):
+        dlg = PartsDialog(self)
+        #dlg.closeEvent(print("closed"))
 
     def editDesignClicked(self):
         print("edit clicked")
@@ -143,15 +163,11 @@ class Project(QtWidgets.QWidget):
         mainArea = QtWidgets.QVBoxLayout()
         tab = QtWidgets.QTabWidget()
 
-        #designerTab = self.createDesignerTab()
         tab.addTab(self.createDesignerTab(), "Конструктор виробів")
         tab.addTab(self.createContractTab(), "Договори")
         tab.addTab(self.createKitTab(), "Комплектуючі")
         mainArea.addWidget(tab)
         self.innerbox.addLayout(mainArea,  QtCore.Qt.AlignmentFlag.AlignCenter)
-
-    def __initLayout2(self):
-        pass
 
     def initVMenu(self):
         #buttons
