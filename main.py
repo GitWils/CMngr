@@ -15,7 +15,7 @@ class Project(QtWidgets.QWidget):
         #self.setWindowOpacity(0.5)
         ico = QtGui.QIcon("img/logo.png")
         self.setWindowIcon(ico)
-        self.setGeometry(400, 400, 950, 690)
+        self.setGeometry(50, 50, 950, 690)
         self.center()
         self.initMenu()
         self.setWindowTitle('Облік договорів, комплектуючих')
@@ -24,7 +24,7 @@ class Project(QtWidgets.QWidget):
 
     def event(self, e):
         if e.type() == QtCore.QEvent.Type.WindowDeactivate:
-            self.setWindowOpacity(0.5)
+            self.setWindowOpacity(0.8)
         elif e.type() == QtCore.QEvent.Type.WindowActivate:
             self.setWindowOpacity(1)
         return QtWidgets.QWidget.event(self, e)
@@ -191,13 +191,13 @@ class Project(QtWidgets.QWidget):
         qr = self.frameGeometry()
         cp = self.screen().availableGeometry().center()
         qr.moveCenter(cp)
-        self.move(qr.topRight())
+        self.move(qr.topLeft())
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
     ico = QtGui.QIcon("img/logo.png")
     app.setWindowIcon(ico)
-    with open("style.css", "r") as file:
+    with open("style0.css", "r") as file:
         app.setStyleSheet(file.read())
     pr = Project()
     sys.exit(app.exec())

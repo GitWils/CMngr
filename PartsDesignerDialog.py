@@ -1,7 +1,8 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 
+
 class PartsDialog(QtWidgets.QDialog):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(PartsDialog, self).__init__(parent)
         self.parent = parent
         self.init()
@@ -30,9 +31,8 @@ class PartsDialog(QtWidgets.QDialog):
         # dialog.show()
 
     def init(self):
-        dialog = QtWidgets.QDialog(self)
-        dialog.setWindowTitle("Конфігурація виробу")
-        dialog.resize(500, 300)
+        self.setWindowTitle("Конфігурація виробу")
+        self.resize(500, 300)
 
         grid = QtWidgets.QGridLayout()
         grid.setContentsMargins(40, 40, 40, 40)
@@ -57,9 +57,9 @@ class PartsDialog(QtWidgets.QDialog):
         grid.addWidget(item1Cnt, 1, 2, 1, 1)
         grid.addWidget(bbox, 2, 0, 1, 3)
 
-        dialog.setLayout(grid)
-        dialog.show()
+        self.setLayout(grid)
+        self.show()
 
     def save(self):
-        print("saved")
+        print("saved fdsf ")
         self.accept()
