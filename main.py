@@ -1,7 +1,7 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PartsDesignerView import Designer
 from PartsDesignerDialog import PartsDialog
-from PartsDesignerModel import DesignModel
+from DBManager import DBManager
 from KitView import Kit
 from ContractView import Contract
 from LoggerView import Logger
@@ -10,6 +10,7 @@ import sys
 class Project(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__()
+        self.db = DBManager()
         self.initUI()
 
     def initUI(self):
@@ -20,7 +21,6 @@ class Project(QtWidgets.QWidget):
         self.initMenu()
         self.setWindowTitle('Облік договорів, комплектуючих')
         self.show()
-        self.designer = Designer(self)
 
     def event(self, e):
         if e.type() == QtCore.QEvent.Type.WindowDeactivate:
@@ -65,7 +65,7 @@ class Project(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(layout)
         if True:
-            contracts = Contract(parent=self)
+            contracts = Contract()
             layout.addWidget(contracts)
         else:
             lbl = QtWidgets.QLabel("Немає активних договорів")
@@ -128,7 +128,8 @@ class Project(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(layout)
-        designer = Designer(parent=self)
+        lst = self.db.getTemplates()
+        designer = Designer(lst)
 
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
@@ -152,9 +153,8 @@ class Project(QtWidgets.QWidget):
         layout.setStretch(1, 1)
         return tab
 
-    def newDesignSave(self, name):
-        designModel = DesignModel()
-        designModel.save(name)
+    def newDesignSave(self, name, items):
+        self.db.saveTemplate(name, items)
 
     def newDesignClicked(self):
         dlg = PartsDialog(self)

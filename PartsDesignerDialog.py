@@ -18,10 +18,10 @@ class PartsDialog(QtWidgets.QDialog):
         grid = QtWidgets.QGridLayout()
         grid.setContentsMargins(40, 40, 40, 40)
         deviceName = QtWidgets.QLabel("Назва виробу:")
-        device = QtWidgets.QLineEdit()
+        self.name = QtWidgets.QLineEdit()
         itemName = QtWidgets.QLabel("Назва деталі №1:")
         self.item1 = QtWidgets.QLineEdit()
-        item1Cnt = QtWidgets.QSpinBox()
+        self.item1Cnt = QtWidgets.QSpinBox()
 
         bbox = QtWidgets.QDialogButtonBox()
         bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok |
@@ -41,10 +41,10 @@ class PartsDialog(QtWidgets.QDialog):
         btn.clicked.connect(self.addItemField)
 
         grid.addWidget(deviceName, 0, 0, 1, 2)
-        grid.addWidget(device, 0, 1, 1, 1)
+        grid.addWidget(self.name, 0, 1, 1, 1)
         grid.addWidget(itemName, 1, 0, 1, 1)
         grid.addWidget(self.item1, 1, 1, 1, 1)
-        grid.addWidget(item1Cnt, 1, 2, 1, 1)
+        grid.addWidget(self.item1Cnt, 1, 2, 1, 1)
         grid.addWidget(btn, 2, 0, 1, 3)
         grid.addWidget(bbox, 3, 0, 1, 3)
 
@@ -56,5 +56,7 @@ class PartsDialog(QtWidgets.QDialog):
         print(self.itemsCnt)
 
     def save(self):
-        self.parent.newDesignSave(self.item1.text())
+        items = [self.item1.text(), self.item1Cnt.value()]
+        #rint(items.__repr__())
+        self.parent.newDesignSave(self.name.text(), items)
         self.accept()

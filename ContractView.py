@@ -1,7 +1,7 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 class Contract(QtWidgets.QTableView):
-    def __init__(self, parent=None):
-        super(Contract, self).__init__(parent)
+    def __init__(self):
+        QtWidgets.QTableView.__init__(self)
         self.init()
 
     def init(self):

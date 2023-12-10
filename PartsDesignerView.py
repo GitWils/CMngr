@@ -1,34 +1,21 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 class Designer(QtWidgets.QTableView):
-    def __init__(self, parent=None):
-        super(Designer, self).__init__(parent)
+    def __init__(self, templates):
+        QtWidgets.QTableView.__init__(self)
+        self.templates = templates
         self.init()
 
     def init(self):
         sti = QtGui.QStandardItemModel(parent=self)
-        # lst1 = ['Шайба', 'Втулка', 'Корпус', 'Тара', 'Перехідник']
-        # lst2 = ['30', '100', '50', '120', '220']  #
-        # lst3 = ['100', '100', '300', '150', '200']  # needed
-        # lst4 = ['171', '171', '171', '171', '171']  # contract
-        # for row in range(0, 5):
-        #     # if row == 2:
-        #     #     iconfile = 'logo.png'
-        #     # else:
-        #     #     iconfile = 'logo.png'
-        #     item1 = QtGui.QStandardItem(lst1[row])
-        #     item2 = QtGui.QStandardItem(lst2[row])
-        #     item3 = QtGui.QStandardItem(lst3[row])
-        #     val = int(lst2[row]) - int(lst3[row])
-        #     item4 = QtGui.QStandardItem(str(val))
-        #     if val >= 0:
-        #         item4.setForeground(QtGui.QBrush(QtGui.QColor('#070')))
-        #     else:
-        #         item4.setForeground(QtGui.QBrush(QtGui.QColor('#a22')))
-        #     item5 = QtGui.QStandardItem('№' + lst4[row])
-        #     sti.appendRow([item1, item2, item3, item4, item5])
-
-        sti.setHorizontalHeaderLabels(['Назва', 'Наявна\nкількість', 'Необхідна\nкількість', 'Залишок', 'Договір'])
-        sti.setRowCount(15)
+        print(self.templates)
+        i = 0
+        for template in self.templates:
+            item1 = QtGui.QStandardItem(template[1])
+            item2 = QtGui.QStandardItem('1' + str(i) + '.12.2023р.')
+            sti.appendRow([item1, item2])
+            i += 1
+        sti.setHorizontalHeaderLabels(['Назва', 'Дата створення'])
+        sti.setRowCount(i)
         self.setModel(sti)
         self.setColumnStyles()
         self.setSortingEnabled(True)
@@ -36,8 +23,6 @@ class Designer(QtWidgets.QTableView):
 
     def setColumnStyles(self):
         self.setColumnWidth(0, 200)
-        self.setColumnWidth(2, 100)
-        self.setColumnWidth(3, 100)
-        self.setColumnWidth(4, 100)
+        self.setColumnWidth(1, 200)
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.setAlternatingRowColors(True)
