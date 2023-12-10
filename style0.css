@@ -4,11 +4,11 @@ QWidget {
     color: "#F0F5F9";
 }
 
-.QPushButton#mng {
+/*.QPushButton#mng {
     min-height: 50px;
     width: 50px;
     max-width: 50px;
-}
+}*/
 
 .QPushButton#vmenu {
     font-size: 16px;
@@ -16,7 +16,7 @@ QWidget {
     background-color: "#52616B";
     border-radius: 7px;
     min-height: 40px;
-    min-width: 200px
+    min-width: 207px
 }
 .QPushButton#vmenu:pressed {
     font-size: 16px;

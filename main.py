@@ -1,6 +1,7 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PartsDesignerView import Designer
 from PartsDesignerDialog import PartsDialog
+from PartsDesignerModel import DesignModel
 from KitView import Kit
 from ContractView import Contract
 from LoggerView import Logger
@@ -12,7 +13,6 @@ class Project(QtWidgets.QWidget):
         self.initUI()
 
     def initUI(self):
-        #self.setWindowOpacity(0.5)
         ico = QtGui.QIcon("img/logo.png")
         self.setWindowIcon(ico)
         self.setGeometry(50, 50, 950, 690)
@@ -64,9 +64,13 @@ class Project(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(layout)
-        lbl = QtWidgets.QLabel("Немає активних договорів")
-        lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(lbl)
+        if True:
+            contracts = Contract(parent=self)
+            layout.addWidget(contracts)
+        else:
+            lbl = QtWidgets.QLabel("Немає активних договорів")
+            lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            layout.addWidget(lbl)
 
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
@@ -147,6 +151,11 @@ class Project(QtWidgets.QWidget):
         layout.setStretch(0, 7)
         layout.setStretch(1, 1)
         return tab
+
+    def newDesignSave(self, name):
+        designModel = DesignModel()
+        designModel.save(name)
+
     def newDesignClicked(self):
         dlg = PartsDialog(self)
         #dlg.closeEvent(print("closed"))
