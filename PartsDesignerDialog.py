@@ -17,6 +17,7 @@ class PartsDialog(QtWidgets.QDialog):
 
         grid = QtWidgets.QGridLayout()
         grid.setContentsMargins(40, 40, 40, 40)
+        grid.setSpacing(25)
         deviceName = QtWidgets.QLabel("Назва виробу:")
         self.name = QtWidgets.QLineEdit()
         itemName = QtWidgets.QLabel("Назва деталі №1:")
@@ -33,19 +34,35 @@ class PartsDialog(QtWidgets.QDialog):
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
 
-        btn = QtWidgets.QPushButton(QtGui.QIcon('img/actnew.png'), '')
-        btn.setIconSize(QtCore.QSize(40, 40))
-        btn.setObjectName("mng")
-        btn.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
-        btn.setStyleSheet("border: 0px solid red")
-        btn.clicked.connect(self.addItemField)
+        btnAdd = QtWidgets.QPushButton(QtGui.QIcon('img/actnew.png'), '')
+        btnAdd.setIconSize(QtCore.QSize(40, 40))
+        btnAdd.setObjectName("mng")
+        btnAdd.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
+        btnAdd.setStyleSheet("border: 0px solid red")
+        btnAdd.clicked.connect(self.addItemField)
 
-        grid.addWidget(deviceName, 0, 0, 1, 2)
+        btnRem = QtWidgets.QPushButton(QtGui.QIcon('img/actdel.png'), '')
+        btnRem.setIconSize(QtCore.QSize(40, 40))
+        btnRem.setObjectName("mng")
+        btnRem.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
+        btnRem.setStyleSheet("border: 0px solid red")
+        btnRem.clicked.connect(self.removeItemField)
+
+        grid.addWidget(deviceName, 0, 0, 1, 1)
         grid.addWidget(self.name, 0, 1, 1, 1)
         grid.addWidget(itemName, 1, 0, 1, 1)
         grid.addWidget(self.item1, 1, 1, 1, 1)
         grid.addWidget(self.item1Cnt, 1, 2, 1, 1)
-        grid.addWidget(btn, 2, 0, 1, 3)
+        hbox = QtWidgets.QHBoxLayout()
+        # hbox.addWidget(btnRem, alignment=QtCore.Qt.AlignmentFlag.AlignLeft)
+        # hbox.addWidget(btnAdd, alignment=QtCore.Qt.AlignmentFlag.AlignRight)
+        hbox.addWidget(btnRem, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+        hbox.addWidget(btnAdd, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+        hbox.setSpacing(40)
+        hwidget = QtWidgets.QWidget()
+        hwidget.setLayout(hbox)
+        hwidget.resize(10, 10)
+        grid.addWidget(hwidget, 2, 0, 1, 3)
         grid.addWidget(bbox, 3, 0, 1, 3)
 
         self.setLayout(grid)
@@ -53,6 +70,11 @@ class PartsDialog(QtWidgets.QDialog):
 
     def addItemField(self):
         self.itemsCnt += 1
+        print(self.itemsCnt)
+
+    def removeItemField(self):
+        if self.itemsCnt > 0:
+            self.itemsCnt -= 1
         print(self.itemsCnt)
 
     def save(self):
