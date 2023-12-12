@@ -1,25 +1,32 @@
 /*using palettes: #1E2022, #52616B, #C9D6DF, #F0F5F9*/
-/*QWidget {
+QWidget {
     background-color: "#1E2022";
-    color: "#F0F5F9";
-}*/
+    /*color: "#F0F5F9";*/
+}
 
 /*.QPushButton#mng {
     min-height: 50px;
     width: 50px;
     max-width: 50px;
 }*/
+/********************************* Main UI settings ***************************************/
+#main {
+    background-color: "#1E2022";
+}
+/********************************* Main UI settings ***************************************/
 
+/********************************* Buttons UI settings ***************************************/
 .QPushButton#vmenu {
-    font-size: 16px;
+    font-size: 18px;
     color: "#F0F5F9";
     background-color: "#52616B";
     border-radius: 7px;
     min-height: 40px;
-    min-width: 207px
+    min-width: 207px;
 }
 .QPushButton#vmenu:pressed {
-    font-size: 16px;
+    font-size: 18px;
+    /*font-weight: bold;*/
     color: "#F0F5F9";
     background-color: "#52616B"
 }
@@ -31,33 +38,50 @@
     color: "#1E2022";
     background-color: "#32414B"
 }
+/********************************* Buttons UI settings ***************************************/
+
+QLabel {
+    color: #F0F5F9;
+    font-size: 16px;
+}
+
+/********************************* TextEdit UI settings ***************************************/
 QTextEdit, QLineEdit {
     background-color: "#C9D6DF";
-    color: "#1E2022"
+    color: "#1E2022";
+    font-size: 16px;
 }
-QHeaderView {
-    background-color: "#52616B";
-    color: "#F0F5F9";
-}
+/********************************* TextEdit UI settings ***************************************/
+
 .date {
-    color: #071;
-}
-QTextEdit  {
     color: #071;
 }
 SPAN {
     color: #071;
 }
 
+/********************************* Table UI settings ***************************************/
 QTableView {
     border: 1px solid '#f00';
     background-color: "#f0f5f9";
     alternate-background-color: "#c9d6df";
+    font-size: 14px;
+}
+
+QHeaderView {
+    background-color: "#52616B";
+    color: "#F0F5F9";
 }
 
 QTableView::item {
     /*border: 1px solid "#fd1321";*/
     color: #1E2022;
+}
+
+QHeaderView::section {
+    font-size: 16px;
+    background-color: #63717a;
+    alternate-background-color: "#63717";
 }
 
 QTableView::item:alternate {
@@ -67,9 +91,53 @@ QTableView::item:selected {
     color: #F0F5F9;
 }
 
+QTableCornerButton::section {
+    background-color: #52616b;
+}
+
 QTableView::item:hover {
 
 }
 
 QTableView::item:focus {
+}
+/********************************* Table UI settings ***************************************/
+
+QTabWidget {
+    background-color: red;
+}
+
+QTabWidget::pane {
+    background-color:red;
+}
+
+QTabBar:top {
+    border: 1px solid white;
+}
+
+QTabBar:tab:top {
+    min-width: 51ex;
+}
+
+QTabBar::tab {
+    background-color: #282a2c;
+    font-size: 16px;
+    color: #F0F5F9;
+    height: 25px;
+    border: 1px solid #424446;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    padding-bottom: 3px;
+    margin-right: 5px;
+}
+
+QTabBar::tab:selected {
+    background-color: #52616B;
+    color: #F0F5F9;
+    border-bottom: red;
+    /*height: 28px;*/
+}
+
+QTabWidget::item {
+    color: red;
 }

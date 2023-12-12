@@ -20,6 +20,7 @@ class Project(QtWidgets.QWidget):
         self.center()
         self.initMenu()
         self.setWindowTitle('Облік договорів, комплектуючих')
+        #self.setObjectName('main')
         self.show()
 
     def event(self, e):
