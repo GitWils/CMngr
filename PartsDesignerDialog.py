@@ -23,6 +23,7 @@ class PartsDialog(QtWidgets.QDialog):
         itemName = QtWidgets.QLabel("Назва деталі №1:")
         self.item1 = QtWidgets.QLineEdit()
         self.item1Cnt = QtWidgets.QSpinBox()
+        self.item1Cnt.setValue(1)
 
         bbox = QtWidgets.QDialogButtonBox()
         bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok |

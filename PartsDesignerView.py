@@ -8,21 +8,24 @@ class Designer(QtWidgets.QTableView):
     def init(self):
         sti = QtGui.QStandardItemModel(parent=self)
         print(self.templates)
-        i = 0
+        rowCnt = 0
         for template in self.templates:
             item1 = QtGui.QStandardItem(template[1])
-            item2 = QtGui.QStandardItem('1' + str(i) + '.12.2023р.')
+            item2 = QtGui.QStandardItem('1' + str(rowCnt) + '.12.2023000000р.')
             sti.appendRow([item1, item2])
-            i += 1
+            rowCnt += 1
         sti.setHorizontalHeaderLabels(['Назва', 'Дата створення'])
-        sti.setRowCount(i)
+        sti.setRowCount(rowCnt)
         self.setModel(sti)
         self.setColumnStyles()
         self.setSortingEnabled(True)
-        self.resize(700, 500)
+        #self.resize(700, 500)
+        self.setObjectName("table")
 
     def setColumnStyles(self):
-        self.setColumnWidth(0, 200)
-        self.setColumnWidth(1, 200)
+        #self.resizeRowsToContents()
+        #self.setMinimumWidth(800)
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.setAlternatingRowColors(True)
+        #self.setAlternatingRowColors(True)
+        self.setColumnWidth(0, 200)
+        self.setColumnWidth(1, 400)

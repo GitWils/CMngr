@@ -1,8 +1,8 @@
 /*using palettes: #1E2022, #52616B, #C9D6DF, #F0F5F9*/
-QWidget {
+/*QWidget {
     background-color: "#1E2022";
     color: "#F0F5F9";
-}
+}*/
 
 /*.QPushButton#mng {
     min-height: 50px;
@@ -49,13 +49,27 @@ SPAN {
     color: #071;
 }
 
-QTabWidget {
+QTableView {
     border: 1px solid '#f00';
+    background-color: "#f0f5f9";
+    alternate-background-color: "#c9d6df";
 }
 
-.items {
-    border: 1px solid "#fd1321";
-    color: "#1d2d44";
-    background-color: "#C9D6DF";
-    alternate-background-color: "#F0F5F9";
+QTableView::item {
+    /*border: 1px solid "#fd1321";*/
+    color: #1E2022;
+}
+
+QTableView::item:alternate {
+}
+
+QTableView::item:selected {
+    color: #F0F5F9;
+}
+
+QTableView::item:hover {
+
+}
+
+QTableView::item:focus {
 }
