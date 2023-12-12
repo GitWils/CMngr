@@ -31,7 +31,7 @@ QWidget {
     background-color: "#52616B"
 }
 .QPushButton#vmenu:hover {
-    border: 2px solid "#fb8b24"
+    border: 2px solid "#e95420";
 }
 .QPushButton#vmenu:disabled {
     font-size: 16px;
@@ -89,6 +89,7 @@ QTableView::item:alternate {
 
 QTableView::item:selected {
     color: #F0F5F9;
+    background-color: #e95420;
 }
 
 QTableCornerButton::section {
@@ -103,6 +104,7 @@ QTableView::item:focus {
 }
 /********************************* Table UI settings ***************************************/
 
+/********************************* TabWidget UI settings ***************************************/
 QTabWidget {
     background-color: red;
 }
@@ -140,4 +142,9 @@ QTabBar::tab:selected {
 
 QTabWidget::item {
     color: red;
+}
+/********************************* TabWidget UI settings ***************************************/
+
+QSpinBox {
+    background-color: #F0F5F9;
 }

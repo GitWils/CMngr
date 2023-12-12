@@ -24,10 +24,6 @@ class PartsDialog(QtWidgets.QDialog):
         self.wgtItemsLst = []
         self.wgtCntsLst = []
         self.addItemField()
-        # self.item1Name = QtWidgets.QLabel("Назва деталі №1:")
-        # self.item1 = QtWidgets.QLineEdit()
-        # self.item1Cnt = QtWidgets.QSpinBox()
-        # self.item1Cnt.setValue(1)
 
         bbox = QtWidgets.QDialogButtonBox()
         bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok |
@@ -55,12 +51,6 @@ class PartsDialog(QtWidgets.QDialog):
 
         self.grid.addWidget(deviceName, 0, 0, 1, 1)
         self.grid.addWidget(self.name, 0, 1, 1, 1)
-        # for i in range(0, self.itemsCnt):
-        #     #print(i)
-        #     self.grid.addWidget(self.wgtNamesLst[i], i + 1, 0, 1, 1)
-        #     self.grid.addWidget(self.wgtItemsLst[i], i + 1, 1, 1, 1)
-        #     self.grid.addWidget(self.wgtCntsLst[i - 1], i + 1, 2, 1, 1)
-        #grid.removeWidget()
         hbox = QtWidgets.QHBoxLayout()
         hbox.addWidget(btnRem, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
         hbox.addWidget(btnAdd, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
@@ -75,9 +65,6 @@ class PartsDialog(QtWidgets.QDialog):
         self.show()
 
     def addItemField(self):
-        # self.wgtNamesLst = []
-        # self.wgtItemsLst = []
-        # self.wgtCntLst = []
         self.wgtNamesLst.append(QtWidgets.QLabel("Назва деталі №{}:".format(self.itemsCnt + 1)))
         self.wgtItemsLst.append(QtWidgets.QLineEdit())
         self.wgtCntsLst.append(QtWidgets.QSpinBox())
