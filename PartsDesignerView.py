@@ -11,7 +11,7 @@ class Designer(QtWidgets.QTableView):
         rowCnt = 0
         for template in self.templates:
             item1 = QtGui.QStandardItem(template[1])
-            item2 = QtGui.QStandardItem('1' + str(rowCnt) + '.12.2023000000р.')
+            item2 = QtGui.QStandardItem('1' + str(rowCnt) + '.12.2023р.')
             sti.appendRow([item1, item2])
             rowCnt += 1
         sti.setHorizontalHeaderLabels(['Назва', 'Дата створення'])

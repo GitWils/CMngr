@@ -36,7 +36,7 @@ class Project(QtWidgets.QWidget):
         self.__initLayout0()
 
     def __initLayout0(self):
-        lblLog = QtWidgets.QLabel("<b>Журнал подій:</b>")
+        lblLog = QtWidgets.QLabel("Журнал подій:")
         logArea = Logger(parent=self)
         self.vbox = QtWidgets.QVBoxLayout()
         self.vbox.addLayout(self.innerbox)

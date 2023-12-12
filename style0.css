@@ -116,7 +116,7 @@ QTabBar:top {
 }
 
 QTabBar:tab:top {
-    min-width: 51ex;
+    min-width: 220px;
 }
 
 QTabBar::tab {
