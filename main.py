@@ -1,4 +1,5 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
+from CustomWidgets import EditBtn
 from PartsDesignerView import Designer
 from PartsDesignerDialog import PartsDialog
 from DBManager import DBManager
@@ -48,17 +49,6 @@ class Project(QtWidgets.QWidget):
         self.vbox.setStretch(1, 1)
         self.setLayout(self.vbox)
 
-    def addEditBtn(self, filename, active):
-        if(active):
-            btn = QtWidgets.QPushButton(QtGui.QIcon('img/act' + filename), '')
-        else:
-            btn = QtWidgets.QPushButton(QtGui.QIcon('img/inact' + filename), '')
-            btn.setDisabled(True)
-        btn.setIconSize(QtCore.QSize(40, 40))
-        btn.setObjectName("mng")
-        btn.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
-        return btn
-
     def createContractTab(self):
         tab = QtWidgets.QWidget()
         tab.setStyleSheet("border: 0px solid red")
@@ -76,9 +66,9 @@ class Project(QtWidgets.QWidget):
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
-        new_btn = self.addEditBtn('new.png', True)
-        edit_btn = self.addEditBtn('edit.png', True)
-        del_btn = self.addEditBtn('del.png', True)
+        new_btn = EditBtn('new.png', True)
+        edit_btn = EditBtn('edit.png', False)
+        del_btn = EditBtn('del.png', False)
         btnLayout.addWidget(new_btn)
         btnLayout.addWidget(edit_btn)
         btnLayout.addWidget(del_btn)
@@ -108,9 +98,9 @@ class Project(QtWidgets.QWidget):
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
-        new_btn = self.addEditBtn('new.png', True)
-        edit_btn = self.addEditBtn('edit.png', True)
-        del_btn = self.addEditBtn('del.png', True)
+        new_btn = EditBtn('new.png', True)
+        edit_btn = EditBtn('edit.png', False)
+        del_btn = EditBtn('del.png', False)
         btnLayout.addWidget(new_btn)
         btnLayout.addWidget(edit_btn)
         btnLayout.addWidget(del_btn)
@@ -130,41 +120,48 @@ class Project(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(layout)
         lst = self.db.getTemplates()
-        designer = Designer(lst)
+        self.designer = Designer(lst)
+        self.designer.clicked.connect(self.itemDesignClicked)
 
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
-        new_btn = self.addEditBtn('new.png', True)
-        new_btn.clicked.connect(self.newDesignClicked)
-        edit_btn = self.addEditBtn('edit.png', True)
-        edit_btn.clicked.connect(self.editDesignClicked)
-        del_btn = self.addEditBtn('del.png', True)
-        del_btn.clicked.connect(self.delDesignClicked)
-        btnLayout.addWidget(new_btn)
-        btnLayout.addWidget(edit_btn)
-        btnLayout.addWidget(del_btn)
+        self.newDesBtn = EditBtn('new.png', True)
+        self.newDesBtn.clicked.connect(self.newDesignClicked)
+        self.editDesBtn = EditBtn('edit.png', False)
+        self.editDesBtn.clicked.connect(self.editDesignClicked)
+        self.delDesBtn = EditBtn('del.png', False)
+        self.delDesBtn.clicked.connect(self.delDesignClicked)
+        btnLayout.addWidget(self.newDesBtn)
+        btnLayout.addWidget(self.editDesBtn)
+        btnLayout.addWidget(self.delDesBtn)
         btns.setLayout(btnLayout)
         btnLayout.addStretch(40)
         btnLayout.setSpacing(40)
 
-        layout.addWidget(designer)
+        layout.addWidget(self.designer)
         layout.addWidget(btns)
         layout.setStretch(0, 7)
         layout.setStretch(1, 1)
         return tab
 
+    def itemDesignClicked(self):
+        self.editDesBtn.setActive(True)
+        self.delDesBtn.setActive(True)
+
     def newDesignSave(self, name, items):
         self.db.saveTemplate(name, items)
+        self.designer.loadData(self.db.getTemplates())
 
     def newDesignClicked(self):
         dlg = PartsDialog(self)
-        #dlg.closeEvent(print("closed"))
 
     def editDesignClicked(self):
+        print(self.designer.currentIndex().row())
         print("edit clicked")
 
     def delDesignClicked(self):
+        self.db.delTemplate(self.designer.getSelectedRowId())
         print("del clicked")
 
     def __initLayout1(self):

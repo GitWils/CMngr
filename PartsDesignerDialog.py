@@ -89,7 +89,7 @@ class PartsDialog(QtWidgets.QDialog):
         print(self.itemsCnt)
 
     def removeItemField(self):
-        if (self.itemsCnt == 0):
+        if (self.itemsCnt == 1):
             return
         self.itemsCnt -= 1
         self.grid.removeWidget(self.wgtNamesLst[self.itemsCnt])

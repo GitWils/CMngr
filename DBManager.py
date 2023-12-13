@@ -24,12 +24,13 @@ class DBManager():
         templateId = self.query.lastInsertId()
         self.query.clear()
 
-        self.query.prepare("insert into items_template values(null, :template_id, :name, :count)")
-        self.query.bindValue(':template_id', templateId)
-        self.query.bindValue(':name', items[0])
-        self.query.bindValue(':count', items[1])
-        self.query.exec()
-        self.query.clear()
+        for item in items:
+            self.query.prepare("insert into items_template values(null, :template_id, :name, :count)")
+            self.query.bindValue(':template_id', templateId)
+            self.query.bindValue(':name', item[0])
+            self.query.bindValue(':count', item[1])
+            self.query.exec()
+            self.query.clear()
         print("збережено")
 
     def getTemplates(self):
@@ -42,6 +43,9 @@ class DBManager():
                 lst.append(arr)
                 self.query.next()
         return lst
+
+    def delTemplate(self, id):
+        self.query.exec("delete * from templates where id")
 
     def __del__(self):
         self.con.close()

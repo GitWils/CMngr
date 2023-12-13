@@ -3,32 +3,46 @@ class Designer(QtWidgets.QTableView):
     def __init__(self, templates):
         QtWidgets.QTableView.__init__(self)
         self.templates = templates
+        self.sti = QtGui.QStandardItemModel(parent=self)
+        self.loadData(self.templates)
         self.init()
 
     def init(self):
-        sti = QtGui.QStandardItemModel(parent=self)
-        print(self.templates)
-        rowCnt = 0
-        for template in self.templates:
-            item1 = QtGui.QStandardItem(template[1])
-            item2 = QtGui.QStandardItem('1' + str(rowCnt) + '.12.2023р.')
-            sti.appendRow([item1, item2])
-            rowCnt += 1
-        sti.setHorizontalHeaderLabels(['Назва', 'Дата створення'])
-        sti.setRowCount(rowCnt)
-        self.setModel(sti)
         self.setColumnStyles()
         self.setSortingEnabled(True)
-        #self.resize(700, 500)
         self.setObjectName("table")
 
+    def loadData(self, templates):
+        self.reset()
+        self.sti.clear()
+        rowCnt = 0
+        for template in templates:
+            item0 = QtGui.QStandardItem(str(template[0]))
+            item1 = QtGui.QStandardItem(template[1])
+            item2 = QtGui.QStandardItem('1' + str(rowCnt) + '.12.2023р.')
+            self.sti.appendRow([item0, item1, item2])
+            rowCnt += 1
+        self.sti.setHorizontalHeaderLabels(['Id', 'Назва', 'Дата створення', 'Примітка'])
+        self.sti.setRowCount(rowCnt)
+        self.setModel(self.sti)
+        self.setColumnStyles()
+
     def setColumnStyles(self):
-        #self.resizeRowsToContents()
         #self.setMinimumWidth(800)
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        #self.setAlternatingRowColors(True)
+        self.setAlternatingRowColors(True)
         #self.setColumnWidth(0, 200)
         #self.setColumnWidth(1, 400)
         header = self.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.setColumnHidden(0, True)
+
+    def getSelectedRowId(self):
+        index = self.currentIndex()
+        NewIndex = self.model().index(index.row(), 0)
+        return self.model().data(NewIndex)
+
+    def getSelectedRow(self):
+        self.currentIndex().row()
