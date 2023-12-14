@@ -45,7 +45,12 @@ class DBManager():
         return lst
 
     def delTemplate(self, id):
-        self.query.exec("delete * from templates where id")
+        print(id)
+        self.query.exec("delete from templates where id=?")
+        self.query.addBindValue(id)
+        self.query.exec()
+        self.query.clear()
+        print('видалено')
 
     def __del__(self):
         self.con.close()

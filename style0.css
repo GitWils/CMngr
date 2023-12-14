@@ -1,6 +1,6 @@
 /*using palettes: #1E2022, #52616B, #C9D6DF, #F0F5F9*/
 QWidget {
-    background-color: "#1E2022";
+    background-color: "#2E3032";
     /*color: "#F0F5F9";*/
 }
 
@@ -147,4 +147,5 @@ QTabWidget::item {
 
 QSpinBox {
     background-color: #F0F5F9;
+    color: #1E2022;
 }

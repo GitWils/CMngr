@@ -162,7 +162,7 @@ class Project(QtWidgets.QWidget):
 
     def delDesignClicked(self):
         self.db.delTemplate(self.designer.getSelectedRowId())
-        print("del clicked")
+        self.designer.loadData(self.db.getTemplates())
 
     def __initLayout1(self):
         self.innerbox = QtWidgets.QHBoxLayout()
