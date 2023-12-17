@@ -18,7 +18,7 @@ class Project(QtWidgets.QWidget):
         ico = QtGui.QIcon("img/logo.png")
         self.setWindowIcon(ico)
         self.setGeometry(50, 50, 950, 690)
-        self.center()
+        self.centerWindow()
         self.initMenu()
         self.setWindowTitle('Облік договорів, комплектуючих')
         #self.setObjectName('main')
@@ -38,12 +38,13 @@ class Project(QtWidgets.QWidget):
 
     def __initLayout0(self):
         lblLog = QtWidgets.QLabel("Журнал подій:")
-        logArea = Logger(parent=self)
+        self.logArea = Logger()
+        self.logArea.showContent(self.db.getLogs())
         self.vbox = QtWidgets.QVBoxLayout()
         self.vbox.addLayout(self.innerbox)
         logs = QtWidgets.QVBoxLayout()
         logs.addWidget(lblLog)
-        logs.addWidget(logArea, QtCore.Qt.AlignmentFlag.AlignBottom)
+        logs.addWidget(self.logArea, QtCore.Qt.AlignmentFlag.AlignBottom)
         self.vbox.addLayout(logs)
         self.vbox.setStretch(0, 3)
         self.vbox.setStretch(1, 1)
@@ -150,8 +151,11 @@ class Project(QtWidgets.QWidget):
         self.delDesBtn.setActive(True)
 
     def newDesignSave(self, name, items):
+        msg = 'створено новий шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
         self.db.saveTemplate(name, items)
+        self.db.saveLogMsg(msg)
         self.designer.loadData(self.db.getTemplates())
+        self.logArea.showContent(self.db.getLogs())
 
     def newDesignClicked(self):
         dlg = PartsDialog(self)
@@ -162,14 +166,17 @@ class Project(QtWidgets.QWidget):
 
     def delDesignClicked(self):
         self.db.delTemplate(self.designer.getSelectedRowId())
+        self.db.saveLogMsg('видалено шаблон <span style="text-decoration: underline">{}</span>'
+                           .format(self.designer.getSelectedRowName()))
         self.designer.loadData(self.db.getTemplates())
+        self.logArea.showContent(self.db.getLogs())
 
     def __initLayout1(self):
         self.innerbox = QtWidgets.QHBoxLayout()
         self.innerbox.addLayout(self.vMenu)
         mainArea = QtWidgets.QVBoxLayout()
-        tab = QtWidgets.QTabWidget()
 
+        tab = QtWidgets.QTabWidget()
         tab.addTab(self.createDesignerTab(), "Конструктор виробів")
         tab.addTab(self.createContractTab(), "Договори")
         tab.addTab(self.createKitTab(), "Комплектуючі")
@@ -194,7 +201,7 @@ class Project(QtWidgets.QWidget):
         self.vMenu.setContentsMargins(10, 10, 10, 10)
         self.vMenu.addStretch(40)
 
-    def center(self):
+    def centerWindow(self):
         qr = self.frameGeometry()
         cp = self.screen().availableGeometry().center()
         qr.moveCenter(cp)

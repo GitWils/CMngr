@@ -15,14 +15,15 @@ class Designer(QtWidgets.QTableView):
     def loadData(self, templates):
         self.reset()
         self.sti.clear()
+        print(templates.__repr__())
         rowCnt = 0
         for template in templates:
             item0 = QtGui.QStandardItem(str(template[0]))
             item1 = QtGui.QStandardItem(template[1])
-            item2 = QtGui.QStandardItem('1' + str(rowCnt) + '.12.2023р.')
+            item2 = QtGui.QStandardItem(template[2][5:])
             self.sti.appendRow([item0, item1, item2])
             rowCnt += 1
-        self.sti.setHorizontalHeaderLabels(['Id', 'Назва', 'Дата створення', 'Примітка'])
+        self.sti.setHorizontalHeaderLabels(['Id', 'Назва', 'Дата\nстворення', 'Примітка'])
         self.sti.setRowCount(rowCnt)
         self.setModel(self.sti)
         self.setColumnStyles()
@@ -42,6 +43,11 @@ class Designer(QtWidgets.QTableView):
     def getSelectedRowId(self):
         index = self.currentIndex()
         NewIndex = self.model().index(index.row(), 0)
+        return self.model().data(NewIndex)
+
+    def getSelectedRowName(self):
+        index = self.currentIndex()
+        NewIndex = self.model().index(index.row(), 1)
         return self.model().data(NewIndex)
 
     def getSelectedRow(self):
