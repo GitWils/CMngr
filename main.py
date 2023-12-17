@@ -50,36 +50,71 @@ class Project(QtWidgets.QWidget):
         self.vbox.setStretch(1, 1)
         self.setLayout(self.vbox)
 
-    def createContractTab(self):
+    def createDesignerTab(self):
         tab = QtWidgets.QWidget()
         tab.setStyleSheet("border: 0px solid red")
-        layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        tab.setLayout(layout)
-        if True:
-            contracts = Contract()
-            layout.addWidget(contracts)
+        self.desLayout = QtWidgets.QVBoxLayout()
+        self.desLayout.setContentsMargins(0, 0, 0, 0)
+        tab.setLayout(self.desLayout)
+        lst = self.db.getTemplates()
+        self.designer = Designer(lst)
+        self.designer.clicked.connect(self.itemDesignClicked)
+        self.desLbl = QtWidgets.QLabel("Немає активних договорів")
+        self.desLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        if len(lst):
+            self.desLayout.addWidget(self.designer)
         else:
-            lbl = QtWidgets.QLabel("Немає активних договорів")
-            lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-            layout.addWidget(lbl)
+            self.desLayout.addWidget(self.desLbl)
 
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
-        new_btn = EditBtn('new.png', True)
-        edit_btn = EditBtn('edit.png', False)
-        del_btn = EditBtn('del.png', False)
-        btnLayout.addWidget(new_btn)
-        btnLayout.addWidget(edit_btn)
-        btnLayout.addWidget(del_btn)
+        self.newDesBtn = EditBtn('new.png', True)
+        self.editDesBtn = EditBtn('edit.png', False)
+        self.delDesBtn = EditBtn('del.png', False)
+        self.newDesBtn.clicked.connect(self.newDesignClicked)
+        self.editDesBtn.clicked.connect(self.editDesignClicked)
+        self.delDesBtn.clicked.connect(self.delDesignClicked)
+        btnLayout.addWidget(self.newDesBtn)
+        btnLayout.addWidget(self.editDesBtn)
+        btnLayout.addWidget(self.delDesBtn)
         btns.setLayout(btnLayout)
         btnLayout.addStretch(40)
         btnLayout.setSpacing(40)
+        self.desLayout.addWidget(btns)
+        self.desLayout.setStretch(0, 8)
+        self.desLayout.setStretch(1, 1)
+        return tab
 
-        layout.addWidget(btns)
-        layout.setStretch(0, 7)
-        layout.setStretch(1, 1)
+    def createContractTab(self):
+        tab = QtWidgets.QWidget()
+        tab.setStyleSheet("border: 0px solid red")
+        self.contractLt = QtWidgets.QVBoxLayout()
+        self.contractLt.setContentsMargins(0, 0, 0, 0)
+        tab.setLayout(self.contractLt)
+        self.contracts = Contract()
+        self.contractLbl = QtWidgets.QLabel("Немає активних договорів")
+        self.contractLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        if True:
+            self.contractLt.addWidget(self.contracts)
+        else:
+            self.contractLt.addWidget(self.contractLbl)
+
+        btns = QtWidgets.QTabWidget()
+        btnLayout = QtWidgets.QHBoxLayout()
+        btnLayout.setContentsMargins(40, 0, 0, 0)
+        self.newConBtn = EditBtn('new.png', True)
+        self.editConBtn = EditBtn('edit.png', False)
+        self.delConBtn = EditBtn('del.png', False)
+        btnLayout.addWidget(self.newConBtn)
+        btnLayout.addWidget(self.editConBtn)
+        btnLayout.addWidget(self.delConBtn)
+        btns.setLayout(btnLayout)
+        btnLayout.addStretch(40)
+        btnLayout.setSpacing(40)
+        self.contractLt.addWidget(btns)
+        self.contractLt.setStretch(0, 8)
+        self.contractLt.setStretch(1, 1)
         return tab
 
     def createKitTab(self):
@@ -114,37 +149,6 @@ class Project(QtWidgets.QWidget):
         layout.setStretch(1, 1)
         return tab
 
-    def createDesignerTab(self):
-        tab = QtWidgets.QWidget()
-        tab.setStyleSheet("border: 0px solid red")
-        layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        tab.setLayout(layout)
-        lst = self.db.getTemplates()
-        self.designer = Designer(lst)
-        self.designer.clicked.connect(self.itemDesignClicked)
-
-        btns = QtWidgets.QTabWidget()
-        btnLayout = QtWidgets.QHBoxLayout()
-        btnLayout.setContentsMargins(40, 0, 0, 0)
-        self.newDesBtn = EditBtn('new.png', True)
-        self.newDesBtn.clicked.connect(self.newDesignClicked)
-        self.editDesBtn = EditBtn('edit.png', False)
-        self.editDesBtn.clicked.connect(self.editDesignClicked)
-        self.delDesBtn = EditBtn('del.png', False)
-        self.delDesBtn.clicked.connect(self.delDesignClicked)
-        btnLayout.addWidget(self.newDesBtn)
-        btnLayout.addWidget(self.editDesBtn)
-        btnLayout.addWidget(self.delDesBtn)
-        btns.setLayout(btnLayout)
-        btnLayout.addStretch(40)
-        btnLayout.setSpacing(40)
-
-        layout.addWidget(self.designer)
-        layout.addWidget(btns)
-        layout.setStretch(0, 7)
-        layout.setStretch(1, 1)
-        return tab
 
     def itemDesignClicked(self):
         self.editDesBtn.setActive(True)
@@ -156,6 +160,10 @@ class Project(QtWidgets.QWidget):
         self.db.saveLogMsg(msg)
         self.designer.loadData(self.db.getTemplates())
         self.logArea.showContent(self.db.getLogs())
+        if self.designer.getTemplatesCount() == 1:
+            self.designer.show()
+            self.desLbl.hide()
+            self.desLayout.replaceWidget(self.desLbl, self.designer)
 
     def newDesignClicked(self):
         dlg = PartsDialog(self)
@@ -170,11 +178,16 @@ class Project(QtWidgets.QWidget):
                            .format(self.designer.getSelectedRowName()))
         self.designer.loadData(self.db.getTemplates())
         self.logArea.showContent(self.db.getLogs())
+        if self.designer.getTemplatesCount() == 0:
+            self.designer.hide()
+            self.desLbl.show()
+            self.desLayout.replaceWidget(self.designer, self.desLbl)
 
     def __initLayout1(self):
         self.innerbox = QtWidgets.QHBoxLayout()
         self.innerbox.addLayout(self.vMenu)
         mainArea = QtWidgets.QVBoxLayout()
+        mainArea.setContentsMargins(0, 10, 10, 0)
 
         tab = QtWidgets.QTabWidget()
         tab.addTab(self.createDesignerTab(), "Конструктор виробів")

@@ -18,13 +18,17 @@ class DBManager():
                     "template_id integer secondary key, name text, count integer, " +
                     "str_date text, dt datetime)")
             self.query.clear()
+        if 'contracts' not in self.con.tables():
+            self.query.exec("create table contracts(id integer primary key autoincrement, " +
+                    "template_id integer secondary key, name text, count integer" +
+                    "str_date text, dt datetime)")
+            self.query.clear()
         if 'logs' not in self.con.tables():
             self.query.exec("create table logs(id integer primary key autoincrement, " +
                     "message text, str_date text, dt datetime default current_timestamp)")
             self.query.clear()
 
     def saveTemplate(self, name, items):
-        #print(items.__repr__())
         date = self.getDateTime()
         self.query.prepare("insert into templates values(null, :name, :str_date, :dt)")
         self.query.bindValue(':name', name)
@@ -43,7 +47,17 @@ class DBManager():
             self.query.bindValue(':dt', date['datetime'])
             self.query.exec()
             self.query.clear()
-        print("збережено")
+
+    def saveContract(self, name, count, templateId):
+        date = self.getDateTime()
+        self.query.prepare("insert into contracts values(null, template_id, :name, :count, :str_date, :dt)")
+        self.query.bindValue(':template_id', templateId)
+        self.query.bindValue(':name', name)
+        self.query.bindValue(':count', count)
+        self.query.bindValue(':str_date', date['s_date'])
+        self.query.bindValue(':dt', date['datetime'])
+        self.query.exec()
+        self.query.clear()
 
     def saveLogMsg(self, msg):
         date = self.getDateTime()

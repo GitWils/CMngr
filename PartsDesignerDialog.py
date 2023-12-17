@@ -25,15 +25,7 @@ class PartsDialog(QtWidgets.QDialog):
         self.wgtCntsLst = []
         self.addItemField()
 
-        bbox = QtWidgets.QDialogButtonBox()
-        bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok |
-                                QtWidgets.QDialogButtonBox.StandardButton.Cancel)
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('vmenu')
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('vmenu')
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
-        bbox.accepted.connect(self.save)
-        bbox.rejected.connect(self.reject)
+        bbox = self.initButtonBox()
 
         btnAdd = QtWidgets.QPushButton(QtGui.QIcon('img/actnew.png'), '')
         btnAdd.setIconSize(QtCore.QSize(40, 40))
@@ -63,6 +55,20 @@ class PartsDialog(QtWidgets.QDialog):
 
         self.setLayout(self.grid)
         self.show()
+
+
+    def initButtonBox(self):
+        """create widget with "Cancel" and "Save" buttons"""
+        bbox = QtWidgets.QDialogButtonBox()
+        bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok |
+                                QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('vmenu')
+        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
+        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('vmenu')
+        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
+        bbox.accepted.connect(self.save)
+        bbox.rejected.connect(self.reject)
+        return bbox
 
     def addItemField(self):
         self.wgtNamesLst.append(QtWidgets.QLabel("Назва деталі №{}:".format(self.itemsCnt + 1)))

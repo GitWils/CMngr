@@ -13,9 +13,9 @@ class Designer(QtWidgets.QTableView):
         self.setObjectName("table")
 
     def loadData(self, templates):
+        self.templates = templates
         self.reset()
         self.sti.clear()
-        print(templates.__repr__())
         rowCnt = 0
         for template in templates:
             item0 = QtGui.QStandardItem(str(template[0]))
@@ -39,6 +39,9 @@ class Designer(QtWidgets.QTableView):
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.setColumnHidden(0, True)
+
+    def getTemplatesCount(self):
+        return len(self.templates)
 
     def getSelectedRowId(self):
         index = self.currentIndex()
