@@ -1,16 +1,11 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
-class Designer(QtWidgets.QTableView):
+from CustomWidgets import CustomTable
+class Designer(CustomTable):
     def __init__(self, templates):
         QtWidgets.QTableView.__init__(self)
         self.templates = templates
         self.sti = QtGui.QStandardItemModel(parent=self)
         self.loadData(self.templates)
-        self.init()
-
-    def init(self):
-        self.setColumnStyles()
-        self.setSortingEnabled(True)
-        self.setObjectName("table")
 
     def loadData(self, templates):
         self.templates = templates
@@ -27,18 +22,6 @@ class Designer(QtWidgets.QTableView):
         self.sti.setRowCount(rowCnt)
         self.setModel(self.sti)
         self.setColumnStyles()
-
-    def setColumnStyles(self):
-        #self.setMinimumWidth(800)
-        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.setAlternatingRowColors(True)
-        #self.setColumnWidth(0, 200)
-        #self.setColumnWidth(1, 400)
-        header = self.horizontalHeader()
-        header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.setColumnHidden(0, True)
 
     def getTemplatesCount(self):
         return len(self.templates)

@@ -1,5 +1,5 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
-
+from CustomWidgets import EditBtn
 
 class PartsDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -7,9 +7,6 @@ class PartsDialog(QtWidgets.QDialog):
         self.parent = parent
         self.itemsCnt = 0
         self.init()
-
-    def __call__(self, *args, **kwargs):
-        pass
 
     def init(self):
         self.setWindowTitle("Конфігурація виробу")
@@ -26,19 +23,9 @@ class PartsDialog(QtWidgets.QDialog):
         self.addItemField()
 
         bbox = self.initButtonBox()
-
-        btnAdd = QtWidgets.QPushButton(QtGui.QIcon('img/actnew.png'), '')
-        btnAdd.setIconSize(QtCore.QSize(40, 40))
-        btnAdd.setObjectName("mng")
-        btnAdd.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
-        btnAdd.setStyleSheet("border: 0px solid red")
+        btnAdd = EditBtn("new", True)
         btnAdd.clicked.connect(self.addItemField)
-
-        btnRem = QtWidgets.QPushButton(QtGui.QIcon('img/actminus.png'), '')
-        btnRem.setIconSize(QtCore.QSize(40, 40))
-        btnRem.setObjectName("mng")
-        btnRem.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
-        btnRem.setStyleSheet("border: 0px solid red")
+        btnRem = EditBtn('minus', True)
         btnRem.clicked.connect(self.removeItemField)
 
         self.grid.addWidget(deviceName, 0, 0, 1, 1)
@@ -58,7 +45,7 @@ class PartsDialog(QtWidgets.QDialog):
 
 
     def initButtonBox(self):
-        """create widget with "Cancel" and "Save" buttons"""
+        """ create widget with "Cancel" and "Save" buttons """
         bbox = QtWidgets.QDialogButtonBox()
         bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok |
                                 QtWidgets.QDialogButtonBox.StandardButton.Cancel)
@@ -71,6 +58,7 @@ class PartsDialog(QtWidgets.QDialog):
         return bbox
 
     def addItemField(self):
+        """ + button click reaction """
         self.wgtNamesLst.append(QtWidgets.QLabel("Назва деталі №{}:".format(self.itemsCnt + 1)))
         self.wgtItemsLst.append(QtWidgets.QLineEdit())
         self.wgtCntsLst.append(QtWidgets.QSpinBox())
@@ -79,9 +67,9 @@ class PartsDialog(QtWidgets.QDialog):
         self.grid.addWidget(self.wgtNamesLst[self.itemsCnt - 1], self.itemsCnt, 0, 1, 1)
         self.grid.addWidget(self.wgtItemsLst[self.itemsCnt - 1], self.itemsCnt, 1, 1, 1)
         self.grid.addWidget(self.wgtCntsLst[self.itemsCnt - 1], self.itemsCnt, 2, 1, 1)
-        print(self.itemsCnt)
 
     def removeItemField(self):
+        """ - button click reaction """
         if (self.itemsCnt == 1):
             return
         self.itemsCnt -= 1
@@ -94,9 +82,9 @@ class PartsDialog(QtWidgets.QDialog):
         print(self.itemsCnt)
 
     def save(self):
+        """ Save button click reaction """
         items = []
         for i in range(0, self.itemsCnt):
             items.append([self.wgtItemsLst[i].text(), self.wgtCntsLst[i].value()])
-        print(items.__repr__())
         self.parent.newDesignSave(self.name.text(), items)
         self.accept()

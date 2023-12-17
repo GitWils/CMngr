@@ -20,7 +20,7 @@ class DBManager():
             self.query.clear()
         if 'contracts' not in self.con.tables():
             self.query.exec("create table contracts(id integer primary key autoincrement, " +
-                    "template_id integer secondary key, name text, count integer" +
+                    "template_id integer secondary key, name text, count integer, " +
                     "str_date text, dt datetime)")
             self.query.clear()
         if 'logs' not in self.con.tables():
@@ -80,6 +80,21 @@ class DBManager():
                 lst.append(arr)
                 self.query.next()
         return lst
+
+    def getContracts(self):
+        self.query.exec("select * from contracts order by id")
+        lst = []
+        if self.query.isActive():
+            self.query.first()
+            while self.query.isValid():
+                arr = [self.query.value('id'),
+                       self.query.value('name'),
+                       self.query.value('count'),
+                       self.query.value('str_date')]
+                lst.append(arr)
+                self.query.next()
+        return lst
+
 
     def delTemplate(self, id):
         self.query.exec("delete from templates where id=?")

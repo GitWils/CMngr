@@ -11,6 +11,7 @@ class EditBtn(QtWidgets.QPushButton):
         self.setIconSize(QtCore.QSize(40, 40))
         self.setObjectName("mng")
         self.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
+        self.setStyleSheet("border: 0px solid red")
 
     def setActive(self, active):
         if (active):
@@ -22,3 +23,21 @@ class EditBtn(QtWidgets.QPushButton):
 
     def fileName(self):
         return self.filename
+
+class CustomTable(QtWidgets.QTableView):
+    def __init__(self):
+        self.setColumnStyles()
+        self.setSortingEnabled(True)
+        self.setObjectName("table")
+
+    def setColumnStyles(self):
+        #self.setMinimumWidth(800)
+        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.setAlternatingRowColors(True)
+        #self.setColumnWidth(0, 200)
+        #self.setColumnWidth(1, 400)
+        header = self.horizontalHeader()
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.setColumnHidden(0, True)

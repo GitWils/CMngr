@@ -4,7 +4,8 @@ from PartsDesignerView import Designer
 from PartsDesignerDialog import PartsDialog
 from DBManager import DBManager
 from KitView import Kit
-from ContractView import Contract
+from ContractsView import Contract
+from ContractDialog import ContractDlg
 from LoggerView import Logger
 import sys
 
@@ -92,10 +93,11 @@ class Project(QtWidgets.QWidget):
         self.contractLt = QtWidgets.QVBoxLayout()
         self.contractLt.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.contractLt)
+        lst = self.db.getContracts()
         self.contracts = Contract()
         self.contractLbl = QtWidgets.QLabel("Немає активних договорів")
         self.contractLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        if True:
+        if len(lst):
             self.contractLt.addWidget(self.contracts)
         else:
             self.contractLt.addWidget(self.contractLbl)
@@ -106,6 +108,9 @@ class Project(QtWidgets.QWidget):
         self.newConBtn = EditBtn('new.png', True)
         self.editConBtn = EditBtn('edit.png', False)
         self.delConBtn = EditBtn('del.png', False)
+        self.newConBtn.clicked.connect(self.newContractClicked)
+        self.editConBtn.clicked.connect(self.editContractClicked)
+        self.delConBtn.clicked.connect(self.delContractClicked)
         btnLayout.addWidget(self.newConBtn)
         btnLayout.addWidget(self.editConBtn)
         btnLayout.addWidget(self.delConBtn)
@@ -124,7 +129,7 @@ class Project(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(layout)
         kit = Kit()
-        if(kit.getSize()):
+        if(True):
             layout.addWidget(kit)
         else:
             lbl = QtWidgets.QLabel("Пустий список")
@@ -168,8 +173,15 @@ class Project(QtWidgets.QWidget):
     def newDesignClicked(self):
         dlg = PartsDialog(self)
 
+    def newContractClicked(self):
+        print("clicked")
+        dlg = ContractDlg(self)
+
     def editDesignClicked(self):
         print(self.designer.currentIndex().row())
+        print("edit clicked")
+
+    def editContractClicked(self):
         print("edit clicked")
 
     def delDesignClicked(self):
@@ -182,6 +194,9 @@ class Project(QtWidgets.QWidget):
             self.designer.hide()
             self.desLbl.show()
             self.desLayout.replaceWidget(self.designer, self.desLbl)
+
+    def delContractClicked(self):
+        pass
 
     def __initLayout1(self):
         self.innerbox = QtWidgets.QHBoxLayout()
