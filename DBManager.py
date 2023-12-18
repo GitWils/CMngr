@@ -23,6 +23,14 @@ class DBManager():
                     "template_id integer secondary key, name text, count integer, " +
                     "str_date text, dt datetime)")
             self.query.clear()
+        if 'components' not in self.con.tables():
+            self.query.exec("create table components(id integer primary key autoincrement, " +
+                    "contract_id integer secondary key, name text, " +
+                    "str_date text, dt datetime)")
+        if 'acts' not in self.con.tables():
+            self.query.exec("create table acts(id integer primary key autoincrement, " +
+                    "contract_id integer secondary key, name text, " +
+                    "str_date text, dt datetime)")
         if 'logs' not in self.con.tables():
             self.query.exec("create table logs(id integer primary key autoincrement, " +
                     "message text, str_date text, dt datetime default current_timestamp)")
@@ -95,6 +103,18 @@ class DBManager():
                 self.query.next()
         return lst
 
+    def getComponents(self):
+        self.query.exec("select * from components order by id")
+        lst = []
+        if self.query.isActive():
+            self.query.first()
+            while self.query.isValid():
+                arr = [self.query.value('id'),
+                       self.query.value('name'),
+                       self.query.value('str_date')]
+                lst.append(arr)
+                self.query.next()
+        return lst
 
     def delTemplate(self, id):
         self.query.exec("delete from templates where id=?")

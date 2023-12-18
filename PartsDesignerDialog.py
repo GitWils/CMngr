@@ -86,5 +86,5 @@ class PartsDialog(QtWidgets.QDialog):
         items = []
         for i in range(0, self.itemsCnt):
             items.append([self.wgtItemsLst[i].text(), self.wgtCntsLst[i].value()])
-        self.parent.newDesignSave(self.name.text(), items)
+        self.parent.newDesignSave(self.name.text())
         self.accept()

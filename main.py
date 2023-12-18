@@ -3,7 +3,7 @@ from CustomWidgets import EditBtn
 from PartsDesignerView import Designer
 from PartsDesignerDialog import PartsDialog
 from DBManager import DBManager
-from KitView import Kit
+from ComponentsView import Components
 from ContractsView import Contract
 from ContractDialog import ContractDlg
 from LoggerView import Logger
@@ -60,13 +60,12 @@ class Project(QtWidgets.QWidget):
         lst = self.db.getTemplates()
         self.designer = Designer(lst)
         self.designer.clicked.connect(self.itemDesignClicked)
-        self.desLbl = QtWidgets.QLabel("Немає активних договорів")
+        self.desLbl = QtWidgets.QLabel("Список шаблонів пустий")
         self.desLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         if len(lst):
             self.desLayout.addWidget(self.designer)
         else:
             self.desLayout.addWidget(self.desLbl)
-
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
@@ -87,7 +86,7 @@ class Project(QtWidgets.QWidget):
         self.desLayout.setStretch(1, 1)
         return tab
 
-    def createContractTab(self):
+    def createContractsTab(self):
         tab = QtWidgets.QWidget()
         tab.setStyleSheet("border: 0px solid red")
         self.contractLt = QtWidgets.QVBoxLayout()
@@ -95,13 +94,12 @@ class Project(QtWidgets.QWidget):
         tab.setLayout(self.contractLt)
         lst = self.db.getContracts()
         self.contracts = Contract()
-        self.contractLbl = QtWidgets.QLabel("Немає активних договорів")
+        self.contractLbl = QtWidgets.QLabel("Список договорів пустий")
         self.contractLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         if len(lst):
             self.contractLt.addWidget(self.contracts)
         else:
             self.contractLt.addWidget(self.contractLbl)
-
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
@@ -122,38 +120,36 @@ class Project(QtWidgets.QWidget):
         self.contractLt.setStretch(1, 1)
         return tab
 
-    def createKitTab(self):
+    def createComponentsTab(self):
         tab = QtWidgets.QWidget()
         tab.setStyleSheet("border: 0px solid red")
-        layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        tab.setLayout(layout)
-        kit = Kit()
-        if(True):
-            layout.addWidget(kit)
+        self.componentsLt = QtWidgets.QVBoxLayout()
+        self.componentsLt.setContentsMargins(0, 0, 0, 0)
+        tab.setLayout(self.componentsLt)
+        lst = self.db.getComponents()
+        self.components = Components()
+        self.componentsLbl = QtWidgets.QLabel("Список комплектуючих пустий")
+        self.componentsLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        if len(lst):
+            self.componentsLt.addWidget(self.components)
         else:
-            lbl = QtWidgets.QLabel("Пустий список")
-            lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-            layout.addWidget(lbl)
-
+            self.componentsLt.addWidget(self.componentsLbl)
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
-        new_btn = EditBtn('new.png', True)
-        edit_btn = EditBtn('edit.png', False)
-        del_btn = EditBtn('del.png', False)
-        btnLayout.addWidget(new_btn)
-        btnLayout.addWidget(edit_btn)
-        btnLayout.addWidget(del_btn)
+        self.newCompBtn = EditBtn('new.png', True)
+        self.editCompBtn = EditBtn('edit.png', False)
+        self.delCompBtn = EditBtn('del.png', False)
+        btnLayout.addWidget(self.newCompBtn)
+        btnLayout.addWidget(self.editCompBtn)
+        btnLayout.addWidget(self.delCompBtn)
         btns.setLayout(btnLayout)
         btnLayout.addStretch(40)
         btnLayout.setSpacing(40)
-
-        layout.addWidget(btns)
-        layout.setStretch(0, 7)
-        layout.setStretch(1, 1)
+        self.componentsLt.addWidget(btns)
+        self.componentsLt.setStretch(0, 8)
+        self.componentsLt.setStretch(1, 1)
         return tab
-
 
     def itemDesignClicked(self):
         self.editDesBtn.setActive(True)
@@ -170,6 +166,9 @@ class Project(QtWidgets.QWidget):
             self.desLbl.hide()
             self.desLayout.replaceWidget(self.desLbl, self.designer)
 
+    def newContractSave(self, name):
+        print(name)
+
     def newDesignClicked(self):
         dlg = PartsDialog(self)
 
@@ -177,11 +176,17 @@ class Project(QtWidgets.QWidget):
         print("clicked")
         dlg = ContractDlg(self)
 
+    def newComponentsClicked(self):
+        print("components clicked")
+
     def editDesignClicked(self):
         print(self.designer.currentIndex().row())
         print("edit clicked")
 
     def editContractClicked(self):
+        print("edit clicked")
+
+    def editComponentsClicked(self):
         print("edit clicked")
 
     def delDesignClicked(self):
@@ -206,8 +211,8 @@ class Project(QtWidgets.QWidget):
 
         tab = QtWidgets.QTabWidget()
         tab.addTab(self.createDesignerTab(), "Конструктор виробів")
-        tab.addTab(self.createContractTab(), "Договори")
-        tab.addTab(self.createKitTab(), "Комплектуючі")
+        tab.addTab(self.createContractsTab(), "Договори")
+        tab.addTab(self.createComponentsTab(), "Комплектуючі")
         mainArea.addWidget(tab)
         self.innerbox.addLayout(mainArea,  QtCore.Qt.AlignmentFlag.AlignCenter)
 
