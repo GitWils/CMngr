@@ -10,6 +10,7 @@ class ContractDlg(QtWidgets.QDialog):
 
     def init(self):
         self.setWindowTitle("Новий договір")
+        self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(500, 300)
 
         self.grid = QtWidgets.QGridLayout()
@@ -18,6 +19,8 @@ class ContractDlg(QtWidgets.QDialog):
 
         contractName = QtWidgets.QLabel("Назва договору:")
         self.name = QtWidgets.QLineEdit()
+        contractShortName = QtWidgets.QLabel("Скорочена назва (№ХХХ):")
+        self.shortName = QtWidgets.QLineEdit()
         contractCountLbl = QtWidgets.QLabel("Кількість виробів:")
         countSpin = QtWidgets.QSpinBox()
         countSpin.setValue(self.itemsCnt)
@@ -27,11 +30,13 @@ class ContractDlg(QtWidgets.QDialog):
 
         self.grid.addWidget(contractName, 0, 0, 1, 1)
         self.grid.addWidget(self.name, 0, 1, 1, 1)
-        self.grid.addWidget(contractCountLbl, 1, 0, 1, 1)
-        self.grid.addWidget(countSpin, 1, 1, 1, 1)
-        self.grid.addWidget(contractNoteLbl, 2, 0, 1, 1)
-        self.grid.addWidget(contractNote, 2, 1, 1, 1)
-        self.grid.addWidget(bbox, 3, 0, 1, 3)
+        self.grid.addWidget(contractShortName, 1, 0, 1, 1)
+        self.grid.addWidget(self.shortName, 1, 1, 1, 1)
+        self.grid.addWidget(contractCountLbl, 2, 0, 1, 1)
+        self.grid.addWidget(countSpin, 2, 1, 1, 1)
+        self.grid.addWidget(contractNoteLbl, 3, 0, 1, 1)
+        self.grid.addWidget(contractNote, 3, 1, 1, 1)
+        self.grid.addWidget(bbox, 4, 0, 1, 3)
 
         self.setLayout(self.grid)
         self.show()

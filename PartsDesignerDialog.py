@@ -4,12 +4,14 @@ from CustomWidgets import EditBtn
 class PartsDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(PartsDialog, self).__init__(parent)
+        self.setParent(parent)
         self.parent = parent
         self.itemsCnt = 0
         self.init()
 
     def init(self):
         self.setWindowTitle("Конфігурація виробу")
+        self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(500, 300)
 
         self.grid = QtWidgets.QGridLayout()
@@ -86,5 +88,5 @@ class PartsDialog(QtWidgets.QDialog):
         items = []
         for i in range(0, self.itemsCnt):
             items.append([self.wgtItemsLst[i].text(), self.wgtCntsLst[i].value()])
-        self.parent.newDesignSave(self.name.text())
+        self.parent.newDesignSave(self.name.text(), items)
         self.accept()

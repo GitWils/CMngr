@@ -4,6 +4,7 @@ from PartsDesignerView import Designer
 from PartsDesignerDialog import PartsDialog
 from DBManager import DBManager
 from ComponentsView import Components
+from ComponentsDialog import ComponentsDlg
 from ContractsView import Contract
 from ContractDialog import ContractDlg
 from LoggerView import Logger
@@ -140,6 +141,9 @@ class Project(QtWidgets.QWidget):
         self.newCompBtn = EditBtn('new.png', True)
         self.editCompBtn = EditBtn('edit.png', False)
         self.delCompBtn = EditBtn('del.png', False)
+        self.newCompBtn.clicked.connect(self.newComponentsClicked)
+        self.editCompBtn.clicked.connect(self.editComponentsClicked)
+        self.delCompBtn.clicked.connect(self.delComponentsClicked)
         btnLayout.addWidget(self.newCompBtn)
         btnLayout.addWidget(self.editCompBtn)
         btnLayout.addWidget(self.delCompBtn)
@@ -178,6 +182,7 @@ class Project(QtWidgets.QWidget):
 
     def newComponentsClicked(self):
         print("components clicked")
+        dlg = ComponentsDlg(self)
 
     def editDesignClicked(self):
         print(self.designer.currentIndex().row())
@@ -201,6 +206,9 @@ class Project(QtWidgets.QWidget):
             self.desLayout.replaceWidget(self.designer, self.desLbl)
 
     def delContractClicked(self):
+        pass
+
+    def delComponentsClicked(self):
         pass
 
     def __initLayout1(self):
