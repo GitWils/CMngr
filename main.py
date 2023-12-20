@@ -23,7 +23,6 @@ class Project(QtWidgets.QWidget):
         self.centerWindow()
         self.initMenu()
         self.setWindowTitle('Облік договорів, комплектуючих')
-        #self.grabKeyboard()
         #self.setObjectName('main')
         self.show()
 
@@ -66,10 +65,7 @@ class Project(QtWidgets.QWidget):
         self.designer.clicked.connect(self.itemDesignClicked)
         self.desLbl = QtWidgets.QLabel("Список шаблонів пустий")
         self.desLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        if len(lst):
-            self.desLayout.addWidget(self.designer)
-        else:
-            self.desLayout.addWidget(self.desLbl)
+        self.desLayout.addWidget(self.designer) if len(lst) else self.desLayout.addWidget(self.desLbl)
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
@@ -187,8 +183,9 @@ class Project(QtWidgets.QWidget):
         dlg = ComponentsDlg(self)
 
     def editDesignClicked(self):
-        print(self.designer.currentIndex().row())
-        print("edit clicked")
+        templateId = self.designer.getSelectedRowId()
+        template = self.db.getTemplateById(templateId)
+        dlg = PartsDialog(self, template['name'], self.db.getItemsByTemplateId(templateId))
 
     def editContractClicked(self):
         print("edit clicked")
@@ -197,7 +194,9 @@ class Project(QtWidgets.QWidget):
         print("edit clicked")
 
     def delDesignClicked(self):
-        self.db.delTemplate(self.designer.getSelectedRowId())
+        templateId = self.designer.getSelectedRowId()
+        self.db.delTemplate(templateId)
+        self.db.delItemsByTemplateId(templateId)
         self.db.saveLogMsg('видалено шаблон <span style="text-decoration: underline">{}</span>'
                            .format(self.designer.getSelectedRowName()))
         self.designer.loadData(self.db.getTemplates())

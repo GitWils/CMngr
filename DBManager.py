@@ -44,12 +44,10 @@ class DBManager():
         self.query.exec()
         templateId = self.query.lastInsertId()
         self.query.clear()
-
         for item in items:
             self.query.prepare("insert into items_template values(null, :template_id, :name, :count, :str_date, :dt)")
             self.query.bindValue(':template_id', templateId)
             self.query.bindValue(':name', item[0])
-            self.query.bindValue(':short_name')
             self.query.bindValue(':count', item[1])
             self.query.bindValue(':str_date', date['s_date'])
             self.query.bindValue(':dt', date['datetime'])
@@ -90,7 +88,34 @@ class DBManager():
                        self.query.value('str_date')]
                 lst.append(arr)
                 self.query.next()
+        self.query.clear()
         return lst
+
+    def getTemplateById(self, id):
+        self.query.exec("select * from templates where id={} order by id".format(id))
+        item = []
+        if self.query.isActive():
+            self.query.first()
+            if self.query.isValid():
+                item = dict({'id': self.query.value('id'),
+                            'name': self.query.value('name'),
+                            'str_date': self.query.value('str_date')})
+        self.query.clear()
+        return item
+
+    def getItemsByTemplateId(self, templateId):
+        self.query.exec("select * from items_template where template_id={} order by id".format(templateId))
+        items = []
+        if self.query.isActive():
+            self.query.first()
+            while self.query.isValid():
+                res = dict({'id': self.query.value('id'),
+                            'name': self.query.value('name'),
+                            'count': self.query.value('count')})
+                items.append(res)
+                self.query.next()
+        self.query.clear()
+        return items
 
     def getContracts(self):
         self.query.exec("select * from contracts order by id")
@@ -104,6 +129,7 @@ class DBManager():
                        self.query.value('str_date')]
                 lst.append(arr)
                 self.query.next()
+        self.query.clear()
         return lst
 
     def getComponents(self):
@@ -117,12 +143,15 @@ class DBManager():
                        self.query.value('str_date')]
                 lst.append(arr)
                 self.query.next()
+        self.query.clear()
         return lst
 
     def delTemplate(self, id):
-        self.query.exec("delete from templates where id=?")
-        self.query.addBindValue(id)
-        self.query.exec()
+        self.query.exec("delete from templates where id={}".format(id))
+        self.query.clear()
+
+    def delItemsByTemplateId(self, templateId):
+        self.query.exec("delete from items_template where template_id={}".format(templateId))
         self.query.clear()
 
     def getLogs(self):

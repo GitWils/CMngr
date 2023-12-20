@@ -16,6 +16,7 @@ class ComponentsDlg(QtWidgets.QDialog):
         self.grid = QtWidgets.QGridLayout()
         self.grid.setContentsMargins(40, 40, 40, 40)
         self.grid.setSpacing(25)
+        self.setTaborders()
         self.show()
 
     def setTaborders(self):

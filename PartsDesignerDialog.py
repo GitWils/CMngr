@@ -2,10 +2,13 @@ from PyQt6 import QtGui, QtWidgets, QtCore
 from CustomWidgets import EditBtn
 
 class PartsDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, name='',items=[]):
         super(PartsDialog, self).__init__(parent)
         self.setParent(parent)
         self.parent = parent
+        self.editMode = True if len(items) else False
+        self.templateName = name
+        self.items = items
         self.itemsCnt = 0
         self.init()
 
@@ -44,8 +47,20 @@ class PartsDialog(QtWidgets.QDialog):
 
         self.setLayout(self.grid)
         self.setTaborders()
+        if self.editMode:
+            self.fillValues()
         self.show()
 
+    def fillValues(self):
+        i = 0
+        self.name.setText(self.templateName)
+        for item in self.items:
+            if i > 0:
+                self.addItemField()
+            self.wgtItemsLst[i].setText(item['name'])
+            self.wgtCntsLst[i].setValue(item['count'])
+            self.wgtItemsLst[i].setReadOnly(True)
+            i += 1
 
     def initButtonBox(self):
         """ create widget with "Cancel" and "Save" buttons """
@@ -70,6 +85,7 @@ class PartsDialog(QtWidgets.QDialog):
         self.grid.addWidget(self.wgtNamesLst[self.itemsCnt - 1], self.itemsCnt, 0, 1, 1)
         self.grid.addWidget(self.wgtItemsLst[self.itemsCnt - 1], self.itemsCnt, 1, 1, 1)
         self.grid.addWidget(self.wgtCntsLst[self.itemsCnt - 1], self.itemsCnt, 2, 1, 1)
+        self.wgtItemsLst[self.itemsCnt - 1].setFocus()
 
     def removeItemField(self):
         """ - button click reaction """
@@ -82,7 +98,6 @@ class PartsDialog(QtWidgets.QDialog):
         self.wgtNamesLst.pop()
         self.wgtItemsLst.pop()
         self.wgtCntsLst.pop()
-        print(self.itemsCnt)
 
     def save(self):
         """ Save button click reaction """
