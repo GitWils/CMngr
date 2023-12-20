@@ -23,6 +23,7 @@ class Project(QtWidgets.QWidget):
         self.centerWindow()
         self.initMenu()
         self.setWindowTitle('Облік договорів, комплектуючих')
+        #self.grabKeyboard()
         #self.setObjectName('main')
         self.show()
 
@@ -31,6 +32,8 @@ class Project(QtWidgets.QWidget):
             self.setWindowOpacity(0.8)
         elif e.type() == QtCore.QEvent.Type.WindowActivate:
             self.setWindowOpacity(1)
+        elif e.type() == QtCore.QEvent.Type.KeyPress and e.key() == QtCore.Qt.Key.Key_Escape:
+            self.close()
         return QtWidgets.QWidget.event(self, e)
 
     def initMenu(self):
@@ -170,15 +173,14 @@ class Project(QtWidgets.QWidget):
             self.desLbl.hide()
             self.desLayout.replaceWidget(self.desLbl, self.designer)
 
-    def newContractSave(self, name):
-        print(name)
+    def newContractSave(self, contract):
+        print(contract.__repr__())
 
     def newDesignClicked(self):
         dlg = PartsDialog(self)
 
     def newContractClicked(self):
-        print("clicked")
-        dlg = ContractDlg(self)
+        dlg = ContractDlg(self, self.db.getTemplates())
 
     def newComponentsClicked(self):
         print("components clicked")

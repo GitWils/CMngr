@@ -43,6 +43,7 @@ class PartsDialog(QtWidgets.QDialog):
         self.grid.addWidget(bbox, 101, 0, 1, 3)
 
         self.setLayout(self.grid)
+        self.setTaborders()
         self.show()
 
 
@@ -90,3 +91,13 @@ class PartsDialog(QtWidgets.QDialog):
             items.append([self.wgtItemsLst[i].text(), self.wgtCntsLst[i].value()])
         self.parent.newDesignSave(self.name.text(), items)
         self.accept()
+
+    def setTaborders(self):
+        self.name.setFocus()
+        QtWidgets.QWidget.setTabOrder(self.name, self.wgtItemsLst[0])
+        QtWidgets.QWidget.setTabOrder(self.wgtItemsLst[0], self.wgtCntsLst[0])
+
+    def event(self, e):
+        if e.type() == QtCore.QEvent.Type.KeyPress and e.key() == QtCore.Qt.Key.Key_Escape:
+            self.close()
+        return QtWidgets.QWidget.event(self, e)

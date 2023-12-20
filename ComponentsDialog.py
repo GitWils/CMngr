@@ -17,3 +17,16 @@ class ComponentsDlg(QtWidgets.QDialog):
         self.grid.setContentsMargins(40, 40, 40, 40)
         self.grid.setSpacing(25)
         self.show()
+
+    def setTaborders(self):
+        pass
+        # self.name.setFocus()
+        # QtWidgets.QWidget.setTabOrder(self.name, self.shortName)
+        # QtWidgets.QWidget.setTabOrder(self.shortName, self.countList)
+        # QtWidgets.QWidget.setTabOrder(self.countList, self.countSpin)
+        # QtWidgets.QWidget.setTabOrder(self.countSpin, self.contractNote)
+
+    def event(self, e):
+        if e.type() == QtCore.QEvent.Type.KeyPress and e.key() == QtCore.Qt.Key.Key_Escape:
+            self.close()
+        return QtWidgets.QWidget.event(self, e)

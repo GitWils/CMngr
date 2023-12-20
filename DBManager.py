@@ -2,7 +2,6 @@ import sys
 import datetime
 from PyQt6 import QtWidgets, QtSql
 
-
 class DBManager():
     def __init__(self):
         self.con = QtSql.QSqlDatabase.addDatabase('QSQLITE')
@@ -20,7 +19,7 @@ class DBManager():
             self.query.clear()
         if 'contracts' not in self.con.tables():
             self.query.exec("create table contracts(id integer primary key autoincrement, " +
-                    "template_id integer secondary key, name text, count integer, " +
+                    "template_id integer secondary key, name text, short_name text, count integer, note text, " +
                     "str_date text, dt datetime)")
             self.query.clear()
         if 'components' not in self.con.tables():
@@ -50,18 +49,22 @@ class DBManager():
             self.query.prepare("insert into items_template values(null, :template_id, :name, :count, :str_date, :dt)")
             self.query.bindValue(':template_id', templateId)
             self.query.bindValue(':name', item[0])
+            self.query.bindValue(':short_name')
             self.query.bindValue(':count', item[1])
             self.query.bindValue(':str_date', date['s_date'])
             self.query.bindValue(':dt', date['datetime'])
             self.query.exec()
             self.query.clear()
 
-    def saveContract(self, name, count, templateId):
+    def saveContract(self, contract):
         date = self.getDateTime()
-        self.query.prepare("insert into contracts values(null, template_id, :name, :count, :str_date, :dt)")
-        self.query.bindValue(':template_id', templateId)
-        self.query.bindValue(':name', name)
-        self.query.bindValue(':count', count)
+        self.query.prepare("insert into contracts values(" +
+                           "null, template_id, :name, :short_name, :count, :note, :str_date, :dt)")
+        self.query.bindValue(':template_id', contract['templateId'])
+        self.query.bindValue(':name', contract['name'])
+        self.query.bindValue(':short_name', contract['short_name'])
+        self.query.bindValue(':count', contract['count'])
+        self.query.bindValue(':note ', contract['note'])
         self.query.bindValue(':str_date', date['s_date'])
         self.query.bindValue(':dt', date['datetime'])
         self.query.exec()
