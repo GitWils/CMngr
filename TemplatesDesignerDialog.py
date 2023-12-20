@@ -1,9 +1,9 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 from CustomWidgets import EditBtn
 
-class PartsDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None, name='',items=[]):
-        super(PartsDialog, self).__init__(parent)
+class TemplateDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None, name='', items=[]):
+        super(TemplateDialog, self).__init__(parent)
         self.setParent(parent)
         self.parent = parent
         self.editMode = True if len(items) else False
@@ -15,7 +15,7 @@ class PartsDialog(QtWidgets.QDialog):
     def init(self):
         self.setWindowTitle("Конфігурація виробу")
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
-        self.resize(500, 300)
+        self.resize(550, 300)
 
         self.grid = QtWidgets.QGridLayout()
         self.grid.setContentsMargins(40, 40, 40, 40)
@@ -25,6 +25,7 @@ class PartsDialog(QtWidgets.QDialog):
         self.wgtNamesLst = []
         self.wgtItemsLst = []
         self.wgtCntsLst = []
+        self.wgtThingsLst = []
         self.addItemField()
 
         bbox = self.initButtonBox()
@@ -42,13 +43,14 @@ class PartsDialog(QtWidgets.QDialog):
         hwidget = QtWidgets.QWidget()
         hwidget.setLayout(hbox)
         hwidget.resize(10, 10)
-        self.grid.addWidget(hwidget, 100, 0, 1, 3)
-        self.grid.addWidget(bbox, 101, 0, 1, 3)
-
+        self.grid.addWidget(hwidget, 100, 0, 1, 4)
+        self.grid.addWidget(bbox, 101, 0, 1, 4)
+        self.grid.setAlignment(bbox, QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.grid)
         self.setTaborders()
         if self.editMode:
             self.fillValues()
+            btnRem.setActive(False)
         self.show()
 
     def fillValues(self):
@@ -80,11 +82,14 @@ class PartsDialog(QtWidgets.QDialog):
         self.wgtNamesLst.append(QtWidgets.QLabel("Назва деталі №{}:".format(self.itemsCnt + 1)))
         self.wgtItemsLst.append(QtWidgets.QLineEdit())
         self.wgtCntsLst.append(QtWidgets.QSpinBox())
+        self.wgtThingsLst.append(QtWidgets.QLabel("кількість:"))
         self.wgtCntsLst[self.itemsCnt].setValue(1)
         self.itemsCnt += 1
         self.grid.addWidget(self.wgtNamesLst[self.itemsCnt - 1], self.itemsCnt, 0, 1, 1)
         self.grid.addWidget(self.wgtItemsLst[self.itemsCnt - 1], self.itemsCnt, 1, 1, 1)
-        self.grid.addWidget(self.wgtCntsLst[self.itemsCnt - 1], self.itemsCnt, 2, 1, 1)
+        self.grid.addWidget(self.wgtThingsLst[self.itemsCnt - 1], self.itemsCnt, 2, 1, 1)
+        self.grid.addWidget(self.wgtCntsLst[self.itemsCnt - 1], self.itemsCnt, 3, 1, 1)
+
         self.wgtItemsLst[self.itemsCnt - 1].setFocus()
 
     def removeItemField(self):
@@ -104,7 +109,10 @@ class PartsDialog(QtWidgets.QDialog):
         items = []
         for i in range(0, self.itemsCnt):
             items.append([self.wgtItemsLst[i].text(), self.wgtCntsLst[i].value()])
-        self.parent.newDesignSave(self.name.text(), items)
+        if self.editMode:
+            self.parent.updateTemplate(self.name.text(), items)
+        else:
+            self.parent.newTemplateSave(self.name.text(), items)
         self.accept()
 
     def setTaborders(self):

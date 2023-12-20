@@ -1,8 +1,8 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 from CustomWidgets import EditBtn
-from PartsDesignerView import Designer
-from PartsDesignerDialog import PartsDialog
 from DBManager import DBManager
+from TempatesDesignerView import Designer
+from TemplatesDesignerDialog import TemplateDialog
 from ComponentsView import Components
 from ComponentsDialog import ComponentsDlg
 from ContractsView import Contract
@@ -158,9 +158,9 @@ class Project(QtWidgets.QWidget):
         self.editDesBtn.setActive(True)
         self.delDesBtn.setActive(True)
 
-    def newDesignSave(self, name, items):
-        msg = 'створено новий шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
+    def newTemplateSave(self, name, items):
         self.db.saveTemplate(name, items)
+        msg = 'створено новий шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
         self.db.saveLogMsg(msg)
         self.designer.loadData(self.db.getTemplates())
         self.logArea.showContent(self.db.getLogs())
@@ -169,11 +169,19 @@ class Project(QtWidgets.QWidget):
             self.desLbl.hide()
             self.desLayout.replaceWidget(self.desLbl, self.designer)
 
+    def updateTemplate(self, name, items):
+        """ edit template mode save edit button clicked """
+        self.db.updateItemsByTemplateId(self.designer.getSelectedRowId(), items)
+        msg = 'оновлено шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
+        self.db.saveLogMsg(msg)
+        self.designer.loadData(self.db.getTemplates())
+        self.logArea.showContent(self.db.getLogs())
+
     def newContractSave(self, contract):
         print(contract.__repr__())
 
     def newDesignClicked(self):
-        dlg = PartsDialog(self)
+        dlg = TemplateDialog(self)
 
     def newContractClicked(self):
         dlg = ContractDlg(self, self.db.getTemplates())
@@ -185,7 +193,7 @@ class Project(QtWidgets.QWidget):
     def editDesignClicked(self):
         templateId = self.designer.getSelectedRowId()
         template = self.db.getTemplateById(templateId)
-        dlg = PartsDialog(self, template['name'], self.db.getItemsByTemplateId(templateId))
+        dlg = TemplateDialog(self, template['name'], self.db.getItemsByTemplateId(templateId))
 
     def editContractClicked(self):
         print("edit clicked")

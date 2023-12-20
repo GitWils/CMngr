@@ -48,9 +48,13 @@ QLabel {
 
 /********************************* TextEdit UI settings ***************************************/
 QTextEdit, QLineEdit {
-    background-color: "#C9D6DF";
+    background-color: "#F0F5F9";
     color: "#1E2022";
     font-size: 16px;
+}
+
+QLineEdit[readOnly="true"] {
+    background-color: "#b9c6cf";
 }
 /********************************* TextEdit UI settings ***************************************/
 
@@ -149,4 +153,8 @@ QTabWidget::item {
 QSpinBox {
     background-color: #F0F5F9;
     color: #1E2022;
+}
+
+QDialogButtonBox {
+    border: 1px solid red;
 }

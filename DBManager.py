@@ -54,6 +54,10 @@ class DBManager():
             self.query.exec()
             self.query.clear()
 
+    def updateItemsByTemplateId(self, templateId, items):
+        print("id = {}".format(templateId))
+        print(items.__repr__())
+
     def saveContract(self, contract):
         date = self.getDateTime()
         self.query.prepare("insert into contracts values(" +
