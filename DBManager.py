@@ -60,18 +60,17 @@ class DBManager():
 
     def saveContract(self, contract):
         print(contract.__repr__())
-        pass
         date = self.getDateTime()
-        self.query.prepare("insert into contracts values(" +
-                           "null, template_id, :name, :short_name, :count, :note, :str_date, :dt)")
-        self.query.bindValue(':template_id', contract['templateId'])
-        self.query.bindValue(':name', contract['name'])
-        self.query.bindValue(':short_name', contract['short_name'])
-        self.query.bindValue(':count', contract['count'])
-        self.query.bindValue(':note ', contract['note'])
-        self.query.bindValue(':str_date', date['s_date'])
-        self.query.bindValue(':dt', date['datetime'])
-        self.query.exec()
+        # self.query.prepare("insert into contracts values(" +
+        #                    "null, template_id, :name, :short_name, :count, :note, :str_date, :dt)")
+        # self.query.bindValue(':template_id', contract['templateId'])
+        # self.query.bindValue(':name', contract['name'])
+        # self.query.bindValue(':short_name', contract['short_name'])
+        # self.query.bindValue(':count', contract['count'])
+        # self.query.bindValue(':note ', contract['note'])
+        # self.query.bindValue(':str_date', date['s_date'])
+        # self.query.bindValue(':dt', date['datetime'])
+        # self.query.exec()
         self.query.clear()
 
     def saveLogMsg(self, msg):

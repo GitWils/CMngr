@@ -160,9 +160,9 @@ class Project(QtWidgets.QWidget):
 
     def newTemplateSave(self, name, items):
         self.db.saveTemplate(name, items)
+        self.designer.loadData(self.db.getTemplates())
         msg = 'створено новий шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
         self.db.saveLogMsg(msg)
-        self.designer.loadData(self.db.getTemplates())
         self.logArea.showContent(self.db.getLogs())
         if self.designer.getTemplatesCount() == 1:
             self.designer.show()
@@ -172,13 +172,19 @@ class Project(QtWidgets.QWidget):
     def updateTemplate(self, name, items):
         """ edit template mode save edit button clicked """
         self.db.updateItemsByTemplateId(self.designer.getSelectedRowId(), items)
+        self.designer.loadData(self.db.getTemplates())
         msg = 'оновлено шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
         self.db.saveLogMsg(msg)
-        self.designer.loadData(self.db.getTemplates())
         self.logArea.showContent(self.db.getLogs())
 
     def newContractSave(self, contract):
         self.db.saveContract(contract)
+        msg = (('створено договір <span style="text-decoration: underline">{}</span> на вироби ' +
+               '<span style="text-decoration: underline">{}</span>').
+               format(contract['short_name'], contract['template_name']))
+        self.db.saveLogMsg(msg)
+        self.logArea.showContent(self.db.getLogs())
+
 
     def newDesignClicked(self):
         dlg = TemplateDialog(self)
@@ -205,9 +211,9 @@ class Project(QtWidgets.QWidget):
         templateId = self.designer.getSelectedRowId()
         self.db.delTemplate(templateId)
         self.db.delItemsByTemplateId(templateId)
+        self.designer.loadData(self.db.getTemplates())
         self.db.saveLogMsg('видалено шаблон <span style="text-decoration: underline">{}</span>'
                            .format(self.designer.getSelectedRowName()))
-        self.designer.loadData(self.db.getTemplates())
         self.logArea.showContent(self.db.getLogs())
         if self.designer.getTemplatesCount() == 0:
             self.designer.hide()
