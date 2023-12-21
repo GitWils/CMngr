@@ -24,14 +24,6 @@ class ContractDlg(QtWidgets.QDialog):
         self.shortName = QtWidgets.QLineEdit()
         self.additionalWgts = []
         self.addItemField()
-
-        # contractCountLbl = QtWidgets.QLabel("Кількість виробів:")
-        # self.countList = QtWidgets.QComboBox()
-        # for template in self.templates:
-        #     self.countList.addItem(template[1], template[0])
-        # self.countSpin = QtWidgets.QSpinBox()
-        # self.countSpin.setMaximum(1000000)
-        # self.countSpin.setValue(self.itemsCnt)
         self.btnAdd = EditBtn("new", True)
         self.btnRem = EditBtn('minus', True)
 
@@ -43,12 +35,9 @@ class ContractDlg(QtWidgets.QDialog):
         self.grid.addWidget(self.name, 0, 1, 1, 2)
         self.grid.addWidget(contractShortName, 1, 0, 1, 1)
         self.grid.addWidget(self.shortName, 1, 1, 1, 2)
-        # self.grid.addWidget(contractCountLbl, 2, 0, 1, 1)
-        # self.grid.addWidget(self.countList, 2, 1, 1, 1)
-        # self.grid.addWidget(self.countSpin, 2, 2, 1, 1)
         self.grid.addWidget(self.plusMinusMenu(), 100, 0, 1, 4)
         self.grid.addWidget(contractNoteLbl, 101, 0, 1, 1)
-        self.grid.addWidget(self.contractNote, 101, 1, 1, 2)
+        self.grid.addWidget(self.contractNote, 101, 1, 1, 3)
         self.grid.addWidget(bbox, 102, 0, 1, 3)
 
         self.setLayout(self.grid)
@@ -82,14 +71,6 @@ class ContractDlg(QtWidgets.QDialog):
 
     def addItemField(self):
         """ + button click reaction """
-        contractCountLbl = QtWidgets.QLabel("Кількість виробів:")
-        self.countList = QtWidgets.QComboBox()
-        for template in self.templates:
-            self.countList.addItem(template[1], template[0])
-        self.countSpin = QtWidgets.QSpinBox()
-        self.countSpin.setMaximum(1000000)
-        self.countSpin.setValue(self.itemsCnt)
-
         self.additionalWgts.append({
             'lbl_name': QtWidgets.QLabel('Назва деталі №{}:'.format(self.itemsCnt + 1)),
             'cbox_name': QtWidgets.QComboBox(),
@@ -104,6 +85,9 @@ class ContractDlg(QtWidgets.QDialog):
         self.grid.addWidget(self.additionalWgts[self.itemsCnt]['cbox_name'], self.itemsCnt + 2, 1, 1, 1)
         self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_cnt'], self.itemsCnt + 2, 2, 1, 1)
         self.grid.addWidget(self.additionalWgts[self.itemsCnt]['spin_cnt'], self.itemsCnt + 2, 3, 1, 1)
+        self.additionalWgts[self.itemsCnt]['cbox_name'].setFocus()
+        QtWidgets.QWidget.setTabOrder(self.additionalWgts[self.itemsCnt]['cbox_name'],
+                                      self.additionalWgts[self.itemsCnt]['spin_cnt'])
         self.itemsCnt += 1
 
     def removeItemField(self):
@@ -121,17 +105,18 @@ class ContractDlg(QtWidgets.QDialog):
         """ Save button click reaction """
         contract = dict({'name': self.name.text(),
                          'short_name': self.shortName.text(),
-                         'count': self.countSpin.value(),
+                         #'count': self.countSpin.value(),
+                         'item': [],
                          'note': self.contractNote})
+        #contract['item'] = []
+        for i in range(0, self.itemsCnt):
+            contract['item'].append(i)
         self.parent.newContractSave(contract)
         self.accept()
 
     def setTaborders(self):
         self.name.setFocus()
         QtWidgets.QWidget.setTabOrder(self.name, self.shortName)
-        QtWidgets.QWidget.setTabOrder(self.shortName, self.countList)
-        QtWidgets.QWidget.setTabOrder(self.countList, self.countSpin)
-        QtWidgets.QWidget.setTabOrder(self.countSpin, self.contractNote)
 
     def event(self, e):
         if e.type() == QtCore.QEvent.Type.KeyPress and e.key() == QtCore.Qt.Key.Key_Escape:

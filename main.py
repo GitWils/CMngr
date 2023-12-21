@@ -178,7 +178,7 @@ class Project(QtWidgets.QWidget):
         self.logArea.showContent(self.db.getLogs())
 
     def newContractSave(self, contract):
-        print(contract.__repr__())
+        self.db.saveContract(contract)
 
     def newDesignClicked(self):
         dlg = TemplateDialog(self)

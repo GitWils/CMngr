@@ -59,6 +59,8 @@ class DBManager():
         print(items.__repr__())
 
     def saveContract(self, contract):
+        print(contract.__repr__())
+        pass
         date = self.getDateTime()
         self.query.prepare("insert into contracts values(" +
                            "null, template_id, :name, :short_name, :count, :note, :str_date, :dt)")
