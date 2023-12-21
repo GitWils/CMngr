@@ -158,3 +158,27 @@ QSpinBox {
 QDialogButtonBox {
     border: 1px solid red;
 }
+
+QComboBox {
+    background-color: #F0F5F9;
+    color: #1E2022;
+}
+
+QComboBox::drop-down {
+    background-color: #C9D6DF;
+    color: red;
+}
+
+QComboBox::down-arrow {
+    /*image: url(/usr/share/icons/crystalsvg/16x16/actions/1downarrow.png);*/
+}
+
+QComboBox:on {
+    background-color: #F0F5F9;
+}
+
+QComboBox QAbstractItemView {
+    selection-background-color: red;
+    background-color: #F0F5F9;
+    color: #1E2022;
+}

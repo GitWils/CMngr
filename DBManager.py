@@ -10,12 +10,12 @@ class DBManager():
         self.query = QtSql.QSqlQuery()
         if 'templates' not in self.con.tables():
             self.query.exec("create table templates(id integer primary key autoincrement, " +
-                    "name text,  str_date text, dt datetime)")
+                    "name text, editable bool, str_date text, dt datetime)")
             self.query.clear()
         if 'items_template' not in self.con.tables():
             self.query.exec("create table items_template(id integer primary key autoincrement, " +
                     "template_id integer secondary key, name text, count integer, " +
-                    "str_date text, dt datetime)")
+                    "editable bool, str_date text, dt datetime)")
             self.query.clear()
         if 'contracts' not in self.con.tables():
             self.query.exec("create table contracts(id integer primary key autoincrement, " +
@@ -37,7 +37,7 @@ class DBManager():
 
     def saveTemplate(self, name, items):
         date = self.getDateTime()
-        self.query.prepare("insert into templates values(null, :name, :str_date, :dt)")
+        self.query.prepare("insert into templates values(null, :name, True, :str_date, :dt)")
         self.query.bindValue(':name', name)
         self.query.bindValue(':str_date', date['s_date'])
         self.query.bindValue(':dt', date['datetime'])
@@ -45,7 +45,7 @@ class DBManager():
         templateId = self.query.lastInsertId()
         self.query.clear()
         for item in items:
-            self.query.prepare("insert into items_template values(null, :template_id, :name, :count, :str_date, :dt)")
+            self.query.prepare("insert into items_template values(null, :template_id, :name, :count, True, :str_date, :dt)")
             self.query.bindValue(':template_id', templateId)
             self.query.bindValue(':name', item[0])
             self.query.bindValue(':count', item[1])

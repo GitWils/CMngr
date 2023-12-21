@@ -6,7 +6,7 @@ class ContractDlg(QtWidgets.QDialog):
         super(ContractDlg, self).__init__(parent)
         self.parent = parent
         self.templates = templates
-        self.itemsCnt = 1
+        self.itemsCnt = 0
         self.init()
 
     def init(self):
@@ -22,13 +22,19 @@ class ContractDlg(QtWidgets.QDialog):
         self.name = QtWidgets.QLineEdit()
         contractShortName = QtWidgets.QLabel("Коротка назва (№ХХХ):")
         self.shortName = QtWidgets.QLineEdit()
-        contractCountLbl = QtWidgets.QLabel("Кількість виробів:")
-        self.countList = QtWidgets.QComboBox()
-        for template in self.templates:
-            self.countList.addItem(template[1], template[0])
-        self.countSpin = QtWidgets.QSpinBox()
-        self.countSpin.setMaximum(1000000)
-        self.countSpin.setValue(self.itemsCnt)
+        self.additionalWgts = []
+        self.addItemField()
+
+        # contractCountLbl = QtWidgets.QLabel("Кількість виробів:")
+        # self.countList = QtWidgets.QComboBox()
+        # for template in self.templates:
+        #     self.countList.addItem(template[1], template[0])
+        # self.countSpin = QtWidgets.QSpinBox()
+        # self.countSpin.setMaximum(1000000)
+        # self.countSpin.setValue(self.itemsCnt)
+        self.btnAdd = EditBtn("new", True)
+        self.btnRem = EditBtn('minus', True)
+
         contractNoteLbl = QtWidgets.QLabel("Примітка:")
         self.contractNote = QtWidgets.QTextEdit()
         bbox = self.initButtonBox()
@@ -37,16 +43,29 @@ class ContractDlg(QtWidgets.QDialog):
         self.grid.addWidget(self.name, 0, 1, 1, 2)
         self.grid.addWidget(contractShortName, 1, 0, 1, 1)
         self.grid.addWidget(self.shortName, 1, 1, 1, 2)
-        self.grid.addWidget(contractCountLbl, 2, 0, 1, 1)
-        self.grid.addWidget(self.countList, 2, 1, 1, 1)
-        self.grid.addWidget(self.countSpin, 2, 2, 1, 1)
-        self.grid.addWidget(contractNoteLbl, 3, 0, 1, 1)
-        self.grid.addWidget(self.contractNote, 3, 1, 1, 2)
-        self.grid.addWidget(bbox, 4, 0, 1, 3)
+        # self.grid.addWidget(contractCountLbl, 2, 0, 1, 1)
+        # self.grid.addWidget(self.countList, 2, 1, 1, 1)
+        # self.grid.addWidget(self.countSpin, 2, 2, 1, 1)
+        self.grid.addWidget(self.plusMinusMenu(), 100, 0, 1, 4)
+        self.grid.addWidget(contractNoteLbl, 101, 0, 1, 1)
+        self.grid.addWidget(self.contractNote, 101, 1, 1, 2)
+        self.grid.addWidget(bbox, 102, 0, 1, 3)
 
         self.setLayout(self.grid)
         self.setTaborders()
         self.show()
+
+    def plusMinusMenu(self):
+        self.btnAdd.clicked.connect(self.addItemField)
+        self.btnRem.clicked.connect(self.removeItemField)
+        hbox = QtWidgets.QHBoxLayout()
+        hbox.addWidget(self.btnRem, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+        hbox.addWidget(self.btnAdd, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+        hbox.setSpacing(40)
+        hwidget = QtWidgets.QWidget()
+        hwidget.setLayout(hbox)
+        hwidget.resize(10, 10)
+        return hwidget
 
     def initButtonBox(self):
         """ create widget with "Cancel" and "Save" buttons """
@@ -60,6 +79,43 @@ class ContractDlg(QtWidgets.QDialog):
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
         return bbox
+
+    def addItemField(self):
+        """ + button click reaction """
+        contractCountLbl = QtWidgets.QLabel("Кількість виробів:")
+        self.countList = QtWidgets.QComboBox()
+        for template in self.templates:
+            self.countList.addItem(template[1], template[0])
+        self.countSpin = QtWidgets.QSpinBox()
+        self.countSpin.setMaximum(1000000)
+        self.countSpin.setValue(self.itemsCnt)
+
+        self.additionalWgts.append({
+            'lbl_name': QtWidgets.QLabel('Назва деталі №{}:'.format(self.itemsCnt + 1)),
+            'cbox_name': QtWidgets.QComboBox(),
+            'lbl_cnt': QtWidgets.QLabel("кількість:"),
+            'spin_cnt': QtWidgets.QSpinBox()
+        })
+        self.additionalWgts[self.itemsCnt]['spin_cnt'].setMaximum(1000000)
+        self.additionalWgts[self.itemsCnt]['spin_cnt'].setValue(1)
+        for template in self.templates:
+            self.additionalWgts[self.itemsCnt]['cbox_name'].addItem(template[1], template[0])
+        self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_name'], self.itemsCnt + 2, 0, 1, 1)
+        self.grid.addWidget(self.additionalWgts[self.itemsCnt]['cbox_name'], self.itemsCnt + 2, 1, 1, 1)
+        self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_cnt'], self.itemsCnt + 2, 2, 1, 1)
+        self.grid.addWidget(self.additionalWgts[self.itemsCnt]['spin_cnt'], self.itemsCnt + 2, 3, 1, 1)
+        self.itemsCnt += 1
+
+    def removeItemField(self):
+        """ - button click reaction """
+        if (self.itemsCnt == 1):
+            return
+        self.itemsCnt -= 1
+        self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['lbl_name'])
+        self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['cbox_name'])
+        self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['lbl_cnt'])
+        self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['spin_cnt'])
+        self.additionalWgts.pop()
 
     def save(self):
         """ Save button click reaction """

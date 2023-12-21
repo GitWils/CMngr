@@ -1,4 +1,4 @@
-from PyQt6 import QtGui, QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore
 from CustomWidgets import EditBtn
 
 class TemplateDialog(QtWidgets.QDialog):
@@ -15,43 +15,42 @@ class TemplateDialog(QtWidgets.QDialog):
     def init(self):
         self.setWindowTitle("Конфігурація виробу")
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
-        self.resize(550, 300)
+        self.resize(600, 300)
 
         self.grid = QtWidgets.QGridLayout()
         self.grid.setContentsMargins(40, 40, 40, 40)
         self.grid.setSpacing(25)
         deviceName = QtWidgets.QLabel("Назва виробу:")
         self.name = QtWidgets.QLineEdit()
-        self.wgtNamesLst = []
-        self.wgtItemsLst = []
-        self.wgtCntsLst = []
-        self.wgtThingsLst = []
+        self.additionalWgts = []
         self.addItemField()
-
+        self.btnAdd = EditBtn("new", True)
+        self.btnRem = EditBtn('minus', True)
         bbox = self.initButtonBox()
-        btnAdd = EditBtn("new", True)
-        btnAdd.clicked.connect(self.addItemField)
-        btnRem = EditBtn('minus', True)
-        btnRem.clicked.connect(self.removeItemField)
 
         self.grid.addWidget(deviceName, 0, 0, 1, 1)
         self.grid.addWidget(self.name, 0, 1, 1, 1)
-        hbox = QtWidgets.QHBoxLayout()
-        hbox.addWidget(btnRem, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
-        hbox.addWidget(btnAdd, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
-        hbox.setSpacing(40)
-        hwidget = QtWidgets.QWidget()
-        hwidget.setLayout(hbox)
-        hwidget.resize(10, 10)
-        self.grid.addWidget(hwidget, 100, 0, 1, 4)
+        self.grid.addWidget(self.plusMinusMenu(), 100, 0, 1, 4)
         self.grid.addWidget(bbox, 101, 0, 1, 4)
         self.grid.setAlignment(bbox, QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.grid)
         self.setTaborders()
         if self.editMode:
             self.fillValues()
-            btnRem.setActive(False)
+            self.btnRem.setActive(False)
         self.show()
+
+    def plusMinusMenu(self):
+        self.btnAdd.clicked.connect(self.addItemField)
+        self.btnRem.clicked.connect(self.removeItemField)
+        hbox = QtWidgets.QHBoxLayout()
+        hbox.addWidget(self.btnRem, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+        hbox.addWidget(self.btnAdd, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+        hbox.setSpacing(40)
+        hwidget = QtWidgets.QWidget()
+        hwidget.setLayout(hbox)
+        hwidget.resize(10, 10)
+        return hwidget
 
     def fillValues(self):
         i = 0
@@ -59,9 +58,9 @@ class TemplateDialog(QtWidgets.QDialog):
         for item in self.items:
             if i > 0:
                 self.addItemField()
-            self.wgtItemsLst[i].setText(item['name'])
-            self.wgtCntsLst[i].setValue(item['count'])
-            self.wgtItemsLst[i].setReadOnly(True)
+            self.additionalWgts[i]['edit_name'].setText(item['name'])
+            self.additionalWgts[i]['spin_cnt'].setValue(item['count'])
+            self.additionalWgts[i]['edit_name'].setReadOnly(True)
             i += 1
 
     def initButtonBox(self):
@@ -79,36 +78,36 @@ class TemplateDialog(QtWidgets.QDialog):
 
     def addItemField(self):
         """ + button click reaction """
-        self.wgtNamesLst.append(QtWidgets.QLabel("Назва деталі №{}:".format(self.itemsCnt + 1)))
-        self.wgtItemsLst.append(QtWidgets.QLineEdit())
-        self.wgtCntsLst.append(QtWidgets.QSpinBox())
-        self.wgtThingsLst.append(QtWidgets.QLabel("кількість:"))
-        self.wgtCntsLst[self.itemsCnt].setValue(1)
+        self.additionalWgts.append({
+            'lbl_name': QtWidgets.QLabel('Назва деталі №{}:'.format(self.itemsCnt + 1)),
+            'edit_name': QtWidgets.QLineEdit(),
+            'lbl_cnt': QtWidgets.QLabel("кількість:"),
+            'spin_cnt': QtWidgets.QSpinBox()
+        })
+        self.additionalWgts[self.itemsCnt]['spin_cnt'].setValue(1)
         self.itemsCnt += 1
-        self.grid.addWidget(self.wgtNamesLst[self.itemsCnt - 1], self.itemsCnt, 0, 1, 1)
-        self.grid.addWidget(self.wgtItemsLst[self.itemsCnt - 1], self.itemsCnt, 1, 1, 1)
-        self.grid.addWidget(self.wgtThingsLst[self.itemsCnt - 1], self.itemsCnt, 2, 1, 1)
-        self.grid.addWidget(self.wgtCntsLst[self.itemsCnt - 1], self.itemsCnt, 3, 1, 1)
-
-        self.wgtItemsLst[self.itemsCnt - 1].setFocus()
+        self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['lbl_name'], self.itemsCnt, 0, 1, 1)
+        self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['edit_name'], self.itemsCnt, 1, 1, 1)
+        self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['spin_cnt'], self.itemsCnt, 3, 1, 1)
+        self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['lbl_cnt'], self.itemsCnt, 2, 1, 1)
+        self.additionalWgts[self.itemsCnt - 1]['edit_name'].setFocus()
 
     def removeItemField(self):
         """ - button click reaction """
         if (self.itemsCnt == 1):
             return
         self.itemsCnt -= 1
-        self.grid.removeWidget(self.wgtNamesLst[self.itemsCnt])
-        self.grid.removeWidget(self.wgtItemsLst[self.itemsCnt])
-        self.grid.removeWidget(self.wgtCntsLst[self.itemsCnt])
-        self.wgtNamesLst.pop()
-        self.wgtItemsLst.pop()
-        self.wgtCntsLst.pop()
+        self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['lbl_name'])
+        self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['edit_name'])
+        self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['lbl_cnt'])
+        self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['spin_cnt'])
+        self.additionalWgts.pop()
 
     def save(self):
         """ Save button click reaction """
         items = []
         for i in range(0, self.itemsCnt):
-            items.append([self.wgtItemsLst[i].text(), self.wgtCntsLst[i].value()])
+            items.append([self.additionalWgts[i]['edit_name'].text(), self.additionalWgts[i]['spin_cnt'].value()])
         if self.editMode:
             self.parent.updateTemplate(self.name.text(), items)
         else:
@@ -117,8 +116,8 @@ class TemplateDialog(QtWidgets.QDialog):
 
     def setTaborders(self):
         self.name.setFocus()
-        QtWidgets.QWidget.setTabOrder(self.name, self.wgtItemsLst[0])
-        QtWidgets.QWidget.setTabOrder(self.wgtItemsLst[0], self.wgtCntsLst[0])
+        QtWidgets.QWidget.setTabOrder(self.name, self.additionalWgts[0]['edit_name'])
+        QtWidgets.QWidget.setTabOrder(self.additionalWgts[0]['edit_name'], self.additionalWgts[0]['spin_cnt'])
 
     def event(self, e):
         if e.type() == QtCore.QEvent.Type.KeyPress and e.key() == QtCore.Qt.Key.Key_Escape:
