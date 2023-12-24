@@ -36,6 +36,8 @@ class DBManager():
             self.query.clear()
 
     def saveTemplate(self, name, items):
+        print(items.__repr__())
+        print(name.__repr__())
         date = self.getDateTime()
         self.query.prepare("insert into templates values(null, :name, True, :str_date, :dt)")
         self.query.bindValue(':name', name)
@@ -61,16 +63,16 @@ class DBManager():
     def saveContract(self, contract):
         print(contract.__repr__())
         date = self.getDateTime()
-        # self.query.prepare("insert into contracts values(" +
-        #                    "null, template_id, :name, :short_name, :count, :note, :str_date, :dt)")
-        # self.query.bindValue(':template_id', contract['templateId'])
-        # self.query.bindValue(':name', contract['name'])
-        # self.query.bindValue(':short_name', contract['short_name'])
-        # self.query.bindValue(':count', contract['count'])
-        # self.query.bindValue(':note ', contract['note'])
-        # self.query.bindValue(':str_date', date['s_date'])
-        # self.query.bindValue(':dt', date['datetime'])
-        # self.query.exec()
+        self.query.prepare("insert into contracts values(" +
+                           "null, :template_id, :name, :short_name, :count, :note, :str_date, :dt)")
+        self.query.bindValue(':template_id', contract['template_id'])
+        self.query.bindValue(':name', contract['name'])
+        self.query.bindValue(':short_name', contract['short_name'])
+        self.query.bindValue(':count', contract['count'])
+        self.query.bindValue(':note', contract['note'])
+        self.query.bindValue(':str_date', date['s_date'])
+        self.query.bindValue(':dt', date['datetime'])
+        self.query.exec()
         self.query.clear()
 
     def saveLogMsg(self, msg):
@@ -128,13 +130,24 @@ class DBManager():
         if self.query.isActive():
             self.query.first()
             while self.query.isValid():
-                arr = [self.query.value('id'),
-                       self.query.value('name'),
-                       self.query.value('count'),
-                       self.query.value('str_date')]
+                arr = dict({
+                        'id':           self.query.value('id'),
+                        'template_id':  self.query.value('template_id'),
+                        'name':         self.query.value('name'),
+                        'short_name':   self.query.value('short_name'),
+                        'count':        self.query.value('count'),
+                        'note':         self.query.value('note'),
+                        'date':         self.query.value('str_date')})
                 lst.append(arr)
                 self.query.next()
         self.query.clear()
+        for item in lst:
+            self.query.exec("select name from templates where id={}".format(item['template_id']))
+            if self.query.isActive():
+                self.query.first()
+                if self.query.isValid():
+                    item['template_name'] = self.query.value(0)
+            self.query.clear()
         return lst
 
     def getComponents(self):

@@ -16,6 +16,7 @@ class Designer(CustomTable):
             item0 = QtGui.QStandardItem(str(template[0]))
             item1 = QtGui.QStandardItem(template[1])
             item2 = QtGui.QStandardItem(template[2][5:])
+            #item3 = QtGui.QStandardItem('примітка')
             self.sti.appendRow([item0, item1, item2])
             rowCnt += 1
         self.sti.setHorizontalHeaderLabels(['Id', 'Назва', 'Дата\nстворення', 'Примітка'])

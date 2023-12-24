@@ -69,10 +69,10 @@ class ContractDlg(QtWidgets.QDialog):
         """ Save button click reaction """
         contract = dict({'name': self.name.text(),
                          'short_name': self.shortName.text(),
-                         #'count': self.countSpin.value(),
+                         'count': self.spinCnt.value(),
                          'template_name': self.cBoxTemplate.currentText(),
                          'template_id': self.cBoxTemplate.currentData(),
-                         'note': self.contractNote})
+                         'note': self.contractNote.toPlainText()})
         #contract['item'] = []
         for i in range(0, self.itemsCnt):
             contract['item'].append(i)

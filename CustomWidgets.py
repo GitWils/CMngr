@@ -40,5 +40,8 @@ class CustomTable(QtWidgets.QTableView):
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        #header.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.setColumnHidden(0, True)
         #self.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))

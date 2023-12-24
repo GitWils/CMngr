@@ -1,14 +1,31 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 from CustomWidgets import CustomTable
 class Contract(CustomTable):
-    def __init__(self):
+    def __init__(self, contracts):
         QtWidgets.QTableView.__init__(self)
+        self.contracts = contracts
         self.sti = QtGui.QStandardItemModel(parent=self)
-        self.loadData()
+        self.loadData(self.contracts)
 
-    def loadData(self):
-        pass
+    def loadData(self, contracts):
+        self.contracts = contracts
+        #print(contracts.__repr__())
+        self.reset()
+        self.sti.clear()
+        rowCnt = 0
+        for contract in contracts:
+            item0 = QtGui.QStandardItem(str(contract['id']))
+            item1 = QtGui.QStandardItem(contract['name'])
+            item2 = QtGui.QStandardItem(contract['template_name'])
+            item3 = QtGui.QStandardItem(str(contract['count']) + ' шт.')
+            item4 = QtGui.QStandardItem(contract['date'][5:])
+            item5 = QtGui.QStandardItem(contract['note'])
+            self.sti.appendRow([item0, item1, item2, item3, item4, item5])
+            rowCnt += 1
+        self.sti.setHorizontalHeaderLabels(['Id', 'Договір', 'Назва\nвиробу', 'Кількість', 'Дата\nстворення', 'Примітка'])
+        self.sti.setRowCount(rowCnt)
+        self.setModel(self.sti)
+        self.setColumnStyles()
 
     def getSize(self):
-        return 1
-
+        return len(self.contracts)

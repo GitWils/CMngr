@@ -93,7 +93,8 @@ class Project(QtWidgets.QWidget):
         self.contractLt.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.contractLt)
         lst = self.db.getContracts()
-        self.contracts = Contract()
+        self.contracts = Contract(lst)
+        self.contracts.clicked.connect(self.itemContractClicked)
         self.contractLbl = QtWidgets.QLabel("Список договорів пустий")
         self.contractLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         if len(lst):
@@ -155,19 +156,40 @@ class Project(QtWidgets.QWidget):
         return tab
 
     def itemDesignClicked(self):
+        """ new template mode save button clicked """
         self.editDesBtn.setActive(True)
         self.delDesBtn.setActive(True)
 
+    def itemContractClicked(self):
+        """ new template mode save button clicked """
+        self.editConBtn.setActive(True)
+        self.delConBtn.setActive(True)
+
     def newTemplateSave(self, name, items):
+        """ new template mode save button clicked """
         self.db.saveTemplate(name, items)
         self.designer.loadData(self.db.getTemplates())
-        msg = 'створено новий шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
+        msg = 'створено шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
         if self.designer.getTemplatesCount() == 1:
             self.designer.show()
             self.desLbl.hide()
             self.desLayout.replaceWidget(self.desLbl, self.designer)
+
+    def newContractSave(self, contract):
+        """ new contract mode save button clicked """
+        self.db.saveContract(contract)
+        self.contracts.loadData(self.db.getContracts())
+        msg = (('створено договір <span style="text-decoration: underline">{}</span> на виготовлення виробів ' +
+               '<span style="text-decoration: underline">{}</span>').
+               format(contract['short_name'], contract['template_name']))
+        self.db.saveLogMsg(msg)
+        self.logArea.showContent(self.db.getLogs())
+        if self.contracts.getSize() == 1:
+            self.contracts.show()
+            self.contractLbl.hide()
+            self.contractLt.replaceWidget(self.contractLbl, self.contracts)
 
     def updateTemplate(self, name, items):
         """ edit template mode save edit button clicked """
@@ -177,14 +199,9 @@ class Project(QtWidgets.QWidget):
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
 
-    def newContractSave(self, contract):
-        self.db.saveContract(contract)
-        msg = (('створено договір <span style="text-decoration: underline">{}</span> на вироби ' +
-               '<span style="text-decoration: underline">{}</span>').
-               format(contract['short_name'], contract['template_name']))
-        self.db.saveLogMsg(msg)
-        self.logArea.showContent(self.db.getLogs())
-
+    def updateContract(self):
+        """ edit contract mode save edit button clicked """
+        pass
 
     def newDesignClicked(self):
         dlg = TemplateDialog(self)
