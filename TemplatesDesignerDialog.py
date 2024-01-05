@@ -85,6 +85,7 @@ class TemplateDialog(QtWidgets.QDialog):
             'spin_cnt': QtWidgets.QSpinBox()
         })
         self.additionalWgts[self.itemsCnt]['spin_cnt'].setValue(1)
+        self.additionalWgts[self.itemsCnt]['spin_cnt'].setMaximum(100000)
         self.itemsCnt += 1
         self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['lbl_name'], self.itemsCnt, 0, 1, 1)
         self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['edit_name'], self.itemsCnt, 1, 1, 1)

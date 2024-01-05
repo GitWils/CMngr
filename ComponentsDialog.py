@@ -2,13 +2,15 @@ from PyQt6 import QtGui, QtWidgets, QtCore
 from CustomWidgets import EditBtn
 
 class ComponentsDlg(QtWidgets.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent, templates):
         super(ComponentsDlg, self).__init__(parent)
         self.parent = parent
+        self.templates = templates
         self.itemsCnt = 0
         self.init()
 
     def init(self):
+        print(self.templates.__repr__())
         self.setWindowTitle("Поставка комплектуючих")
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(500, 300)
@@ -16,8 +18,53 @@ class ComponentsDlg(QtWidgets.QDialog):
         self.grid = QtWidgets.QGridLayout()
         self.grid.setContentsMargins(40, 40, 40, 40)
         self.grid.setSpacing(25)
+
+        self.cBoxTemplate = QtWidgets.QComboBox()
+        for template in self.templates:
+            self.cBoxTemplate.addItem(template[1], template[0])
+        lbl_cnt = QtWidgets.QLabel("кількість:")
+        self.spinCnt = QtWidgets.QSpinBox()
+        self.spinCnt.setValue(1)
+        self.spinCnt.setMaximum(100000)
+
+        bbox = self.initButtonBox()
+
+        self.grid.addWidget(self.cBoxTemplate, 2, 1, 1, 1)
+        self.grid.addWidget(lbl_cnt, 2, 2, 1, 1)
+        self.grid.addWidget(self.spinCnt, 2, 3, 1, 1)
+        self.grid.addWidget(bbox, 102, 0, 1, 4)
+        self.grid.setAlignment(bbox, QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.setLayout(self.grid)
+
         self.setTaborders()
         self.show()
+
+    def initButtonBox(self):
+        """ create widget with "Cancel" and "Save" buttons """
+        bbox = QtWidgets.QDialogButtonBox()
+        bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok |
+                                QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('vmenu')
+        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
+        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('vmenu')
+        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
+        bbox.accepted.connect(self.save)
+        bbox.rejected.connect(self.reject)
+        return bbox
+
+    def save(self):
+        """ Save button click reaction """
+        # contract = dict({'name': self.name.text(),
+        #                  'short_name': self.shortName.text(),
+        #                  'count': self.spinCnt.value(),
+        #                  'template_name': self.cBoxTemplate.currentText(),
+        #                  'template_id': self.cBoxTemplate.currentData(),
+        #                  'note': self.contractNote.toPlainText()})
+        # #contract['item'] = []
+        # for i in range(0, self.itemsCnt):
+        #     contract['item'].append(i)
+        # self.parent.newContractSave(contract)
+        self.accept()
 
     def setTaborders(self):
         pass

@@ -210,8 +210,7 @@ class Project(QtWidgets.QWidget):
         dlg = ContractDlg(self, self.db.getTemplates())
 
     def newComponentsClicked(self):
-        print("components clicked")
-        dlg = ComponentsDlg(self)
+        dlg = ComponentsDlg(self, self.db.getTemplates())
 
     def editDesignClicked(self):
         templateId = self.designer.getSelectedRowId()
