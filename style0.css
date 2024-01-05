@@ -1,7 +1,7 @@
 /*using palettes: #1E2022, #52616B, #C9D6DF, #F0F5F9*/
 QWidget {
     /*background-color: "#2E3032";*/
-    background-color: "#323335";
+    background-color: "#323a39";
     /*color: "#F0F5F9";*/
 }
 
@@ -12,7 +12,7 @@ QWidget {
 }*/
 /********************************* Main UI settings ***************************************/
 #main {
-    background-color: "#1E2022";
+    background-color: "#323335";
 }
 /********************************* Main UI settings ***************************************/
 
@@ -36,7 +36,7 @@ QWidget {
 }
 .QPushButton#vmenu:disabled {
     font-size: 16px;
-    color: "#1E2022";
+    color: "#888";
     background-color: "#32414B"
 }
 /********************************* Buttons UI settings ***************************************/
@@ -49,7 +49,7 @@ QLabel {
 /********************************* TextEdit UI settings ***************************************/
 QTextEdit, QLineEdit {
     background-color: "#F0F5F9";
-    color: "#1E2022";
+    color: "#323335";
     font-size: 16px;
 }
 
@@ -80,7 +80,7 @@ QHeaderView {
 
 QTableView::item {
     /*border: 1px solid "#fd1321";*/
-    color: #1E2022;
+    color: #323335;
 }
 
 QHeaderView::section {
@@ -152,7 +152,7 @@ QTabWidget::item {
 
 QSpinBox {
     background-color: #F0F5F9;
-    color: #1E2022;
+    color: #323335;
 }
 
 QDialogButtonBox {
@@ -161,7 +161,7 @@ QDialogButtonBox {
 
 QComboBox {
     background-color: #F0F5F9;
-    color: #1E2022;
+    color: #323335;
 }
 
 QComboBox::drop-down {
@@ -180,5 +180,5 @@ QComboBox:on {
 QComboBox QAbstractItemView {
     selection-background-color: red;
     background-color: #F0F5F9;
-    color: #1E2022;
+    color: #323335;
 }

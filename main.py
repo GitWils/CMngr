@@ -182,8 +182,8 @@ class Project(QtWidgets.QWidget):
         self.db.saveContract(contract)
         self.contracts.loadData(self.db.getContracts())
         msg = (('створено договір <span style="text-decoration: underline">{}</span> на виготовлення виробів ' +
-               '<span style="text-decoration: underline">{}</span>').
-               format(contract['short_name'], contract['template_name']))
+               '<span style="text-decoration: underline">{}</span> кількістю {}шт.').
+               format(contract['short_name'], contract['template_name'], contract['count']))
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
         if self.contracts.getSize() == 1:

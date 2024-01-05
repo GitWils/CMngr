@@ -27,5 +27,12 @@ class Contract(CustomTable):
         self.setModel(self.sti)
         self.setColumnStyles()
 
+    def setColumnStyles(self):
+        CustomTable.setColumnStyles(self)
+        header = self.horizontalHeader()
+        header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        #header.setMaximumWidth(300)
+
     def getSize(self):
         return len(self.contracts)

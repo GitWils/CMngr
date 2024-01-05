@@ -17,5 +17,5 @@ class Logger(QtWidgets.QTextEdit):
         self.ensureCursorVisible()
 
     def addMessage(self, msg, date):
-        self.insertHtml('<span style="color: #261">' + date + '</span> ' + msg + '<br>')
+        self.insertHtml(date[0:5] + ' <span style="text-decoration: underline">' + date[7:] + '</span> ' + msg + '<br>')
         self.ensureCursorVisible()
