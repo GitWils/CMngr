@@ -2,42 +2,82 @@ from PyQt6 import QtGui, QtWidgets, QtCore
 from CustomWidgets import EditBtn
 
 class ComponentsDlg(QtWidgets.QDialog):
-    def __init__(self, parent, templates):
+    def __init__(self, parent, contracts, components):
         super(ComponentsDlg, self).__init__(parent)
         self.parent = parent
-        self.templates = templates
+        self.components = components
+        self.contracts = contracts
         self.itemsCnt = 0
         self.init()
 
     def init(self):
-        print(self.templates.__repr__())
+        #print(self.components.__repr__())
+        #print(self.contracts.__repr__())
         self.setWindowTitle("Поставка комплектуючих")
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
-        self.resize(500, 300)
+        self.resize(600, 300)
 
         self.grid = QtWidgets.QGridLayout()
         self.grid.setContentsMargins(40, 40, 40, 40)
         self.grid.setSpacing(25)
+        lblContractName = QtWidgets.QLabel('Назва договору:')
+        self.cBoxContract = QtWidgets.QComboBox()
+        for contract in self.contracts:
+            self.cBoxContract.addItem(contract['name'], str(contract['id']))
+        self.cBoxContract.currentIndexChanged.connect(self.fillItemslist)
+        lblNote = QtWidgets.QLabel("Супровідні\nдокументи:")
+        self.qTextNote = QtWidgets.QTextEdit()
 
-        self.cBoxTemplate = QtWidgets.QComboBox()
-        for template in self.templates:
-            self.cBoxTemplate.addItem(template[1], template[0])
-        lbl_cnt = QtWidgets.QLabel("кількість:")
-        self.spinCnt = QtWidgets.QSpinBox()
-        self.spinCnt.setValue(1)
-        self.spinCnt.setMaximum(100000)
-
+        self.additionalWgts = []
         bbox = self.initButtonBox()
-
-        self.grid.addWidget(self.cBoxTemplate, 2, 1, 1, 1)
-        self.grid.addWidget(lbl_cnt, 2, 2, 1, 1)
-        self.grid.addWidget(self.spinCnt, 2, 3, 1, 1)
+        self.grid.addWidget(lblContractName, 1, 0, 1, 1)
+        self.grid.addWidget(self.cBoxContract, 1, 1, 1, 3)
+        self.fillItemslist()
+        self.grid.addWidget(lblNote, 101, 0, 1, 1)
+        self.grid.addWidget(self.qTextNote, 101, 1, 1, 3)
         self.grid.addWidget(bbox, 102, 0, 1, 4)
         self.grid.setAlignment(bbox, QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.grid)
 
         self.setTaborders()
         self.show()
+        self.cBoxContract.setFocus()
+
+    def clearItemsList(self):
+        """ cleaning the list of components """
+        for i in range(self.itemsCnt, 0, -1):
+            if self.itemsCnt:
+                self.itemsCnt -= 1
+                self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['lbl_name'])
+                self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['edit_name'])
+                self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['lbl_cnt'])
+                self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['spin_cnt'])
+                self.additionalWgts.pop()
+
+    def fillItemslist(self):
+        """ filling component fields """
+        self.clearItemsList()
+        for component in self.components:
+            print(component.__repr__())
+            if component['template_id'] == int(self.cBoxContract.currentData()):
+                self.additionalWgts.append({
+                    'lbl_name': QtWidgets.QLabel('Деталь №{}: '.format(self.itemsCnt + 1)),
+                    'edit_name': QtWidgets.QLineEdit(),
+                    'lbl_cnt': QtWidgets.QLabel("кількість:"),
+                    'item_template_id': component['id'],
+                    'template_id': component['template_id'],
+                    'spin_cnt': QtWidgets.QSpinBox()
+                })
+                self.additionalWgts[self.itemsCnt]['spin_cnt'].setValue(0)
+                self.additionalWgts[self.itemsCnt]['spin_cnt'].setMaximum(100000)
+                self.additionalWgts[self.itemsCnt]['edit_name'].setText(component['name'])
+                #print("{} - {}".format(self.itemsCnt, component['name']))
+                self.additionalWgts[self.itemsCnt]['edit_name'].setReadOnly(True)
+                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_name'],  self.itemsCnt + 2, 0, 1, 1)
+                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['edit_name'], self.itemsCnt + 2, 1, 1, 1)
+                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_cnt'],   self.itemsCnt + 2, 2, 1, 1)
+                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['spin_cnt'],  self.itemsCnt + 2, 3, 1, 1)
+                self.itemsCnt += 1
 
     def initButtonBox(self):
         """ create widget with "Cancel" and "Save" buttons """
@@ -54,16 +94,16 @@ class ComponentsDlg(QtWidgets.QDialog):
 
     def save(self):
         """ Save button click reaction """
-        # contract = dict({'name': self.name.text(),
-        #                  'short_name': self.shortName.text(),
-        #                  'count': self.spinCnt.value(),
-        #                  'template_name': self.cBoxTemplate.currentText(),
-        #                  'template_id': self.cBoxTemplate.currentData(),
-        #                  'note': self.contractNote.toPlainText()})
-        # #contract['item'] = []
-        # for i in range(0, self.itemsCnt):
-        #     contract['item'].append(i)
-        # self.parent.newContractSave(contract)
+        res = []
+        for widget in self.additionalWgts:
+            #print("id = {} {}pcs".format(widget['item_template_id'], widget['spin_cnt'].value()))
+            if widget['spin_cnt'].value() > 0:
+                item = dict({'item_template_id': widget['item_template_id'],
+                            'template_id': widget['template_id'],
+                            'count': widget['spin_cnt'].value(),
+                            'contract_id':  self.cBoxContract.currentData()})
+                res.append(item)
+        self.parent.newComponentsSave(res)
         self.accept()
 
     def setTaborders(self):

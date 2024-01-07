@@ -12,7 +12,7 @@ class ContractDlg(QtWidgets.QDialog):
     def init(self):
         self.setWindowTitle("Новий договір")
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
-        self.resize(500, 300)
+        self.resize(600, 300)
 
         self.grid = QtWidgets.QGridLayout()
         self.grid.setContentsMargins(40, 40, 40, 40)

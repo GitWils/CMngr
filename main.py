@@ -128,7 +128,7 @@ class Project(QtWidgets.QWidget):
         self.componentsLt.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.componentsLt)
         lst = self.db.getComponents()
-        self.components = Components()
+        self.components = Components(lst)
         self.componentsLbl = QtWidgets.QLabel("Список комплектуючих пустий")
         self.componentsLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         if len(lst):
@@ -178,7 +178,7 @@ class Project(QtWidgets.QWidget):
             self.desLayout.replaceWidget(self.desLbl, self.designer)
 
     def newContractSave(self, contract):
-        """ new contract mode save button clicked """
+        """ new contract save button clicked """
         self.db.saveContract(contract)
         self.contracts.loadData(self.db.getContracts())
         msg = (('створено договір <span style="text-decoration: underline">{}</span> на виготовлення виробів ' +
@@ -190,6 +190,17 @@ class Project(QtWidgets.QWidget):
             self.contracts.show()
             self.contractLbl.hide()
             self.contractLt.replaceWidget(self.contractLbl, self.contracts)
+
+    def newComponentsSave(self, components):
+        """ new components save button clicked"""
+        self.db.saveComponents(components)
+        self.components.loadData(self.db.getComponents())
+
+
+        if self.components.getSize() == 1:
+            self.components.show()
+            self.componentsLbl.hide()
+            self.componentsLt.replaceWidget(self.componentsLbl, self.components)
 
     def updateTemplate(self, name, items):
         """ edit template mode save edit button clicked """
@@ -210,7 +221,7 @@ class Project(QtWidgets.QWidget):
         dlg = ContractDlg(self, self.db.getTemplates())
 
     def newComponentsClicked(self):
-        dlg = ComponentsDlg(self, self.db.getTemplates())
+        dlg = ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems())
 
     def editDesignClicked(self):
         templateId = self.designer.getSelectedRowId()

@@ -24,11 +24,17 @@ class DBManager():
             self.query.clear()
         if 'components' not in self.con.tables():
             self.query.exec("create table components(id integer primary key autoincrement, " +
-                    "contract_id integer secondary key, name text, " +
+                    "contract_id integer secondary key, " +
+                    "item_template_id integer secondary key, " +
+                    "template_id integer, note_id integer, count integer, "
                     "str_date text, dt datetime)")
         if 'acts' not in self.con.tables():
             self.query.exec("create table acts(id integer primary key autoincrement, " +
                     "contract_id integer secondary key, name text, " +
+                    "str_date text, dt datetime)")
+        if 'notes' not in self.con.tables():
+            self.query.exec("create table notes(id integer primary key autoincrement, " +
+                    " note text, " +
                     "str_date text, dt datetime)")
         if 'logs' not in self.con.tables():
             self.query.exec("create table logs(id integer primary key autoincrement, " +
@@ -36,8 +42,6 @@ class DBManager():
             self.query.clear()
 
     def saveTemplate(self, name, items):
-        print(items.__repr__())
-        print(name.__repr__())
         date = self.getDateTime()
         self.query.prepare("insert into templates values(null, :name, True, :str_date, :dt)")
         self.query.bindValue(':name', name)
@@ -61,7 +65,6 @@ class DBManager():
         print(items.__repr__())
 
     def saveContract(self, contract):
-        print(contract.__repr__())
         date = self.getDateTime()
         self.query.prepare("insert into contracts values(" +
                            "null, :template_id, :name, :short_name, :count, :note, :str_date, :dt)")
@@ -74,6 +77,22 @@ class DBManager():
         self.query.bindValue(':dt', date['datetime'])
         self.query.exec()
         self.query.clear()
+
+    def saveComponents(self, components):
+        if len(components):
+            date = self.getDateTime()
+            for component in components:
+                self.query.prepare("insert into components values(" +
+                                   "null, :contract_id, :item_template_id, :template_id, :note_id, :count, :str_date, :dt)")
+                self.query.bindValue(':contract_id', component['contract_id'])
+                self.query.bindValue(':item_template_id', component['item_template_id'])
+                self.query.bindValue(':template_id', component['template_id'])
+                self.query.bindValue(':note_id', '3')
+                self.query.bindValue(':count', component['count'])
+                self.query.bindValue(':str_date', date['s_date'])
+                self.query.bindValue(':dt', date['datetime'])
+                self.query.exec()
+                self.query.clear()
 
     def saveLogMsg(self, msg):
         date = self.getDateTime()
@@ -124,6 +143,21 @@ class DBManager():
         self.query.clear()
         return items
 
+    def getAllTemplateItems(self):
+        self.query.exec("select * from items_template order by id")
+        items = []
+        if self.query.isActive():
+            self.query.first()
+            while self.query.isValid():
+                res = dict({'id': self.query.value('id'),
+                            'template_id': self.query.value('template_id'),
+                            'name': self.query.value('name'),
+                            'count': self.query.value('count')})
+                items.append(res)
+                self.query.next()
+        self.query.clear()
+        return items
+
     def getContracts(self):
         self.query.exec("select * from contracts order by id")
         lst = []
@@ -151,17 +185,38 @@ class DBManager():
         return lst
 
     def getComponents(self):
-        self.query.exec("select * from components order by id")
+        self.query.exec("select components.id, components.count, components.str_date," +
+                        "items_template.name, contracts.short_name, templates.name as device " +
+                        "from components " +
+                        "left join contracts on " +
+                        "(contracts.id = components.contract_id)"
+                        "left join items_template on " +
+                        "(items_template.id = components.item_template_id) " +
+                        "left join templates on " +
+                        "(templates.id = components.template_id)"
+                        "order by components.id")
         lst = []
         if self.query.isActive():
             self.query.first()
             while self.query.isValid():
-                arr = [self.query.value('id'),
-                       self.query.value('name'),
-                       self.query.value('str_date')]
+                arr = dict({
+                    'id': self.query.value('id'),
+                    'name': self.query.value('name'),
+                    'device': self.query.value('device'),
+                    'contract': self.query.value('short_name'),
+                    'count': self.query.value('count'),
+                    'date':         self.query.value('str_date')})
                 lst.append(arr)
                 self.query.next()
         self.query.clear()
+        # select components.id, items_template.name, contracts.name, components.[count]
+        # from components
+        # left join contracts on
+        # (contracts.id = components.contract_id)
+        # left join items_template on
+        # (items_template.id = components.item_template_id)
+        # order by components.id
+        #(https://www.sqlitetutorial.net/sqlite-left-join/)
         return lst
 
     def delTemplate(self, id):
