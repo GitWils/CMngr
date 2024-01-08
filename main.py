@@ -181,8 +181,8 @@ class Project(QtWidgets.QWidget):
         """ new contract save button clicked """
         self.db.saveContract(contract)
         self.contracts.loadData(self.db.getContracts())
-        msg = (('створено договір <span style="text-decoration: underline">{}</span> на виготовлення виробів ' +
-               '<span style="text-decoration: underline">{}</span> кількістю {}шт.').
+        msg = ('створено договір <span style="text-decoration: underline">{}</span> на виготовлення виробів ' +
+               '<span style="text-decoration: underline">{}</span> кількістю {}шт.'.
                format(contract['short_name'], contract['template_name'], contract['count']))
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
@@ -192,12 +192,18 @@ class Project(QtWidgets.QWidget):
             self.contractLt.replaceWidget(self.contractLbl, self.contracts)
 
     def newComponentsSave(self, components):
-        """ new components save button clicked"""
+        """ new components save button clicked """
+        if len(components) == 0:
+            return
+        print(components.__repr__())
         self.db.saveComponents(components)
         self.components.loadData(self.db.getComponents())
-
-
-        if self.components.getSize() == 1:
+        msg = ('добавлені комплектуючі до виробу <span style="text-decoration: underline">{}</span>,' +
+               ' згідно договору <span style="text-decoration: underline">{}</span>'
+               .format(components[0]['template_name'], components[0]['contract_name']))
+        self.db.saveLogMsg(msg)
+        self.logArea.showContent(self.db.getLogs())
+        if self.components.getSize() > 0:
             self.components.show()
             self.componentsLbl.hide()
             self.componentsLt.replaceWidget(self.componentsLbl, self.components)

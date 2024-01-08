@@ -25,20 +25,25 @@ class ComponentsDlg(QtWidgets.QDialog):
         for contract in self.contracts:
             self.cBoxContract.addItem(contract['name'], str(contract['id']))
         self.cBoxContract.currentIndexChanged.connect(self.fillItemslist)
+        lblTemplateName = QtWidgets.QLabel('Назва виробу:')
+        self.templateName = QtWidgets.QLineEdit()
+        self.templateName.setReadOnly(True)
         lblNote = QtWidgets.QLabel("Супровідні\nдокументи:")
         self.qTextNote = QtWidgets.QTextEdit()
+        self.qTextNote.setFixedHeight(65)
 
         self.additionalWgts = []
         bbox = self.initButtonBox()
         self.grid.addWidget(lblContractName, 1, 0, 1, 1)
         self.grid.addWidget(self.cBoxContract, 1, 1, 1, 3)
+        self.grid.addWidget(lblTemplateName, 2, 0, 1, 1)
+        self.grid.addWidget(self.templateName, 2, 1, 1, 3)
         self.fillItemslist()
         self.grid.addWidget(lblNote, 101, 0, 1, 1)
         self.grid.addWidget(self.qTextNote, 101, 1, 1, 3)
         self.grid.addWidget(bbox, 102, 0, 1, 4)
         self.grid.setAlignment(bbox, QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.grid)
-
         self.setTaborders()
         self.show()
         self.cBoxContract.setFocus()
@@ -56,9 +61,12 @@ class ComponentsDlg(QtWidgets.QDialog):
 
     def fillItemslist(self):
         """ filling component fields """
+        if len(self.contracts) == 0:
+            return
         self.clearItemsList()
+        self.templateName.setText(self.getTemplateByContractId(int(self.cBoxContract.currentData())))
         for component in self.components:
-            print(component.__repr__())
+            #print(component.__repr__())
             if component['template_id'] == int(self.cBoxContract.currentData()):
                 self.additionalWgts.append({
                     'lbl_name': QtWidgets.QLabel('Деталь №{}: '.format(self.itemsCnt + 1)),
@@ -73,10 +81,10 @@ class ComponentsDlg(QtWidgets.QDialog):
                 self.additionalWgts[self.itemsCnt]['edit_name'].setText(component['name'])
                 #print("{} - {}".format(self.itemsCnt, component['name']))
                 self.additionalWgts[self.itemsCnt]['edit_name'].setReadOnly(True)
-                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_name'],  self.itemsCnt + 2, 0, 1, 1)
-                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['edit_name'], self.itemsCnt + 2, 1, 1, 1)
-                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_cnt'],   self.itemsCnt + 2, 2, 1, 1)
-                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['spin_cnt'],  self.itemsCnt + 2, 3, 1, 1)
+                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_name'],  self.itemsCnt + 3, 0, 1, 1)
+                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['edit_name'], self.itemsCnt + 3, 1, 1, 1)
+                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_cnt'],   self.itemsCnt + 3, 2, 1, 1)
+                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['spin_cnt'],  self.itemsCnt + 3, 3, 1, 1)
                 self.itemsCnt += 1
 
     def initButtonBox(self):
@@ -100,11 +108,25 @@ class ComponentsDlg(QtWidgets.QDialog):
             if widget['spin_cnt'].value() > 0:
                 item = dict({'item_template_id': widget['item_template_id'],
                             'template_id': widget['template_id'],
+                            'template_name': self.getTemplateByContractId(int(self.cBoxContract.currentData())),
                             'count': widget['spin_cnt'].value(),
-                            'contract_id':  self.cBoxContract.currentData()})
+                            'contract_id':  self.cBoxContract.currentData(),
+                            'contract_name': self.getContractNameById(int(self.cBoxContract.currentData()))})
                 res.append(item)
         self.parent.newComponentsSave(res)
         self.accept()
+
+    def getTemplateByContractId(self, id):
+        for contract in self.contracts:
+            if id == contract['id']:
+                return contract['template_name']
+        return ''
+
+    def getContractNameById(self, id):
+        for contract in self.contracts:
+            if id == contract['id']:
+                return contract['short_name']
+        return ''
 
     def setTaborders(self):
         pass
