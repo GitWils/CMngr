@@ -179,6 +179,8 @@ class Project(QtWidgets.QWidget):
 
     def newContractSave(self, contract):
         """ new contract save button clicked """
+        if contract['count'] == 0 or contract['name'] == '':
+            return
         self.db.saveContract(contract)
         self.contracts.loadData(self.db.getContracts())
         msg = ('створено договір <span style="text-decoration: underline">{}</span> на виготовлення виробів ' +
