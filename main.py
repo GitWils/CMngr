@@ -4,6 +4,7 @@ from DBManager import DBManager
 from TempatesDesignerView import Designer
 from TemplatesDesignerDialog import TemplateDialog
 from ComponentsView import Components
+from ReportsView import Reports
 from ComponentsDialog import ComponentsDlg
 from ContractsView import Contract
 from ContractDialog import ContractDlg
@@ -19,7 +20,7 @@ class Project(QtWidgets.QWidget):
     def initUI(self):
         ico = QtGui.QIcon("img/logo.png")
         self.setWindowIcon(ico)
-        self.setGeometry(50, 50, 950, 690)
+        self.setGeometry(50, 50, 974, 690)
         self.centerWindow()
         self.initMenu()
         self.setWindowTitle('Облік договорів, комплектуючих')
@@ -155,6 +156,37 @@ class Project(QtWidgets.QWidget):
         self.componentsLt.setStretch(1, 1)
         return tab
 
+    def createReportTab(self):
+        tab = QtWidgets.QWidget()
+        tab.setStyleSheet("border: 0px solid red")
+        self.reportsLt = QtWidgets.QVBoxLayout()
+        self.reportsLt.setContentsMargins(0, 0, 0, 0)
+        tab.setLayout(self.reportsLt)
+        lst = self.db.getReports()
+        self.reports = Reports(lst)
+        self.reportsLbl = QtWidgets.QLabel("Список комплектуючих пустий")
+        self.reportsLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        if len(lst):
+            self.reportsLt.addWidget(self.reports)
+        else:
+            self.reportsLt.addWidget(self.reportsLbl)
+        btns = QtWidgets.QTabWidget()
+        btnLayout = QtWidgets.QHBoxLayout()
+        btnLayout.setContentsMargins(40, 0, 0, 0)
+        self.newCompBtn = EditBtn('new.png', False)
+        self.editCompBtn = EditBtn('edit.png', False)
+        self.delCompBtn = EditBtn('del.png', False)
+        btnLayout.addWidget(self.newCompBtn)
+        btnLayout.addWidget(self.editCompBtn)
+        btnLayout.addWidget(self.delCompBtn)
+        btns.setLayout(btnLayout)
+        btnLayout.addStretch(40)
+        btnLayout.setSpacing(40)
+        self.reportsLt.addWidget(btns)
+        self.reportsLt.setStretch(0, 8)
+        self.reportsLt.setStretch(1, 1)
+        return tab
+
     def itemDesignClicked(self):
         """ new template mode save button clicked """
         self.editDesBtn.setActive(True)
@@ -270,7 +302,8 @@ class Project(QtWidgets.QWidget):
         tab = QtWidgets.QTabWidget()
         tab.addTab(self.createDesignerTab(), "Конструктор виробів")
         tab.addTab(self.createContractsTab(), "Договори")
-        tab.addTab(self.createComponentsTab(), "Комплектуючі")
+        tab.addTab(self.createComponentsTab(), "Поставлено")
+        tab.addTab(self.createReportTab(), "Звітні дані")
         mainArea.addWidget(tab)
         self.innerbox.addLayout(mainArea,  QtCore.Qt.AlignmentFlag.AlignCenter)
 

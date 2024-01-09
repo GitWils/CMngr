@@ -188,24 +188,24 @@ class DBManager():
         self.query.exec("select components.id, components.count, components.str_date," +
                         "items_template.name, contracts.short_name, templates.name as device " +
                         "from components " +
-                        "left join contracts on " +
+                        "join contracts on " +
                         "(contracts.id = components.contract_id)"
-                        "left join items_template on " +
+                        "join items_template on " +
                         "(items_template.id = components.item_template_id) " +
-                        "left join templates on " +
-                        "(templates.id = components.template_id)"
+                        "join templates on " +
+                        "(templates.id = components.template_id) "
                         "order by components.id")
         lst = []
         if self.query.isActive():
             self.query.first()
             while self.query.isValid():
                 arr = dict({
-                    'id': self.query.value('id'),
-                    'name': self.query.value('name'),
-                    'device': self.query.value('device'),
+                    'id':       self.query.value('id'),
+                    'name':     self.query.value('name'),
+                    'device':   self.query.value('device'),
                     'contract': self.query.value('short_name'),
-                    'count': self.query.value('count'),
-                    'date':         self.query.value('str_date')})
+                    'count':    self.query.value('count'),
+                    'date':     self.query.value('str_date')})
                 lst.append(arr)
                 self.query.next()
         self.query.clear()
@@ -217,6 +217,37 @@ class DBManager():
         # (items_template.id = components.item_template_id)
         # order by components.id
         #(https://www.sqlitetutorial.net/sqlite-left-join/)
+        return lst
+
+    def getReports(self):
+        self.query.exec("select components.contract_id, components.item_template_id, " +
+                        "sum(components.count) as count, " +
+                        "components.str_date,  contracts.short_name as contract, templates.name as device, " +
+                        "items_template.name as product,  items_template.count * contracts.count as needed " +
+                        "from components " +
+                        "join contracts on " +
+                        "(contracts.id = components.contract_id) " +
+                        "join templates on " +
+                        "(templates.id = components.template_id) "
+                        "join items_template on " +
+                        "(items_template.id = components.item_template_id)"
+                        "group by components.template_id, components.item_template_id")
+        lst = []
+        if self.query.isActive():
+            self.query.first()
+            while self.query.isValid():
+                arr = dict({
+                    'contract':         self.query.value('contract'),
+                    'contract_id':      self.query.value('contract_id'),
+                    'device':           self.query.value('device'),
+                    'item_template_id': self.query.value('item_template_id'),
+                    'product':          self.query.value('product'),
+                    'count':            self.query.value('count'),
+                    'needed':           self.query.value('needed'),
+                    'date':             self.query.value('str_date')})
+                lst.append(arr)
+                self.query.next()
+        self.query.clear()
         return lst
 
     def delTemplate(self, id):
