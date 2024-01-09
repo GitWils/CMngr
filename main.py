@@ -229,7 +229,6 @@ class Project(QtWidgets.QWidget):
         """ new components save button clicked """
         if len(components) == 0:
             return
-        print(components.__repr__())
         self.db.saveComponents(components)
         self.components.loadData(self.db.getComponents())
         msg = ('добавлені комплектуючі до виробу <span style="text-decoration: underline">{}</span>,' +

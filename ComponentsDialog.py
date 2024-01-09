@@ -11,8 +11,6 @@ class ComponentsDlg(QtWidgets.QDialog):
         self.init()
 
     def init(self):
-        #print(self.components.__repr__())
-        #print(self.contracts.__repr__())
         self.setWindowTitle("Поставка комплектуючих")
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(600, 300)
@@ -66,8 +64,7 @@ class ComponentsDlg(QtWidgets.QDialog):
         self.clearItemsList()
         self.templateName.setText(self.getTemplateByContractId(int(self.cBoxContract.currentData())))
         for component in self.components:
-            #print(component.__repr__())
-            if component['template_id'] == int(self.cBoxContract.currentData()):
+            if component['template_id'] == self.getTemplateIdByContractId(self.cBoxContract.currentData()):
                 self.additionalWgts.append({
                     'lbl_name': QtWidgets.QLabel('Деталь №{}: '.format(self.itemsCnt + 1)),
                     'edit_name': QtWidgets.QLineEdit(),
@@ -127,6 +124,13 @@ class ComponentsDlg(QtWidgets.QDialog):
             if id == contract['id']:
                 return contract['short_name']
         return ''
+
+    def getTemplateIdByContractId(self, id):
+        id = int(id)
+        for contract in self.contracts:
+            if id == contract['id']:
+                return contract['template_id']
+        return 0
 
     def setTaborders(self):
         pass

@@ -62,7 +62,7 @@ class DBManager():
 
     def updateItemsByTemplateId(self, templateId, items):
         print("id = {}".format(templateId))
-        print(items.__repr__())
+        #print(items.__repr__())
 
     def saveContract(self, contract):
         date = self.getDateTime()
@@ -159,29 +159,28 @@ class DBManager():
         return items
 
     def getContracts(self):
-        self.query.exec("select * from contracts order by id")
+        self.query.exec("select contracts.id, contracts.template_id, contracts.name, contracts.short_name, " +
+                        "contracts.count, contracts.note, contracts.str_date, templates.name " +
+                        "from contracts " +
+                        "join templates on " +
+                        "(templates.id = contracts.template_id) " +
+                        "order by contracts.id")
         lst = []
         if self.query.isActive():
             self.query.first()
             while self.query.isValid():
                 arr = dict({
-                        'id':           self.query.value('id'),
-                        'template_id':  self.query.value('template_id'),
-                        'name':         self.query.value('name'),
-                        'short_name':   self.query.value('short_name'),
-                        'count':        self.query.value('count'),
-                        'note':         self.query.value('note'),
-                        'date':         self.query.value('str_date')})
+                        'id':           self.query.value('contracts.id'),
+                        'template_id':  self.query.value('contracts.template_id'),
+                        'name':         self.query.value('contracts.name'),
+                        'template_name':self.query.value('templates.name'),
+                        'short_name':   self.query.value('contracts.short_name'),
+                        'count':        self.query.value('contracts.count'),
+                        'note':         self.query.value('contracts.note'),
+                        'date':         self.query.value('contracts.str_date')})
                 lst.append(arr)
                 self.query.next()
         self.query.clear()
-        for item in lst:
-            self.query.exec("select name from templates where id={}".format(item['template_id']))
-            if self.query.isActive():
-                self.query.first()
-                if self.query.isValid():
-                    item['template_name'] = self.query.value(0)
-            self.query.clear()
         return lst
 
     def getComponents(self):

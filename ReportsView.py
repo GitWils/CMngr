@@ -8,7 +8,6 @@ class Reports(CustomTable):
         self.loadData(self.reports)
 
     def loadData(self, reports):
-        print(reports.__repr__())
         self.reset()
         self.sti.clear()
         rowCnt = 0
