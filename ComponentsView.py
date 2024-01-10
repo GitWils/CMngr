@@ -8,6 +8,7 @@ class Components(CustomTable):
         self.loadData(self.components)
 
     def loadData(self, components):
+        self.components = components
         self.reset()
         self.sti.clear()
         rowCnt = 0

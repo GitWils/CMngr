@@ -215,31 +215,36 @@ class Project(QtWidgets.QWidget):
             return
         self.db.saveContract(contract)
         self.contracts.loadData(self.db.getContracts())
+        self.reports.loadData(self.db.getReports())
         msg = ('створено договір <span style="text-decoration: underline">{}</span> на виготовлення виробів ' +
                '<span style="text-decoration: underline">{}</span> кількістю {}шт.'.
                format(contract['short_name'], contract['template_name'], contract['count']))
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
         if self.contracts.getSize() == 1:
-            self.contracts.show()
             self.contractLbl.hide()
+            self.reportsLbl.hide()
             self.contractLt.replaceWidget(self.contractLbl, self.contracts)
+            self.reportsLt.replaceWidget(self.reportsLbl, self.reports)
+            self.contracts.show()
+            self.reports.show()
 
     def newComponentsSave(self, components):
         """ new components save button clicked """
         if len(components) == 0:
             return
         self.db.saveComponents(components)
+        self.reports.loadData(self.db.getReports())
         self.components.loadData(self.db.getComponents())
         msg = ('добавлені комплектуючі до виробу <span style="text-decoration: underline">{}</span>,' +
                ' згідно договору <span style="text-decoration: underline">{}</span>'
                .format(components[0]['template_name'], components[0]['contract_name']))
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
-        if self.components.getSize() > 0:
-            self.components.show()
+        if not self.componentsLbl.isHidden() and self.components.getSize() > 0:
             self.componentsLbl.hide()
             self.componentsLt.replaceWidget(self.componentsLbl, self.components)
+            self.components.show()
 
     def updateTemplate(self, name, items):
         """ edit template mode save edit button clicked """

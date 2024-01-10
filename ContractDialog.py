@@ -20,7 +20,7 @@ class ContractDlg(QtWidgets.QDialog):
 
         contractName = QtWidgets.QLabel("Назва договору:")
         self.name = QtWidgets.QLineEdit()
-        contractShortName = QtWidgets.QLabel("Коротка назва (№ХХХ):")
+        contractShortName = QtWidgets.QLabel("Коротка назва (№ХХ):")
         self.shortName = QtWidgets.QLineEdit()
 
         lbl_name = QtWidgets.QLabel('Назва деталі №{}:'.format(self.itemsCnt + 1))

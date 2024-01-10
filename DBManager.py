@@ -76,7 +76,17 @@ class DBManager():
         self.query.bindValue(':str_date', date['s_date'])
         self.query.bindValue(':dt', date['datetime'])
         self.query.exec()
+        contractId = self.query.lastInsertId()
         self.query.clear()
+        #TODO fill components table with zero count fields
+        components = self.getItemsByTemplateId(contract['template_id'])
+        for component in components:
+            component['contract_id'] = contractId
+            component['item_template_id'] = component['id']
+            component['template_id'] = contract['template_id']
+            #TODO component['note_id'] = ?
+            component['count'] = 0
+        self.saveComponents(components)
 
     def saveComponents(self, components):
         if len(components):
@@ -87,6 +97,7 @@ class DBManager():
                 self.query.bindValue(':contract_id', component['contract_id'])
                 self.query.bindValue(':item_template_id', component['item_template_id'])
                 self.query.bindValue(':template_id', component['template_id'])
+                #TODO insert note_id
                 self.query.bindValue(':note_id', '3')
                 self.query.bindValue(':count', component['count'])
                 self.query.bindValue(':str_date', date['s_date'])
@@ -184,16 +195,17 @@ class DBManager():
         return lst
 
     def getComponents(self):
-        self.query.exec("select components.id, components.count, components.str_date," +
-                        "items_template.name, contracts.short_name, templates.name as device " +
-                        "from components " +
-                        "join contracts on " +
-                        "(contracts.id = components.contract_id)"
-                        "join items_template on " +
-                        "(items_template.id = components.item_template_id) " +
-                        "join templates on " +
-                        "(templates.id = components.template_id) "
-                        "order by components.id")
+        self.query.exec(" select components.id, components.count, components.str_date," +
+                        " items_template.name, contracts.short_name, templates.name as device " +
+                        " from components " +
+                        " join contracts on " +
+                        " (contracts.id = components.contract_id)" +
+                        " join items_template on " +
+                        " (items_template.id = components.item_template_id) " +
+                        " join templates on " +
+                        " (templates.id = components.template_id) " +
+                        " where components.count > 0 " +
+                        " order by components.id")
         lst = []
         if self.query.isActive():
             self.query.first()
@@ -230,7 +242,7 @@ class DBManager():
                         "(templates.id = components.template_id) "
                         "join items_template on " +
                         "(items_template.id = components.item_template_id)"
-                        "group by components.template_id, components.item_template_id")
+                        "group by components.contract_id, components.item_template_id")
         lst = []
         if self.query.isActive():
             self.query.first()

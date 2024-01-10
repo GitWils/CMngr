@@ -8,6 +8,7 @@ class Reports(CustomTable):
         self.loadData(self.reports)
 
     def loadData(self, reports):
+        self.reports = reports
         self.reset()
         self.sti.clear()
         rowCnt = 0
@@ -19,11 +20,11 @@ class Reports(CustomTable):
             item4 = QtGui.QStandardItem(str(report['count']))
             item5 = QtGui.QStandardItem(str(report['needed'] - report['count']))
             item6 = QtGui.QStandardItem(str(report['needed']))
-            item7 = QtGui.QStandardItem(report['date'][5:])
+            #item7 = QtGui.QStandardItem(report['date'][5:])
             self.sti.appendRow([item0, item1, item2, item3, item4, item5, item6])
             rowCnt += 1
         self.sti.setHorizontalHeaderLabels(
-            ['Id', 'Деталь', 'Виріб', 'Договір', 'Наявність', 'Очікується','По договору\nнеобхідно', 'Дата\nнадходження'])
+            ['Id', 'Деталь', 'Виріб', 'Договір', 'Наявність', 'Очікується','Всього\nнеобхідно'])
         self.sti.setRowCount(rowCnt)
         self.setModel(self.sti)
         self.setColumnStyles()
