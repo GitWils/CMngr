@@ -29,7 +29,7 @@ class Project(QtWidgets.QWidget):
 
     def event(self, e):
         if e.type() == QtCore.QEvent.Type.WindowDeactivate:
-            self.setWindowOpacity(0.8)
+            self.setWindowOpacity(0.9)
         elif e.type() == QtCore.QEvent.Type.WindowActivate:
             self.setWindowOpacity(1)
         elif e.type() == QtCore.QEvent.Type.KeyPress and e.key() == QtCore.Qt.Key.Key_Escape:
@@ -199,6 +199,8 @@ class Project(QtWidgets.QWidget):
 
     def newTemplateSave(self, name, items):
         """ new template mode save button clicked """
+        if len(name) == 0 or items[0]['name'] == '':
+            return
         self.db.saveTemplate(name, items)
         self.designer.loadData(self.db.getTemplates())
         msg = 'створено шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
@@ -211,14 +213,15 @@ class Project(QtWidgets.QWidget):
 
     def newContractSave(self, contract):
         """ new contract save button clicked """
+        print(contract.__repr__())
         if contract['count'] == 0 or contract['name'] == '':
             return
         self.db.saveContract(contract)
         self.contracts.loadData(self.db.getContracts())
         self.reports.loadData(self.db.getReports())
-        msg = ('створено договір <span style="text-decoration: underline">{}</span> на виготовлення виробів ' +
-               '<span style="text-decoration: underline">{}</span> кількістю {}шт.'.
-               format(contract['short_name'], contract['template_name'], contract['count']))
+        msg = """створено договір <span style='text-decoration: underline'>{}</span> на виготовлення виробів 
+                <span style='text-decoration: underline'>{}</span> кількістю {}шт."""
+        msg = msg.format(contract['short_name'], contract['template_name'], str(contract['count']))
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
         if self.contracts.getSize() == 1:
@@ -236,9 +239,9 @@ class Project(QtWidgets.QWidget):
         self.db.saveComponents(components)
         self.reports.loadData(self.db.getReports())
         self.components.loadData(self.db.getComponents())
-        msg = ('добавлені комплектуючі до виробу <span style="text-decoration: underline">{}</span>,' +
-               ' згідно договору <span style="text-decoration: underline">{}</span>'
-               .format(components[0]['template_name'], components[0]['contract_name']))
+        msg = """добавлені комплектуючі до виробу <span style='text-decoration: underline'>{}</span>,
+                 згідно договору <span style='text-decoration: underline'>{}</span>"""
+        msg = msg.format(components[0]['template_name'], components[0]['contract_name'])
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
         if not self.componentsLbl.isHidden() and self.components.getSize() > 0:
@@ -279,7 +282,11 @@ class Project(QtWidgets.QWidget):
         print("edit clicked")
 
     def delDesignClicked(self):
+        #TODO checking for template usage
+        return
         templateId = self.designer.getSelectedRowId()
+        print(templateId)
+        return
         self.db.delTemplate(templateId)
         self.db.delItemsByTemplateId(templateId)
         self.designer.loadData(self.db.getTemplates())

@@ -1,3 +1,4 @@
+import sys
 from PyQt6 import QtGui, QtWidgets, QtCore
 from CustomWidgets import EditBtn
 
@@ -87,12 +88,14 @@ class ComponentsDlg(QtWidgets.QDialog):
     def initButtonBox(self):
         """ create widget with "Cancel" and "Save" buttons """
         bbox = QtWidgets.QDialogButtonBox()
-        bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok |
-                                QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Cancel |
+                                QtWidgets.QDialogButtonBox.StandardButton.Ok)
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('vmenu')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('vmenu')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
+        if sys.platform == 'win32':
+            bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
         return bbox

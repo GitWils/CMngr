@@ -53,8 +53,8 @@ class DBManager():
         for item in items:
             self.query.prepare("insert into items_template values(null, :template_id, :name, :count, True, :str_date, :dt)")
             self.query.bindValue(':template_id', templateId)
-            self.query.bindValue(':name', item[0])
-            self.query.bindValue(':count', item[1])
+            self.query.bindValue(':name', item['name'])
+            self.query.bindValue(':count', item['count'])
             self.query.bindValue(':str_date', date['s_date'])
             self.query.bindValue(':dt', date['datetime'])
             self.query.exec()

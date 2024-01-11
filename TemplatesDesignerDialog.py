@@ -1,3 +1,4 @@
+import sys
 from PyQt6 import QtWidgets, QtCore
 from CustomWidgets import EditBtn
 
@@ -72,6 +73,8 @@ class TemplateDialog(QtWidgets.QDialog):
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('vmenu')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
+        if sys.platform == 'win32':
+            bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
         return bbox
@@ -108,7 +111,7 @@ class TemplateDialog(QtWidgets.QDialog):
         """ Save button click reaction """
         items = []
         for i in range(0, self.itemsCnt):
-            items.append([self.additionalWgts[i]['edit_name'].text(), self.additionalWgts[i]['spin_cnt'].value()])
+            items.append(dict({'name': self.additionalWgts[i]['edit_name'].text(), 'count': self.additionalWgts[i]['spin_cnt'].value()}))
         if self.editMode:
             self.parent.updateTemplate(self.name.text(), items)
         else:
