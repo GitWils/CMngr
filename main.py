@@ -8,6 +8,7 @@ from ReportsView import Reports
 from ComponentsDialog import ComponentsDlg
 from ContractsView import Contract
 from ContractDialog import ContractDlg
+from FindMenu import FindMenu
 from LoggerView import Logger
 import sys
 
@@ -37,7 +38,9 @@ class Project(QtWidgets.QWidget):
         return QtWidgets.QWidget.event(self, e)
 
     def initMenu(self):
-        self.initVMenu()
+        # self.initVMenu()
+        self.vMenu = QtWidgets.QGridLayout()
+        self.fMenu = FindMenu(self.vMenu)
         self.__initLayout1()
         self.__initLayout0()
 
@@ -283,7 +286,6 @@ class Project(QtWidgets.QWidget):
 
     def delDesignClicked(self):
         #TODO checking for template usage
-        return
         templateId = self.designer.getSelectedRowId()
         print(templateId)
         return
@@ -319,24 +321,26 @@ class Project(QtWidgets.QWidget):
         self.innerbox.addLayout(mainArea,  QtCore.Qt.AlignmentFlag.AlignCenter)
 
     def initVMenu(self):
+        """ creates vertical menu on the left """
         #buttons
-        button4 = QtWidgets.QPushButton("Налаштування")
-        button4.setObjectName('vmenu')
-        button4.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
-        button4.setDisabled(True)
-        button5 = QtWidgets.QPushButton("Фільтр")
-        button5.setObjectName('vmenu')
-        button5.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
+        # button4 = QtWidgets.QPushButton("Налаштування")
+        # button4.setObjectName('vmenu')
+        # button4.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
+        # button4.setDisabled(True)
+        # button5 = QtWidgets.QPushButton("Фільтр")
+        # button5.setObjectName('vmenu')
+        # button5.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
 
-        self.vMenu = QtWidgets.QVBoxLayout()
-        self.vMenu.addWidget(button4)
-        self.vMenu.addWidget(button5)
-        self.vMenu.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
-        self.vMenu.setSpacing(20)
-        self.vMenu.setContentsMargins(10, 10, 10, 10)
-        self.vMenu.addStretch(40)
+        # self.vMenu = QtWidgets.QVBoxLayout()
+        # self.vMenu.addWidget(button4)
+        # self.vMenu.addWidget(button5)
+        # self.vMenu.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+        # self.vMenu.setSpacing(20)
+        # self.vMenu.setContentsMargins(10, 10, 10, 10)
+        # self.vMenu.addStretch(40)
 
     def centerWindow(self):
+        """ centering the main window in the center of the screen"""
         qr = self.frameGeometry()
         cp = self.screen().availableGeometry().center()
         qr.moveCenter(cp)
