@@ -3,8 +3,10 @@ from PyQt6.QtWidgets import QAbstractItemView
 
 
 class FindMenu():
-    def __init__(self, grid):
+    def __init__(self, grid, contracts):
         self.grid = grid
+        self.contracts = contracts
+        print(self.contracts.__repr__())
         self.lblFrom = QtWidgets.QLabel("З:")
         self.dateFrom = QtWidgets.QDateTimeEdit()
         self.chckFrom = QtWidgets.QCheckBox()
@@ -32,15 +34,20 @@ class FindMenu():
         self.lblFrom.setDisabled(True)
         self.lblTo.setDisabled(True)
 
-        lst = ['Договір №1', 'Договір №2', 'Договір №3']
-        for row in lst:
-            item = QtGui.QStandardItem(row)
-            self.sti.appendRow(item)
         self.lv.setModel(self.sti)
-        #self.lv.resize(50, 50)
         self.lv.setFixedWidth(185)
         self.lv.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.MultiSelection)
+        self.lv.setSpacing(2)
+        lst = ['Договір №1', 'Договір №2', 'Договір №3']
+        for contract in self.contracts:
+            item = QtGui.QStandardItem(contract['name'])
+            item.setCheckState(1)
+            self.sti.appendRow(item)
+        #self.lv.setSelectionRectVisible(True)
         #self.lv.setEditTriggers(QtWidgets.QAbstractItemView.)
+
+    def update(self):
+        pass
 
     def initConnections(self):
         self.chckFrom.stateChanged.connect(self.fromClicked)

@@ -30,7 +30,7 @@ class TemplateDialog(QtWidgets.QDialog):
         bbox = self.initButtonBox()
 
         self.grid.addWidget(deviceName, 0, 0, 1, 1)
-        self.grid.addWidget(self.name, 0, 1, 1, 1)
+        self.grid.addWidget(self.name, 0, 1, 1, 3)
         self.grid.addWidget(self.plusMinusMenu(), 100, 0, 1, 4)
         self.grid.addWidget(bbox, 101, 0, 1, 4)
         self.grid.setAlignment(bbox, QtCore.Qt.AlignmentFlag.AlignCenter)

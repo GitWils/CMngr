@@ -40,7 +40,7 @@ class Project(QtWidgets.QWidget):
     def initMenu(self):
         # self.initVMenu()
         self.vMenu = QtWidgets.QGridLayout()
-        self.fMenu = FindMenu(self.vMenu)
+        self.fMenu = FindMenu(self.vMenu, self.db.getContracts())
         self.__initLayout1()
         self.__initLayout0()
 
