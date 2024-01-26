@@ -222,10 +222,11 @@ class Project(QtWidgets.QWidget):
         self.__filter['contracts'] = contracts
         if hasattr(self, 'components'):
             self.components.loadData(self.db.getComponents(self.getFilter()))
+        if hasattr(self, 'reports'):
+            self.reports.loadData(self.db.getReports(self.getFilter()))
 
     def newContractSave(self, contract: dict):
         """ new contract save button clicked """
-        print(contract.__repr__())
         if contract['count'] == 0 or contract['name'] == '':
             return
         self.db.saveContract(contract)
@@ -237,6 +238,7 @@ class Project(QtWidgets.QWidget):
         msg = msg.format(contract['short_name'], contract['template_name'], str(contract['count']))
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
+        self.fMenu.setAllSelected()
         if self.contracts.getSize() == 1:
             self.contractLbl.hide()
             self.reportsLbl.hide()
@@ -250,8 +252,8 @@ class Project(QtWidgets.QWidget):
         if len(components) == 0:
             return
         self.db.saveComponents(components)
-        self.reports.loadData(self.db.getReports())
-        self.components.loadData(self.db.getComponents())
+        self.reports.loadData(self.db.getReports(self.getFilter()))
+        self.components.loadData(self.db.getComponents(self.getFilter()))
         msg = """добавлені комплектуючі до виробу <span style='text-decoration: underline'>{}</span>,
                  згідно договору <span style='text-decoration: underline'>{}</span>"""
         msg = msg.format(components[0]['template_name'], components[0]['contract_name'])

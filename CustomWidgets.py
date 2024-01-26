@@ -35,6 +35,7 @@ class CustomTable(QtWidgets.QTableView):
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.setAlternatingRowColors(True)
         self.setSortingEnabled(True)
+        self.setEditTriggers(QtWidgets.QListView.EditTrigger.NoEditTriggers)
         #self.setColumnWidth(0, 200)
         #self.setColumnWidth(1, 400)
         header = self.horizontalHeader()

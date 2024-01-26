@@ -238,19 +238,25 @@ class DBManager():
         #(https://www.sqlitetutorial.net/sqlite-left-join/)
         return lst
 
-    def getReports(self):
-        self.query.exec("select components.contract_id, components.item_template_id, " +
-                        "sum(components.count) as count, " +
-                        "components.str_date,  contracts.short_name as contract, templates.name as device, " +
-                        "items_template.name as product,  items_template.count * contracts.count as needed " +
-                        "from components " +
-                        "join contracts on " +
-                        "(contracts.id = components.contract_id) " +
-                        "join templates on " +
-                        "(templates.id = components.template_id) "
-                        "join items_template on " +
-                        "(items_template.id = components.item_template_id)"
-                        "group by components.contract_id, components.item_template_id")
+    def getReports(self, filter=()):
+        where = ''
+        if len(filter):
+            where = ' and ('
+            for id in filter['contracts']:
+                where += 'components.contract_id = {} or '.format(id)
+            where = where[:-4] + ')'
+        self.query.exec(" select components.contract_id, components.item_template_id, " +
+                        " sum(components.count) as count, " +
+                        " components.str_date,  contracts.short_name as contract, templates.name as device, " +
+                        " items_template.name as product,  items_template.count * contracts.count as needed " +
+                        " from components " +
+                        " join contracts on " +
+                        " (contracts.id = components.contract_id) " +
+                        " join templates on " +
+                        " (templates.id = components.template_id) "
+                        " join items_template on " +
+                        " (items_template.id = components.item_template_id) " + where +
+                        " group by components.contract_id, components.item_template_id")
         lst = []
         if self.query.isActive():
             self.query.first()

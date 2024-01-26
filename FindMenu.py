@@ -37,6 +37,7 @@ class FindMenu():
         self.lv.setModel(self.sti)
         self.lv.setFixedWidth(185)
         self.lv.selectionModel().selectionChanged.connect(self.update)
+        self.lv.setEditTriggers(QtWidgets.QListView.EditTrigger.NoEditTriggers)
         self.lv.setSpacing(2)
         self.reload()
 
@@ -49,9 +50,7 @@ class FindMenu():
             item = QtGui.QStandardItem(contract['name'])
             self.sti.appendRow(item)
         if contracts is None:
-            for i in range(len(self.contracts)):
-                index = self.sti.index(i, 0)
-                self.lv.selectionModel().select(index,  QtCore.QItemSelectionModel.SelectionFlag.Select)
+            self.setAllSelected()
 
     def getSelected(self):
         lst = []
@@ -62,6 +61,11 @@ class FindMenu():
 
     def update(self):
         self.parent.setFindFilter(self.getSelected())
+
+    def setAllSelected(self):
+        for i in range(len(self.contracts)):
+            index = self.sti.index(i, 0)
+            self.lv.selectionModel().select(index, QtCore.QItemSelectionModel.SelectionFlag.Select)
 
     def initConnections(self):
         self.chckFrom.stateChanged.connect(self.fromClicked)

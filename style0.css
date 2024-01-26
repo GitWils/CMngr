@@ -70,6 +70,24 @@ QListView::item:selected {
     background-color: "#e95420"
 }
 
+/********************************* QCheckBox UI settings ***************************************/
+QCheckBox::indicator {
+    color: "red";
+}
+
+QCheckBox::indicator:checked {
+    color: "red";
+}
+
+/********************************* QDateTimeEdit UI settings ***************************************/
+QDateTimeEdit {
+    color: #F0F5F9;
+}
+
+QDateTimeEdit:disabled {
+    color: #52616B;
+}
+
 .date {
     color: #071;
 }
