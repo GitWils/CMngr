@@ -3,10 +3,10 @@ from PyQt6.QtWidgets import QAbstractItemView
 
 
 class FindMenu():
-    def __init__(self, grid, contracts):
+    def __init__(self, parent, grid, contracts):
+        self.parent = parent
         self.grid = grid
         self.contracts = contracts
-        print(self.contracts.__repr__())
         self.lblFrom = QtWidgets.QLabel("З:")
         self.dateFrom = QtWidgets.QDateTimeEdit()
         self.chckFrom = QtWidgets.QCheckBox()
@@ -36,22 +36,37 @@ class FindMenu():
 
         self.lv.setModel(self.sti)
         self.lv.setFixedWidth(185)
-        self.lv.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.MultiSelection)
+        self.lv.selectionModel().selectionChanged.connect(self.update)
         self.lv.setSpacing(2)
-        lst = ['Договір №1', 'Договір №2', 'Договір №3']
+        self.reload()
+
+    def reload(self, contracts=None):
+        """ reload must be use when table templates changed """
+        if contracts:
+            self.contracts = contracts
+            self.sti.clear()
         for contract in self.contracts:
             item = QtGui.QStandardItem(contract['name'])
-            item.setCheckState(1)
             self.sti.appendRow(item)
-        #self.lv.setSelectionRectVisible(True)
-        #self.lv.setEditTriggers(QtWidgets.QAbstractItemView.)
+        if contracts is None:
+            for i in range(len(self.contracts)):
+                index = self.sti.index(i, 0)
+                self.lv.selectionModel().select(index,  QtCore.QItemSelectionModel.SelectionFlag.Select)
+
+    def getSelected(self):
+        lst = []
+        indexes = self.lv.selectionModel().selectedIndexes()
+        for index in indexes:
+            lst.append(self.contracts[index.row()]['id'])
+        return lst
 
     def update(self):
-        pass
+        self.parent.setFindFilter(self.getSelected())
 
     def initConnections(self):
         self.chckFrom.stateChanged.connect(self.fromClicked)
         self.chckTo.stateChanged.connect(self.toClicked)
+        self.lv.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.MultiSelection)
 
     def addWidgets(self):
         self.grid.addWidget(self.lblFrom, 1, 0, 1, 1)

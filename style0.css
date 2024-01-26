@@ -1,4 +1,4 @@
-/*using palettes: #1E2022, #52616B, #C9D6DF, #F0F5F9*/
+/*using palettes: #1E2022, #52616B, #C9D6DF, #F0F5F9, orange - #e95420*/
 QWidget {
     /*background-color: "#2E3032";*/
     background-color: "#343938";
@@ -63,6 +63,11 @@ QLineEdit[readOnly="true"] {
 /********************************* QListView UI settings ***************************************/
 QListView {
     width: 50px;
+    color: #F0F5F9;
+}
+
+QListView::item:selected {
+    background-color: "#e95420"
 }
 
 .date {

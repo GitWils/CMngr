@@ -94,8 +94,8 @@ class ComponentsDlg(QtWidgets.QDialog):
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('vmenu')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
-        if sys.platform == 'win32':
-            bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
+        #if sys.platform == 'win32':
+        bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
         return bbox

@@ -194,8 +194,15 @@ class DBManager():
         self.query.clear()
         return lst
 
-    def getComponents(self):
-        self.query.exec(" select components.id, components.count, components.str_date," +
+    def getComponents(self, filter=()):
+        where = ''
+        if len(filter):
+            where = ' and ('
+            for id in filter['contracts']:
+                where += 'components.contract_id = {} or '.format(id)
+            where = where[:-4] + ')'
+
+        self.query.exec(" select components.id, components.count, components.contract_id, components.str_date," +
                         " items_template.name, contracts.short_name, templates.name as device " +
                         " from components " +
                         " join contracts on " +
@@ -204,19 +211,20 @@ class DBManager():
                         " (items_template.id = components.item_template_id) " +
                         " join templates on " +
                         " (templates.id = components.template_id) " +
-                        " where components.count > 0 " +
+                        " where components.count > 0 " + where +
                         " order by components.id")
         lst = []
         if self.query.isActive():
             self.query.first()
             while self.query.isValid():
                 arr = dict({
-                    'id':       self.query.value('id'),
-                    'name':     self.query.value('name'),
-                    'device':   self.query.value('device'),
-                    'contract': self.query.value('short_name'),
-                    'count':    self.query.value('count'),
-                    'date':     self.query.value('str_date')})
+                    'id':           self.query.value('id'),
+                    'name':         self.query.value('name'),
+                    'device':       self.query.value('device'),
+                    'contract':     self.query.value('short_name'),
+                    'contract_id':  self.query.value('contract_id'),
+                    'count':        self.query.value('count'),
+                    'date':         self.query.value('str_date')})
                 lst.append(arr)
                 self.query.next()
         self.query.clear()

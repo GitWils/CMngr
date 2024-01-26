@@ -3,9 +3,9 @@ from PyQt6 import QtWidgets, QtCore
 from CustomWidgets import EditBtn
 
 class TemplateDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None, name='', items=[]):
-        super(TemplateDialog, self).__init__(parent)
-        self.setParent(parent)
+    def __init__(self, parent=None, name='', items=()):
+        super().__init__(parent)
+        #self.setParent(parent)
         self.parent = parent
         self.editMode = True if len(items) else False
         self.templateName = name
@@ -73,8 +73,10 @@ class TemplateDialog(QtWidgets.QDialog):
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('vmenu')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
-        if sys.platform == 'win32':
-            bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
+        #TODO:
+        #if sys.platform == 'Ubuntu Gnome':
+        bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
+        print(sys.platform)
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
         return bbox

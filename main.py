@@ -16,6 +16,9 @@ class Project(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.db = DBManager()
+        self.__filter = dict({
+            'contracts': []
+        })
         self.initUI()
 
     def initUI(self):
@@ -28,7 +31,7 @@ class Project(QtWidgets.QWidget):
         #self.setObjectName('main')
         self.show()
 
-    def event(self, e):
+    def event(self, e) -> QtWidgets.QWidget.event:
         if e.type() == QtCore.QEvent.Type.WindowDeactivate:
             self.setWindowOpacity(0.9)
         elif e.type() == QtCore.QEvent.Type.WindowActivate:
@@ -40,7 +43,7 @@ class Project(QtWidgets.QWidget):
     def initMenu(self):
         # self.initVMenu()
         self.vMenu = QtWidgets.QGridLayout()
-        self.fMenu = FindMenu(self.vMenu, self.db.getContracts())
+        self.fMenu = FindMenu(self, self.vMenu, self.db.getContracts())
         self.__initLayout1()
         self.__initLayout0()
 
@@ -58,7 +61,7 @@ class Project(QtWidgets.QWidget):
         self.vbox.setStretch(1, 1)
         self.setLayout(self.vbox)
 
-    def createDesignerTab(self):
+    def createDesignerTab(self) -> QtWidgets.QWidget:
         tab = QtWidgets.QWidget()
         tab.setStyleSheet("border: 0px solid red")
         self.desLayout = QtWidgets.QVBoxLayout()
@@ -90,7 +93,7 @@ class Project(QtWidgets.QWidget):
         self.desLayout.setStretch(1, 1)
         return tab
 
-    def createContractsTab(self):
+    def createContractsTab(self) -> QtWidgets.QWidget:
         tab = QtWidgets.QWidget()
         tab.setStyleSheet("border: 0px solid red")
         self.contractLt = QtWidgets.QVBoxLayout()
@@ -125,7 +128,7 @@ class Project(QtWidgets.QWidget):
         self.contractLt.setStretch(1, 1)
         return tab
 
-    def createComponentsTab(self):
+    def createComponentsTab(self) -> QtWidgets.QWidget:
         tab = QtWidgets.QWidget()
         tab.setStyleSheet("border: 0px solid red")
         self.componentsLt = QtWidgets.QVBoxLayout()
@@ -159,7 +162,7 @@ class Project(QtWidgets.QWidget):
         self.componentsLt.setStretch(1, 1)
         return tab
 
-    def createReportTab(self):
+    def createReportTab(self) -> QtWidgets.QWidget:
         tab = QtWidgets.QWidget()
         tab.setStyleSheet("border: 0px solid red")
         self.reportsLt = QtWidgets.QVBoxLayout()
@@ -200,7 +203,7 @@ class Project(QtWidgets.QWidget):
         self.editConBtn.setActive(True)
         self.delConBtn.setActive(True)
 
-    def newTemplateSave(self, name, items):
+    def newTemplateSave(self, name: str, items: list):
         """ new template mode save button clicked """
         if len(name) == 0 or items[0]['name'] == '':
             return
@@ -214,13 +217,20 @@ class Project(QtWidgets.QWidget):
             self.desLbl.hide()
             self.desLayout.replaceWidget(self.desLbl, self.designer)
 
-    def newContractSave(self, contract):
+    def setFindFilter(self, contracts):
+        """ filter for components and reports tabs """
+        self.__filter['contracts'] = contracts
+        if hasattr(self, 'components'):
+            self.components.loadData(self.db.getComponents(self.getFilter()))
+
+    def newContractSave(self, contract: dict):
         """ new contract save button clicked """
         print(contract.__repr__())
         if contract['count'] == 0 or contract['name'] == '':
             return
         self.db.saveContract(contract)
         self.contracts.loadData(self.db.getContracts())
+        self.fMenu.reload(self.db.getContracts())
         self.reports.loadData(self.db.getReports())
         msg = """створено договір <span style='text-decoration: underline'>{}</span> на виготовлення виробів 
                 <span style='text-decoration: underline'>{}</span> кількістю {}шт."""
@@ -235,7 +245,7 @@ class Project(QtWidgets.QWidget):
             self.contracts.show()
             self.reports.show()
 
-    def newComponentsSave(self, components):
+    def newComponentsSave(self, components: list):
         """ new components save button clicked """
         if len(components) == 0:
             return
@@ -252,7 +262,7 @@ class Project(QtWidgets.QWidget):
             self.componentsLt.replaceWidget(self.componentsLbl, self.components)
             self.components.show()
 
-    def updateTemplate(self, name, items):
+    def updateTemplate(self, name: str, items: list):
         """ edit template mode save edit button clicked """
         self.db.updateItemsByTemplateId(self.designer.getSelectedRowId(), items)
         self.designer.loadData(self.db.getTemplates())
@@ -345,6 +355,9 @@ class Project(QtWidgets.QWidget):
         cp = self.screen().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
+    def getFilter(self):
+        return self.__filter
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
