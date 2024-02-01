@@ -1,6 +1,4 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
-from PyQt6.QtWidgets import QAbstractItemView
-
 
 class FindMenu():
     def __init__(self, parent, grid, contracts):
@@ -27,16 +25,23 @@ class FindMenu():
 
         self.dateFrom.setCalendarPopup(True)
         self.dateFrom.setDisabled(True)
+        date_from = QtCore.QDateTime.currentDateTime()
+        date_from = date_from.addYears(-1)
+        date_from.setTime(QtCore.QTime(0, 0, 0))
+        self.dateFrom.setDateTime(date_from)
 
         self.dateTo.setCalendarPopup(True)
         self.dateTo.setDisabled(True)
+        date_to = QtCore.QDateTime.currentDateTime().addDays(1)
+        date_to = date_to.addDays(1)
+        date_to.setTime(QtCore.QTime(0, 0, 0))
+        self.dateTo.setDateTime(date_to)
 
         self.lblFrom.setDisabled(True)
         self.lblTo.setDisabled(True)
 
         self.lv.setModel(self.sti)
         self.lv.setFixedWidth(185)
-        self.lv.selectionModel().selectionChanged.connect(self.update)
         self.lv.setEditTriggers(QtWidgets.QListView.EditTrigger.NoEditTriggers)
         self.lv.setSpacing(2)
         self.reload()
@@ -59,8 +64,16 @@ class FindMenu():
             lst.append(self.contracts[index.row()]['id'])
         return lst
 
+    def getDateFilter(self):
+        arr = dict({'from': None, 'to': None})
+        if self.chckFrom.isChecked():
+            arr['from'] = self.dateFrom.dateTime().toString('yyyy-MM-dd hh:mm:ss')
+        if self.chckTo.isChecked():
+            arr['to'] = self.dateTo.dateTime().toString('yyyy-MM-dd hh:mm:ss')
+        return arr
+
     def update(self):
-        self.parent.setFindFilter(self.getSelected())
+        self.parent.setFindFilter(self.getSelected(), self.getDateFilter())
 
     def setAllSelected(self):
         for i in range(len(self.contracts)):
@@ -71,6 +84,9 @@ class FindMenu():
         self.chckFrom.stateChanged.connect(self.fromClicked)
         self.chckTo.stateChanged.connect(self.toClicked)
         self.lv.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.MultiSelection)
+        self.lv.selectionModel().selectionChanged.connect(self.update)
+        self.dateFrom.dateChanged.connect(self.update)
+        self.dateTo.dateChanged.connect(self.update)
 
     def addWidgets(self):
         self.grid.addWidget(self.lblFrom, 1, 0, 1, 1)
@@ -84,17 +100,19 @@ class FindMenu():
     def fromClicked(self):
         """ checkbox from changing state """
         if self.chckFrom.isChecked():
-            self.dateFrom.setDisabled(False)
-            self.lblFrom.setDisabled(False)
+            self.dateFrom.setEnabled(True)
+            self.lblFrom.setEnabled(True)
         else:
-            self.dateFrom.setDisabled(True)
-            self.lblFrom.setDisabled(True)
+            self.dateFrom.setEnabled(False)
+            self.lblFrom.setEnabled(False)
+        self.update()
 
     def toClicked(self):
         """ checkbox to changing state """
         if self.chckTo.isChecked():
-            self.dateTo.setDisabled(False)
-            self.lblTo.setDisabled(False)
+            self.dateTo.setEnabled(True)
+            self.lblTo.setEnabled(True)
         else:
-            self.dateTo.setDisabled(True)
-            self.lblTo.setDisabled(True)
+            self.dateTo.setEnabled(False)
+            self.lblTo.setEnabled(False)
+        self.update()

@@ -194,14 +194,22 @@ class DBManager():
         self.query.clear()
         return lst
 
-    def getComponents(self, filter=()):
+    def getWhereFromFilter(self, filter):
         where = ''
         if len(filter):
             where = ' and ('
             for id in filter['contracts']:
-                where += 'components.contract_id = {} or '.format(id)
+                where += ' components.contract_id = {} or '.format(id)
             where = where[:-4] + ')'
 
+            if filter['from']:
+                where += ' and(components.dt > "{}") '.format(filter['from'])
+            if filter['to']:
+                where += ' and(components.dt < "{}")'.format(filter['to'])
+        return where
+
+    def getComponents(self, filter=()):
+        where = self.getWhereFromFilter(filter)
         self.query.exec(" select components.id, components.count, components.contract_id, components.str_date," +
                         " items_template.name, contracts.short_name, templates.name as device " +
                         " from components " +
@@ -228,23 +236,10 @@ class DBManager():
                 lst.append(arr)
                 self.query.next()
         self.query.clear()
-        # select components.id, items_template.name, contracts.name, components.[count]
-        # from components
-        # left join contracts on
-        # (contracts.id = components.contract_id)
-        # left join items_template on
-        # (items_template.id = components.item_template_id)
-        # order by components.id
-        #(https://www.sqlitetutorial.net/sqlite-left-join/)
         return lst
 
     def getReports(self, filter=()):
-        where = ''
-        if len(filter):
-            where = ' and ('
-            for id in filter['contracts']:
-                where += 'components.contract_id = {} or '.format(id)
-            where = where[:-4] + ')'
+        where = self.getWhereFromFilter(filter)
         self.query.exec(" select components.contract_id, components.item_template_id, " +
                         " sum(components.count) as count, " +
                         " components.str_date,  contracts.short_name as contract, templates.name as device, " +

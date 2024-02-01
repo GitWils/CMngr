@@ -217,9 +217,11 @@ class Project(QtWidgets.QWidget):
             self.desLbl.hide()
             self.desLayout.replaceWidget(self.desLbl, self.designer)
 
-    def setFindFilter(self, contracts):
+    def setFindFilter(self, contracts, dates):
         """ filter for components and reports tabs """
         self.__filter['contracts'] = contracts
+        self.__filter['from'] = dates['from']
+        self.__filter['to'] = dates['to']
         if hasattr(self, 'components'):
             self.components.loadData(self.db.getComponents(self.getFilter()))
         if hasattr(self, 'reports'):
@@ -254,7 +256,7 @@ class Project(QtWidgets.QWidget):
         self.db.saveComponents(components)
         self.reports.loadData(self.db.getReports(self.getFilter()))
         self.components.loadData(self.db.getComponents(self.getFilter()))
-        msg = """добавлені комплектуючі до виробу <span style='text-decoration: underline'>{}</span>,
+        msg = """поставлені комплектуючі до виробу <span style='text-decoration: underline'>{}</span>,
                  згідно договору <span style='text-decoration: underline'>{}</span>"""
         msg = msg.format(components[0]['template_name'], components[0]['contract_name'])
         self.db.saveLogMsg(msg)
