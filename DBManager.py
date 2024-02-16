@@ -84,21 +84,26 @@ class DBManager():
             component['contract_id'] = contractId
             component['item_template_id'] = component['id']
             component['template_id'] = contract['template_id']
-            #TODO component['note_id'] = ?
             component['count'] = 0
         self.saveComponents(components)
 
     def saveComponents(self, components):
         if len(components):
             date = self.getDateTime()
+            self.query.prepare("insert into notes values (null, :note, :str_date, :dt)")
+            self.query.bindValue(':note', components[0]['note'])
+            self.query.bindValue(':str_date', date['s_date'])
+            self.query.bindValue(':dt', date['datetime'])
+            self.query.exec()
+            noteId = self.query.lastInsertId()
+            self.query.clear()
             for component in components:
                 self.query.prepare("insert into components values(" +
                                    "null, :contract_id, :item_template_id, :template_id, :note_id, :count, :str_date, :dt)")
                 self.query.bindValue(':contract_id', component['contract_id'])
                 self.query.bindValue(':item_template_id', component['item_template_id'])
                 self.query.bindValue(':template_id', component['template_id'])
-                #TODO insert note_id
-                self.query.bindValue(':note_id', '3')
+                self.query.bindValue(':note_id', noteId)
                 self.query.bindValue(':count', component['count'])
                 self.query.bindValue(':str_date', date['s_date'])
                 self.query.bindValue(':dt', date['datetime'])
@@ -202,16 +207,16 @@ class DBManager():
                 where += ' components.contract_id = {} or '.format(id)
             where = where[:-4] + ')'
 
-            if filter['from']:
+            if filter.get('from'):
                 where += ' and(components.dt > "{}") '.format(filter['from'])
-            if filter['to']:
+            if filter.get('to'):
                 where += ' and(components.dt < "{}")'.format(filter['to'])
         return where
 
     def getComponents(self, filter=()):
         where = self.getWhereFromFilter(filter)
         self.query.exec(" select components.id, components.count, components.contract_id, components.str_date," +
-                        " items_template.name, contracts.short_name, templates.name as device " +
+                        " items_template.name, contracts.short_name, templates.name as device, notes.note " +
                         " from components " +
                         " join contracts on " +
                         " (contracts.id = components.contract_id)" +
@@ -219,6 +224,8 @@ class DBManager():
                         " (items_template.id = components.item_template_id) " +
                         " join templates on " +
                         " (templates.id = components.template_id) " +
+                        " join notes on " +
+                        " (components.note_id = notes.id) " +
                         " where components.count > 0 " + where +
                         " order by components.id")
         lst = []
@@ -232,7 +239,8 @@ class DBManager():
                     'contract':     self.query.value('short_name'),
                     'contract_id':  self.query.value('contract_id'),
                     'count':        self.query.value('count'),
-                    'date':         self.query.value('str_date')})
+                    'date':         self.query.value('str_date'),
+                    'note':         self.query.value('note')})
                 lst.append(arr)
                 self.query.next()
         self.query.clear()

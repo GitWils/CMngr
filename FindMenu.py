@@ -1,7 +1,9 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 
-class FindMenu():
+
+class FindMenu:
     def __init__(self, parent, grid, contracts):
+        """ constructor function """
         self.parent = parent
         self.grid = grid
         self.contracts = contracts
@@ -19,6 +21,7 @@ class FindMenu():
         self.addWidgets()
 
     def initSettings(self):
+        """ initialisation settings """
         self.grid.setContentsMargins(20, 20, 20, 20)
         self.grid.setSpacing(10)
         self.grid.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
@@ -58,6 +61,7 @@ class FindMenu():
             self.setAllSelected()
 
     def getSelected(self):
+        """ get selected list values """
         lst = []
         indexes = self.lv.selectionModel().selectedIndexes()
         for index in indexes:
@@ -65,6 +69,7 @@ class FindMenu():
         return lst
 
     def getDateFilter(self):
+        """ get date filter values """
         arr = dict({'from': None, 'to': None})
         if self.chckFrom.isChecked():
             arr['from'] = self.dateFrom.dateTime().toString('yyyy-MM-dd hh:mm:ss')
@@ -73,14 +78,17 @@ class FindMenu():
         return arr
 
     def update(self):
+        """ on change any filter values"""
         self.parent.setFindFilter(self.getSelected(), self.getDateFilter())
 
     def setAllSelected(self):
+        """ set listview items all selected status """
         for i in range(len(self.contracts)):
             index = self.sti.index(i, 0)
             self.lv.selectionModel().select(index, QtCore.QItemSelectionModel.SelectionFlag.Select)
 
     def initConnections(self):
+        """ initialization signal connections"""
         self.chckFrom.stateChanged.connect(self.fromClicked)
         self.chckTo.stateChanged.connect(self.toClicked)
         self.lv.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.MultiSelection)
@@ -89,6 +97,7 @@ class FindMenu():
         self.dateTo.dateChanged.connect(self.update)
 
     def addWidgets(self):
+        """ positioning widgets at grid """
         self.grid.addWidget(self.lblFrom, 1, 0, 1, 1)
         self.grid.addWidget(self.dateFrom, 1, 1, 1, 1)
         self.grid.addWidget(self.chckFrom, 1, 2, 1, 1)

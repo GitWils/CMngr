@@ -19,13 +19,20 @@ class Components(CustomTable):
             item3 = QtGui.QStandardItem(component['contract'])
             item4 = QtGui.QStandardItem(str(component['count']) + ' шт.')
             item5 = QtGui.QStandardItem(component['date'][5:])
-            # item5 = QtGui.QStandardItem(contract['note'])
-            self.sti.appendRow([item0, item1, item2, item3, item4, item5])
+            item6 = QtGui.QStandardItem(component['note'])
+            self.sti.appendRow([item0, item1, item2, item3, item4, item5, item6])
             rowCnt += 1
         self.sti.setHorizontalHeaderLabels(['Id', 'Назва деталі', 'Виріб', 'Договір', 'Кількість', 'Дата\nнадходження', 'Примітка'])
         self.sti.setRowCount(rowCnt)
         self.setModel(self.sti)
         self.setColumnStyles()
+
+    def setColumnStyles(self):
+        CustomTable.setColumnStyles(self)
+        header = self.horizontalHeader()
+        #header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        #header.setMaximumWidth(300)
 
     def getSize(self):
         return len(self.components)

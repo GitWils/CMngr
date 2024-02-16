@@ -111,7 +111,9 @@ class ComponentsDlg(QtWidgets.QDialog):
                             'template_name': self.getTemplateByContractId(int(self.cBoxContract.currentData())),
                             'count': widget['spin_cnt'].value(),
                             'contract_id':  self.cBoxContract.currentData(),
-                            'contract_name': self.getContractNameById(int(self.cBoxContract.currentData()))})
+                            'contract_name': self.getContractNameById(int(self.cBoxContract.currentData())),
+                            'note': self.qTextNote.toPlainText()
+                             })
                 res.append(item)
         self.parent.newComponentsSave(res)
         self.accept()
