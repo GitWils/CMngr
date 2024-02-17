@@ -91,7 +91,7 @@ class DBManager():
         if len(components):
             date = self.getDateTime()
             self.query.prepare("insert into notes values (null, :note, :str_date, :dt)")
-            self.query.bindValue(':note', components[0]['note'])
+            self.query.bindValue(':note', components[0].get('note', ' '))
             self.query.bindValue(':str_date', date['s_date'])
             self.query.bindValue(':dt', date['datetime'])
             self.query.exec()
