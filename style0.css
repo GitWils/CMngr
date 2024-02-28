@@ -18,7 +18,7 @@ QWidget {
 
 /********************************* Buttons UI settings ***************************************/
 .QPushButton#vmenu {
-    font-size: 18px;
+    font-size: 16px;
     color: "#F0F5F9";
     background-color: "#52616B";
     border-radius: 7px;
@@ -26,7 +26,7 @@ QWidget {
     min-width: 207px;
 }
 .QPushButton#vmenu:pressed {
-    font-size: 18px;
+    font-size: 16px;
     /*font-weight: bold;*/
     color: "#F0F5F9";
     background-color: "#52616B"
@@ -64,6 +64,7 @@ QLineEdit[readOnly="true"] {
 QListView {
     width: 50px;
     color: #F0F5F9;
+    font-size: 16px;
 }
 
 QListView::item:selected {
@@ -82,6 +83,8 @@ QCheckBox::indicator:checked {
 /********************************* QDateTimeEdit UI settings ***************************************/
 QDateTimeEdit {
     color: #F0F5F9;
+    border: 1px solid #424446;
+    font-size: 16px;
 }
 
 QDateTimeEdit:disabled {
@@ -91,10 +94,19 @@ QDateTimeEdit:disabled {
 .date {
     color: #071;
 }
+
 SPAN {
     color: #071;
 }
 
+QDateTimeEdit::up-arrow, QDateTimeEdit::down-arrow {
+    image: url(img/actdown.png);
+    border: 1px solid #1E2022B;
+}
+
+QDateTimeEdit::up-arrow:disabled, QDateTimeEdit::down-arrow:disabled {
+    image: url(img/down.png);
+}
 /********************************* Table UI settings ***************************************/
 QTableView {
     border: 1px solid '#f00';
@@ -153,7 +165,7 @@ QTabBar:top {
 }
 
 QTabBar:tab:top {
-    min-width: 170px;
+    min-width: 165px;
 }
 
 QTabBar::tab {
