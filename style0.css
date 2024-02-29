@@ -101,7 +101,7 @@ SPAN {
 
 QDateTimeEdit::up-arrow, QDateTimeEdit::down-arrow {
     image: url(img/actdown.png);
-    border: 1px solid #1E2022B;
+    /*border: 1px solid #1E2022B;*/
 }
 
 QDateTimeEdit::up-arrow:disabled, QDateTimeEdit::down-arrow:disabled {
@@ -198,23 +198,27 @@ QSpinBox {
     font-size: 16px;
 }
 
-QDialogButtonBox {
-    border: 1px solid red;
-}
-
 QComboBox {
     background-color: #F0F5F9;
     color: #323335;
     font-size: 16px;
+    /*padding: 0px 0px 0px 0px;*/
+    /*border: 1px solid red;*/
 }
 
 QComboBox::drop-down {
-    background-color: #C9D6DF;
-    color: red;
+    background-color: #52616B;
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    border: 0px;
+    margin-right: -2px;
+    /*using palettes: #1E2022, #52616B, #C9D6DF, #F0F5F9, orange - #e95420*/
 }
 
 QComboBox::down-arrow {
-    /*image: url(/usr/share/icons/crystalsvg/16x16/actions/1downarrow.png);*/
+    image: url(img/actdown.png);
+    width: 10px;
+    height: 10px;
 }
 
 QComboBox:on {

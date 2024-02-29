@@ -24,7 +24,7 @@ class Reports(CustomTable):
             self.sti.appendRow([item0, item1, item2, item3, item4, item5, item6])
             rowCnt += 1
         self.sti.setHorizontalHeaderLabels(
-            ['Id', 'Деталь', 'Виріб', 'Договір', 'Наявність', 'Очікується','Всього\nнеобхідно'])
+            ['Id', 'Деталь', 'Виріб', 'Договір', 'Наявність', 'Очікується', 'Всього\nнеобхідно'])
         self.sti.setRowCount(rowCnt)
         self.setModel(self.sti)
         self.setColumnStyles()

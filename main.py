@@ -146,12 +146,15 @@ class Project(QtWidgets.QWidget):
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
         self.newCompBtn = EditBtn('new.png', True)
+        self.moveCompBtn = EditBtn('move.png', True)
         self.editCompBtn = EditBtn('edit.png', False)
         self.delCompBtn = EditBtn('del.png', False)
         self.newCompBtn.clicked.connect(self.newComponentsClicked)
+        self.moveCompBtn.clicked.connect(self.moveComponentsClicked)
         self.editCompBtn.clicked.connect(self.editComponentsClicked)
         self.delCompBtn.clicked.connect(self.delComponentsClicked)
         btnLayout.addWidget(self.newCompBtn)
+        btnLayout.addWidget(self.moveCompBtn)
         btnLayout.addWidget(self.editCompBtn)
         btnLayout.addWidget(self.delCompBtn)
         btns.setLayout(btnLayout)
@@ -170,6 +173,7 @@ class Project(QtWidgets.QWidget):
         tab.setLayout(self.reportsLt)
         lst = self.db.getReports()
         self.reports = Reports(lst)
+        self.reports.clicked.connect(self.itemReportsClicked)
         self.reportsLbl = QtWidgets.QLabel("Список комплектуючих пустий")
         self.reportsLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         if len(lst):
@@ -179,12 +183,12 @@ class Project(QtWidgets.QWidget):
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
-        self.newCompBtn = EditBtn('new.png', False)
-        self.editCompBtn = EditBtn('edit.png', False)
-        self.delCompBtn = EditBtn('del.png', False)
-        btnLayout.addWidget(self.newCompBtn)
-        btnLayout.addWidget(self.editCompBtn)
-        btnLayout.addWidget(self.delCompBtn)
+        self.newRepBtn = EditBtn('new.png', True)
+        self.moveRepBtn = EditBtn('move.png', True)
+        self.newRepBtn.clicked.connect(self.newComponentsClicked)
+        self.moveRepBtn.clicked.connect(self.moveComponentsClicked)
+        btnLayout.addWidget(self.newRepBtn)
+        btnLayout.addWidget(self.moveRepBtn)
         btns.setLayout(btnLayout)
         btnLayout.addStretch(40)
         btnLayout.setSpacing(40)
@@ -202,6 +206,10 @@ class Project(QtWidgets.QWidget):
         """ new template mode save button clicked """
         self.editConBtn.setActive(True)
         self.delConBtn.setActive(True)
+
+    def itemReportsClicked(self):
+        """ reports tab item field clicked """
+        self.moveCompBtn.setActive(True)
 
     def newTemplateSave(self, name: str, items: list):
         """ new template mode save button clicked """
@@ -256,8 +264,25 @@ class Project(QtWidgets.QWidget):
         self.db.saveComponents(components)
         self.reports.loadData(self.db.getReports(self.getFilter()))
         self.components.loadData(self.db.getComponents(self.getFilter()))
-        msg = """поставлені комплектуючі до виробу <span style='text-decoration: underline'>{}</span>,
+        msg = """поставлено комплектуючі до виробу <span style='text-decoration: underline'>{}</span>,
                  згідно договору <span style='text-decoration: underline'>{}</span>"""
+        msg = msg.format(components[0]['template_name'], components[0]['contract_name'])
+        self.db.saveLogMsg(msg)
+        self.logArea.showContent(self.db.getLogs())
+        if not self.componentsLbl.isHidden() and self.components.getSize() > 0:
+            self.componentsLbl.hide()
+            self.componentsLt.replaceWidget(self.componentsLbl, self.components)
+            self.components.show()
+
+    def moveComponents(self, components: list):
+        """ move components save button clicked """
+        if len(components) == 0:
+            return
+        self.db.moveComponents(components)
+        self.reports.loadData(self.db.getReports(self.getFilter()))
+        self.components.loadData(self.db.getComponents(self.getFilter()))
+        msg = """переміщено комплектуючі до виробу <span style='text-decoration: underline'>{}</span>,
+                         з договору <span style='text-decoration: underline'>{}</span>"""
         msg = msg.format(components[0]['template_name'], components[0]['contract_name'])
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
@@ -319,6 +344,10 @@ class Project(QtWidgets.QWidget):
 
     def delComponentsClicked(self):
         pass
+
+    def moveComponentsClicked(self):
+        """ move components button clicked """
+        dlg = ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems(), True)
 
     def __initLayout1(self):
         self.innerbox = QtWidgets.QHBoxLayout()
