@@ -230,3 +230,7 @@ QComboBox QAbstractItemView {
     background-color: #F0F5F9;
     color: #323335;
 }
+
+QLabel::p {
+    color: #e95420;
+}
