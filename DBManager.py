@@ -103,11 +103,18 @@ class DBManager():
                 self.query.bindValue(':dt', date['datetime'])
                 self.query.exec()
                 self.query.clear()
+            return noteId
+        return 0
 
     def moveComponents(self, components):
+        print(components.__repr__())
+        return
         if len(components):
+            noteId = self.saveComponents(components)
             date = self.getDateTime()
-            noteId = self.saveNote(components[0].get('note', ' '), date)
+            #noteId = self.saveNote(components[0].get('note', ' '), date)
+
+        #TODO: move components from one to other contract
 
     def saveNote(self, msg, date):
         self.query.prepare("insert into notes values (null, :note, :str_date, :dt)")
@@ -224,7 +231,6 @@ class DBManager():
 
     def getComponents(self, filter={}):
         where = self.getWhereFromFilter(filter)
-        print(where)
         self.query.exec(" select components.id, components.count, components.contract_id, components.str_date," +
                         " items_template.name, contracts.short_name, templates.name as device, notes.note " +
                         " from components " +

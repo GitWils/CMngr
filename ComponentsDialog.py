@@ -1,4 +1,5 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
+import sys
 
 class ComponentsDlg(QtWidgets.QDialog):
     def __init__(self, parent, contracts, components, isMovement = False):
@@ -37,18 +38,22 @@ class ComponentsDlg(QtWidgets.QDialog):
 
         self.additionalWgts = []
         bbox = self.initButtonBox()
-        self.grid.addWidget(lblContractName, 1, 0, 1, 1)
-        self.grid.addWidget(self.cBoxContract, 1, 1, 1, 3)
+        self.lblWarning = QtWidgets.QLabel(
+            '<p class="orange">Переміщення комплектуючих можливе<br/> тільки між договорами з однаковими виробами!</p>')
+        self.lblWarning.setObjectName('orange')
+        self.lblWarning.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.lblWarning.hide()
+        self.grid.addWidget(self.lblWarning, 1, 0, 1, 4)
+        self.grid.addWidget(lblContractName, 2, 0, 1, 1)
+        self.grid.addWidget(self.cBoxContract, 2, 1, 1, 3)
         if self.isMovement:
             lblToContractName = QtWidgets.QLabel('В договір:')
             self.cBoxToContract = QtWidgets.QComboBox()
-            self.grid.addWidget(lblToContractName, 2, 0, 1, 1)
-            self.grid.addWidget(self.cBoxToContract, 2, 1, 1, 3)
-        self.grid.addWidget(lblTemplateName, 3, 0, 1, 1)
-        self.grid.addWidget(self.templateName, 3, 1, 1, 3)
-        self.lblWarning = QtWidgets.QLabel('<p class="orange">Переміщення комплектуючих можливе<br/> тільки між договорами з однаковими виробами!</p>')
-        self.lblWarning.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.grid.addWidget(self.lblWarning, 4, 0, 1, 4)
+            self.grid.addWidget(lblToContractName, 3, 0, 1, 1)
+            self.grid.addWidget(self.cBoxToContract, 3, 1, 1, 3)
+        self.grid.addWidget(lblTemplateName, 4, 0, 1, 1)
+        self.grid.addWidget(self.templateName, 4, 1, 1, 3)
+
         self.fillItemslist()
         self.grid.addWidget(lblNote, 201, 0, 1, 1)
         self.grid.addWidget(self.qTextNote, 201, 1, 1, 3)
@@ -102,9 +107,24 @@ class ComponentsDlg(QtWidgets.QDialog):
                 self.itemsCnt += 1
 
         if self.isMovement:
+            isAdded = False
             for contract in self.contracts:
                 if currTemplateId == contract['template_id'] and int(self.cBoxContract.currentData()) != contract['id']:
                     self.cBoxToContract.addItem(contract['name'], str(contract['id']))
+                    isAdded = True
+            if not isAdded:
+                self.showWarning()
+            else:
+                self.showWarning(False)
+
+    def showWarning(self, show=True):
+        """ show warning message on the top of dialog """
+        if show:
+            self.lblWarning.show()
+        elif not self.lblWarning.isHidden():
+            self.lblWarning.hide()
+            self.adjustSize()
+            self.resize(600, 300)
 
     def initButtonBox(self):
         """ create widget with "Cancel" and "Save" buttons """
@@ -115,8 +135,10 @@ class ComponentsDlg(QtWidgets.QDialog):
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('vmenu')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
-        #if sys.platform == 'win32':
-        bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
+        if sys.platform == 'win32':
+            bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
+        else:
+            bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
         return bbox

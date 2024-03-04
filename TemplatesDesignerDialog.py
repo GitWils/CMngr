@@ -73,10 +73,10 @@ class TemplateDialog(QtWidgets.QDialog):
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('vmenu')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
-        #TODO:
-        #if sys.platform == 'Ubuntu Gnome':
-        bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
-        print(sys.platform)
+        if sys.platform == 'win32':
+            bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
+        else:
+            bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
         return bbox

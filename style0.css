@@ -50,6 +50,10 @@ QLabel:disabled {
     color: #52616B;
 }
 
+QLabel#orange {
+    color: #e95420;
+}
+
 /********************************* TextEdit UI settings ***************************************/
 QTextEdit, QLineEdit {
     background-color: "#F0F5F9";
@@ -229,8 +233,4 @@ QComboBox QAbstractItemView {
     selection-background-color: red;
     background-color: #F0F5F9;
     color: #323335;
-}
-
-QLabel::p {
-    color: #e95420;
 }
