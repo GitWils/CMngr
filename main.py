@@ -28,7 +28,6 @@ class Project(QtWidgets.QWidget):
         self.centerWindow()
         self.initMenu()
         self.setWindowTitle('Облік договорів, комплектуючих')
-        #self.setObjectName('main')
         self.show()
 
     def event(self, e) -> QtWidgets.QWidget.event:
@@ -41,9 +40,9 @@ class Project(QtWidgets.QWidget):
         return QtWidgets.QWidget.event(self, e)
 
     def initMenu(self):
-        # self.initVMenu()
         self.vMenu = QtWidgets.QGridLayout()
         self.fMenu = FindMenu(self, self.vMenu, self.db.getContracts())
+        self.fMenu.update()
         self.__initLayout1()
         self.__initLayout0()
 
@@ -63,7 +62,7 @@ class Project(QtWidgets.QWidget):
 
     def createDesignerTab(self) -> QtWidgets.QWidget:
         tab = QtWidgets.QWidget()
-        tab.setStyleSheet("border: 0px solid red")
+        tab.setStyleSheet("border: 0px;")
         self.desLayout = QtWidgets.QVBoxLayout()
         self.desLayout.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.desLayout)
@@ -76,9 +75,9 @@ class Project(QtWidgets.QWidget):
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
-        self.newDesBtn = EditBtn('new.png', True)
-        self.editDesBtn = EditBtn('edit.png', False)
-        self.delDesBtn = EditBtn('del.png', False)
+        self.newDesBtn = EditBtn('new.png', True, 'Створити шаблон')
+        self.editDesBtn = EditBtn('edit.png', False, 'Редагувати шаблон')
+        self.delDesBtn = EditBtn('del.png', False, 'Видалити шаблон')
         self.newDesBtn.clicked.connect(self.newDesignClicked)
         self.editDesBtn.clicked.connect(self.editDesignClicked)
         self.delDesBtn.clicked.connect(self.delDesignClicked)
@@ -95,7 +94,7 @@ class Project(QtWidgets.QWidget):
 
     def createContractsTab(self) -> QtWidgets.QWidget:
         tab = QtWidgets.QWidget()
-        tab.setStyleSheet("border: 0px solid red")
+        tab.setStyleSheet("border: 0px;")
         self.contractLt = QtWidgets.QVBoxLayout()
         self.contractLt.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.contractLt)
@@ -111,9 +110,9 @@ class Project(QtWidgets.QWidget):
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
-        self.newConBtn = EditBtn('new.png', True)
-        self.editConBtn = EditBtn('edit.png', False)
-        self.delConBtn = EditBtn('del.png', False)
+        self.newConBtn = EditBtn('new.png', True, 'Створити договір')
+        self.editConBtn = EditBtn('edit.png', False, 'Редагувати договір')
+        self.delConBtn = EditBtn('del.png', False, 'Видалети договір')
         self.newConBtn.clicked.connect(self.newContractClicked)
         self.editConBtn.clicked.connect(self.editContractClicked)
         self.delConBtn.clicked.connect(self.delContractClicked)
@@ -130,11 +129,11 @@ class Project(QtWidgets.QWidget):
 
     def createComponentsTab(self) -> QtWidgets.QWidget:
         tab = QtWidgets.QWidget()
-        tab.setStyleSheet("border: 0px solid red")
+        tab.setStyleSheet("border: 0px;")
         self.componentsLt = QtWidgets.QVBoxLayout()
         self.componentsLt.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.componentsLt)
-        lst = self.db.getComponents()
+        lst = self.db.getComponents(self.getFilter())
         self.components = Components(lst)
         self.componentsLbl = QtWidgets.QLabel("Список комплектуючих пустий")
         self.componentsLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
@@ -145,18 +144,18 @@ class Project(QtWidgets.QWidget):
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
-        self.newCompBtn = EditBtn('new.png', True)
-        self.moveCompBtn = EditBtn('move.png', True)
-        self.editCompBtn = EditBtn('edit.png', False)
-        self.delCompBtn = EditBtn('del.png', False)
+        self.newCompBtn = EditBtn('new.png', True, 'Поставка комплектуючих')
+        self.moveCompBtn = EditBtn('move.png', True, 'Переміщення в інший договір')
+        self.editCompBtn = EditBtn('edit.png', False, 'Забракування, переміщення')
+        #self.delCompBtn = EditBtn('del.png', False)
         self.newCompBtn.clicked.connect(self.newComponentsClicked)
         self.moveCompBtn.clicked.connect(self.moveComponentsClicked)
         self.editCompBtn.clicked.connect(self.editComponentsClicked)
-        self.delCompBtn.clicked.connect(self.delComponentsClicked)
+        #self.delCompBtn.clicked.connect(self.delComponentsClicked)
         btnLayout.addWidget(self.newCompBtn)
         btnLayout.addWidget(self.moveCompBtn)
         btnLayout.addWidget(self.editCompBtn)
-        btnLayout.addWidget(self.delCompBtn)
+        #btnLayout.addWidget(self.delCompBtn)
         btns.setLayout(btnLayout)
         btnLayout.addStretch(40)
         btnLayout.setSpacing(40)
@@ -167,11 +166,11 @@ class Project(QtWidgets.QWidget):
 
     def createReportTab(self) -> QtWidgets.QWidget:
         tab = QtWidgets.QWidget()
-        tab.setStyleSheet("border: 0px solid red")
+        tab.setStyleSheet("border: 0px;")
         self.reportsLt = QtWidgets.QVBoxLayout()
         self.reportsLt.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.reportsLt)
-        lst = self.db.getReports()
+        lst = self.db.getReports(self.getFilter())
         self.reports = Reports(lst)
         self.reports.clicked.connect(self.itemReportsClicked)
         self.reportsLbl = QtWidgets.QLabel("Список комплектуючих пустий")
@@ -183,8 +182,8 @@ class Project(QtWidgets.QWidget):
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
-        self.newRepBtn = EditBtn('new.png', True)
-        self.moveRepBtn = EditBtn('move.png', True)
+        self.newRepBtn = EditBtn('new.png', True, 'Поставка комплектуючих')
+        self.moveRepBtn = EditBtn('move.png', True, 'Переміщення в інший договір')
         self.newRepBtn.clicked.connect(self.newComponentsClicked)
         self.moveRepBtn.clicked.connect(self.moveComponentsClicked)
         btnLayout.addWidget(self.newRepBtn)
@@ -242,7 +241,7 @@ class Project(QtWidgets.QWidget):
         self.db.saveContract(contract)
         self.contracts.loadData(self.db.getContracts())
         self.fMenu.reload(self.db.getContracts())
-        self.reports.loadData(self.db.getReports())
+        self.reports.loadData(self.db.getReports(self.getFilter()))
         msg = """створено договір <span style='text-decoration: underline'>{}</span> на виготовлення виробів 
                 <span style='text-decoration: underline'>{}</span> кількістю {}шт."""
         msg = msg.format(contract['short_name'], contract['template_name'], str(contract['count']))
@@ -342,8 +341,8 @@ class Project(QtWidgets.QWidget):
     def delContractClicked(self):
         pass
 
-    def delComponentsClicked(self):
-        pass
+    # def delComponentsClicked(self):
+    #     pass
 
     def moveComponentsClicked(self):
         """ move components button clicked """
@@ -362,25 +361,6 @@ class Project(QtWidgets.QWidget):
         tab.addTab(self.createReportTab(), "Звітні дані")
         mainArea.addWidget(tab)
         self.innerbox.addLayout(mainArea,  QtCore.Qt.AlignmentFlag.AlignCenter)
-
-    def initVMenu(self):
-        """ creates vertical menu on the left """
-        #buttons
-        # button4 = QtWidgets.QPushButton("Налаштування")
-        # button4.setObjectName('vmenu')
-        # button4.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
-        # button4.setDisabled(True)
-        # button5 = QtWidgets.QPushButton("Фільтр")
-        # button5.setObjectName('vmenu')
-        # button5.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
-
-        # self.vMenu = QtWidgets.QVBoxLayout()
-        # self.vMenu.addWidget(button4)
-        # self.vMenu.addWidget(button5)
-        # self.vMenu.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
-        # self.vMenu.setSpacing(20)
-        # self.vMenu.setContentsMargins(10, 10, 10, 10)
-        # self.vMenu.addStretch(40)
 
     def centerWindow(self):
         """ centering the main window in the center of the screen"""

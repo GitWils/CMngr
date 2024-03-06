@@ -5,7 +5,6 @@ from CustomWidgets import EditBtn
 class TemplateDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, name='', items=()):
         super().__init__(parent)
-        #self.setParent(parent)
         self.parent = parent
         self.editMode = True if len(items) else False
         self.templateName = name
@@ -25,8 +24,8 @@ class TemplateDialog(QtWidgets.QDialog):
         self.name = QtWidgets.QLineEdit()
         self.additionalWgts = []
         self.addItemField()
-        self.btnAdd = EditBtn("new", True)
-        self.btnRem = EditBtn('minus', True)
+        self.btnAdd = EditBtn("new", True, 'Добавити поле')
+        self.btnRem = EditBtn('minus', True, 'Видалити поле')
         bbox = self.initButtonBox()
 
         self.grid.addWidget(deviceName, 0, 0, 1, 1)

@@ -10,40 +10,40 @@ class DBManager():
         self.query = QtSql.QSqlQuery()
         if 'templates' not in self.con.tables():
             self.query.exec("create table templates(id integer primary key autoincrement, " +
-                    "name text, editable bool, str_date text, dt datetime)")
+                    "name text, editable bool, str_date text, dt datetime, enable bool default true)")
             self.query.clear()
         if 'items_template' not in self.con.tables():
             self.query.exec("create table items_template(id integer primary key autoincrement, " +
                     "template_id integer secondary key, name text, count integer, " +
-                    "editable bool, str_date text, dt datetime)")
+                    "editable bool, str_date text, dt datetime, enable bool default true)")
             self.query.clear()
         if 'contracts' not in self.con.tables():
             self.query.exec("create table contracts(id integer primary key autoincrement, " +
                     "template_id integer secondary key, name text, short_name text, count integer, note text, " +
-                    "str_date text, dt datetime)")
+                    "str_date text, dt datetime, enable bool default true)")
             self.query.clear()
         if 'components' not in self.con.tables():
             self.query.exec("create table components(id integer primary key autoincrement, " +
                     "contract_id integer secondary key, " +
                     "item_template_id integer secondary key, " +
                     "template_id integer, note_id integer, count integer, "
-                    "str_date text, dt datetime)")
+                    "str_date text, dt datetime, enable bool default true)")
         if 'acts' not in self.con.tables():
             self.query.exec("create table acts(id integer primary key autoincrement, " +
                     "contract_id integer secondary key, name text, " +
-                    "str_date text, dt datetime)")
+                    "str_date text, dt datetime, enable bool default true)")
         if 'notes' not in self.con.tables():
             self.query.exec("create table notes(id integer primary key autoincrement, " +
                     " note text, " +
-                    "str_date text, dt datetime)")
+                    "str_date text, dt datetime, enable bool default true)")
         if 'logs' not in self.con.tables():
             self.query.exec("create table logs(id integer primary key autoincrement, " +
-                    "message text, str_date text, dt datetime default current_timestamp)")
+                    "message text, str_date text, dt datetime default current_timestamp, enable bool default true)")
             self.query.clear()
 
     def saveTemplate(self, name, items):
         date = self.getDateTime()
-        self.query.prepare("insert into templates values(null, :name, True, :str_date, :dt)")
+        self.query.prepare("insert into templates values(null, :name, True, :str_date, :dt, True)")
         self.query.bindValue(':name', name)
         self.query.bindValue(':str_date', date['s_date'])
         self.query.bindValue(':dt', date['datetime'])
@@ -51,7 +51,7 @@ class DBManager():
         templateId = self.query.lastInsertId()
         self.query.clear()
         for item in items:
-            self.query.prepare("insert into items_template values(null, :template_id, :name, :count, True, :str_date, :dt)")
+            self.query.prepare("insert into items_template values(null, :template_id, :name, :count, True, :str_date, :dt, True)")
             self.query.bindValue(':template_id', templateId)
             self.query.bindValue(':name', item['name'])
             self.query.bindValue(':count', item['count'])
@@ -67,7 +67,7 @@ class DBManager():
     def saveContract(self, contract):
         date = self.getDateTime()
         self.query.prepare("insert into contracts values(" +
-                           "null, :template_id, :name, :short_name, :count, :note, :str_date, :dt)")
+                           "null, :template_id, :name, :short_name, :count, :note, :str_date, :dt, True)")
         self.query.bindValue(':template_id', contract['template_id'])
         self.query.bindValue(':name', contract['name'])
         self.query.bindValue(':short_name', contract['short_name'])
@@ -88,12 +88,13 @@ class DBManager():
         self.saveComponents(components)
 
     def saveComponents(self, components):
+        print(components.__repr__())
         if len(components):
             date = self.getDateTime()
             noteId = self.saveNote(components[0].get('note', ' '), date)
             for component in components:
                 self.query.prepare("insert into components values(" +
-                                   "null, :contract_id, :item_template_id, :template_id, :note_id, :count, :str_date, :dt)")
+                                   "null, :contract_id, :item_template_id, :template_id, :note_id, :count, :str_date, :dt, True)")
                 self.query.bindValue(':contract_id', component['contract_id'])
                 self.query.bindValue(':item_template_id', component['item_template_id'])
                 self.query.bindValue(':template_id', component['template_id'])
@@ -108,16 +109,15 @@ class DBManager():
 
     def moveComponents(self, components):
         print(components.__repr__())
-        return
         if len(components):
-            noteId = self.saveComponents(components)
-            date = self.getDateTime()
-            #noteId = self.saveNote(components[0].get('note', ' '), date)
-
-        #TODO: move components from one to other contract
+            self.saveComponents(components)
+            for component in components:
+                component['contract_id'] = component['to_contract_id']
+                component['count'] *= -1
+            self.saveComponents(components)
 
     def saveNote(self, msg, date):
-        self.query.prepare("insert into notes values (null, :note, :str_date, :dt)")
+        self.query.prepare("insert into notes values (null, :note, :str_date, :dt, True)")
         self.query.bindValue(':note', msg)
         self.query.bindValue(':str_date', date['s_date'])
         self.query.bindValue(':dt', date['datetime'])
@@ -128,7 +128,7 @@ class DBManager():
 
     def saveLogMsg(self, msg):
         date = self.getDateTime()
-        self.query.prepare("insert into logs values(null, :message, :str_date, :dt)")
+        self.query.prepare("insert into logs values(null, :message, :str_date, :dt, True)")
         self.query.bindValue(':message', msg)
         self.query.bindValue(':str_date', date['s_date'])
         self.query.bindValue(':dt', date['datetime'])
@@ -222,14 +222,15 @@ class DBManager():
             for id in filter['contracts']:
                 where += ' components.contract_id = {} or '.format(id)
             where = where[:-4] + ')'
-
         if filter.get('from'):
             where += ' and(components.dt > "{}") '.format(filter['from'])
         if filter.get('to'):
             where += ' and(components.dt < "{}")'.format(filter['to'])
+        if where == '': #if need to find nothing
+            where = ' and (components.contract_id = 0)'
         return where
 
-    def getComponents(self, filter={}):
+    def getComponents(self, filter):
         where = self.getWhereFromFilter(filter)
         self.query.exec(" select components.id, components.count, components.contract_id, components.str_date," +
                         " items_template.name, contracts.short_name, templates.name as device, notes.note " +
@@ -242,7 +243,7 @@ class DBManager():
                         " (templates.id = components.template_id) " +
                         " join notes on " +
                         " (components.note_id = notes.id) " +
-                        " where components.count > 0 " + where +
+                        " where components.count != 0 " + where +
                         " order by components.id")
         lst = []
         if self.query.isActive():
@@ -262,7 +263,7 @@ class DBManager():
         self.query.clear()
         return lst
 
-    def getReports(self, filter={}):
+    def getReports(self, filter):
         where = self.getWhereFromFilter(filter)
         self.query.exec(" select components.contract_id, components.item_template_id, " +
                         " sum(components.count) as count, " +

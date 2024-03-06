@@ -1,15 +1,7 @@
 /*using palettes: #1E2022, #52616B, #C9D6DF, #F0F5F9, orange - #e95420*/
 QWidget {
-    /*background-color: "#2E3032";*/
     background-color: "#343938";
-    /*color: "#F0F5F9";*/
 }
-
-/*.QPushButton#mng {
-    min-height: 50px;
-    width: 50px;
-    max-width: 50px;
-}*/
 /********************************* Main UI settings ***************************************/
 #main {
     background-color: "#323335";
@@ -27,7 +19,6 @@ QWidget {
 }
 .QPushButton#vmenu:pressed {
     font-size: 16px;
-    /*font-weight: bold;*/
     color: "#F0F5F9";
     background-color: "#52616B"
 }
@@ -113,7 +104,6 @@ QDateTimeEdit::up-arrow:disabled, QDateTimeEdit::down-arrow:disabled {
 }
 /********************************* Table UI settings ***************************************/
 QTableView {
-    border: 1px solid '#f00';
     background-color: "#f0f5f9";
     alternate-background-color: "#c9d6df";
     font-size: 14px;
@@ -158,6 +148,7 @@ QTableView::item:focus {
 /********************************* TabWidget UI settings ***************************************/
 QTabWidget {
     background-color: red;
+    border: 0px;
 }
 
 QTabWidget::pane {
@@ -187,8 +178,6 @@ QTabBar::tab {
 QTabBar::tab:selected {
     background-color: #52616B;
     color: #F0F5F9;
-    border-bottom: red;
-    /*height: 28px;*/
 }
 
 QTabWidget::item {

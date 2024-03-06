@@ -1,7 +1,7 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 
 class EditBtn(QtWidgets.QPushButton):
-    def __init__(self, filename, active):
+    def __init__(self, filename, active, tooltip = ''):
         self.filename = filename
         if(active):
             QtWidgets.QPushButton.__init__(self, QtGui.QIcon('img/act' + self.filename), '')
@@ -9,6 +9,7 @@ class EditBtn(QtWidgets.QPushButton):
             QtWidgets.QPushButton.__init__(self, QtGui.QIcon('img/inact' + self.filename), '')
             self.setDisabled(True)
         self.setIconSize(QtCore.QSize(40, 40))
+        self.setToolTip(tooltip)
         self.setObjectName("mng")
         self.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))
         self.setStyleSheet("border: 0px solid red")
@@ -46,4 +47,3 @@ class CustomTable(QtWidgets.QTableView):
         #header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         #header.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.setColumnHidden(0, True)
-        #self.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.OpenHandCursor))

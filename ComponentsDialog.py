@@ -15,9 +15,11 @@ class ComponentsDlg(QtWidgets.QDialog):
         if self.isMovement:
             self.setWindowTitle("Переміщення комплектуючих")
             lblContractName = QtWidgets.QLabel('З договору:')
+            self.qTextNote = QtWidgets.QTextEdit("Переміщення, згідно листа №")
         else:
             self.setWindowTitle("Поставка комплектуючих")
             lblContractName = QtWidgets.QLabel('Назва договору:')
+            self.qTextNote = QtWidgets.QTextEdit("Поставка комплектуючих, згідно листа №")
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(600, 300)
 
@@ -33,7 +35,6 @@ class ComponentsDlg(QtWidgets.QDialog):
         self.templateName = QtWidgets.QLineEdit()
         self.templateName.setReadOnly(True)
         lblNote = QtWidgets.QLabel("Супровідні\nдокументи:")
-        self.qTextNote = QtWidgets.QTextEdit()
         self.qTextNote.setFixedHeight(65)
 
         self.additionalWgts = []
@@ -158,6 +159,7 @@ class ComponentsDlg(QtWidgets.QDialog):
                             'note': self.qTextNote.toPlainText()
                              })
                 if self.isMovement:
+                    item['count'] *= -1
                     item['to_contract_id'] = self.cBoxToContract.currentData()
                 res.append(item)
         if self.isMovement:
