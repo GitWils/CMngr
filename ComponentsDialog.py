@@ -15,11 +15,11 @@ class ComponentsDlg(QtWidgets.QDialog):
         if self.isMovement:
             self.setWindowTitle("Переміщення комплектуючих")
             lblContractName = QtWidgets.QLabel('З договору:')
-            self.qTextNote = QtWidgets.QTextEdit("Переміщення, згідно листа №")
+            self.qTextNote = QtWidgets.QTextEdit("Лист №")
         else:
             self.setWindowTitle("Поставка комплектуючих")
             lblContractName = QtWidgets.QLabel('Назва договору:')
-            self.qTextNote = QtWidgets.QTextEdit("Поставка комплектуючих, згідно листа №")
+            self.qTextNote = QtWidgets.QTextEdit("Лист №")
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(600, 300)
 

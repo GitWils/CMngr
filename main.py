@@ -12,8 +12,9 @@ from FindMenu import FindMenu
 from LoggerView import Logger
 import sys
 
+
 class Project(QtWidgets.QWidget):
-    def __init__(self, parent=None):
+    def __init__(self):
         super().__init__()
         self.db = DBManager()
         self.__filter = dict({
@@ -196,21 +197,21 @@ class Project(QtWidgets.QWidget):
         self.reportsLt.setStretch(1, 1)
         return tab
 
-    def itemDesignClicked(self):
+    def itemDesignClicked(self) -> None:
         """ new template mode save button clicked """
         self.editDesBtn.setActive(True)
         self.delDesBtn.setActive(True)
 
-    def itemContractClicked(self):
+    def itemContractClicked(self) -> None:
         """ new template mode save button clicked """
         self.editConBtn.setActive(True)
         self.delConBtn.setActive(True)
 
-    def itemReportsClicked(self):
+    def itemReportsClicked(self) -> None:
         """ reports tab item field clicked """
         self.moveCompBtn.setActive(True)
 
-    def newTemplateSave(self, name: str, items: list):
+    def newTemplateSave(self, name: str, items: list) -> None:
         """ new template mode save button clicked """
         if len(name) == 0 or items[0]['name'] == '':
             return

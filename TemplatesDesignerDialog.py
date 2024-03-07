@@ -120,11 +120,13 @@ class TemplateDialog(QtWidgets.QDialog):
         self.accept()
 
     def setTaborders(self):
+        """ change focus when tab button pressed """
         self.name.setFocus()
         QtWidgets.QWidget.setTabOrder(self.name, self.additionalWgts[0]['edit_name'])
         QtWidgets.QWidget.setTabOrder(self.additionalWgts[0]['edit_name'], self.additionalWgts[0]['spin_cnt'])
 
     def event(self, e):
+        """ close window when escape pressed """
         if e.type() == QtCore.QEvent.Type.KeyPress and e.key() == QtCore.Qt.Key.Key_Escape:
             self.close()
         return QtWidgets.QWidget.event(self, e)
