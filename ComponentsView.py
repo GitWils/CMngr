@@ -61,7 +61,9 @@ class TableModel(QtGui.QStandardItemModel):
                 case 6:
                     return self._data[index.row()]['note']
 
-        if role == QtCore.Qt.ItemDataRole.BackgroundRole and index.column() == 4 and self._data[index.row()]['count'] < 0:
+        if (role == QtCore.Qt.ItemDataRole.BackgroundRole and
+                index.column() == 4 and
+                self._data[index.row()]['count'] < 0):
             return QtGui.QColor('#d99')
 
     def reloadData(self, data):

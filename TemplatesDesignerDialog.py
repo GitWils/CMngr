@@ -13,6 +13,7 @@ class TemplateDialog(QtWidgets.QDialog):
         self.init()
 
     def init(self):
+        """ setup dialog widgets """
         self.setWindowTitle("Конфігурація виробу")
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(600, 300)

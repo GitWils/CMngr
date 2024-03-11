@@ -19,7 +19,8 @@ class DBManager():
             self.query.clear()
         if 'contracts' not in self.con.tables():
             self.query.exec("create table contracts(id integer primary key autoincrement, " +
-                    "template_id integer secondary key, name text, short_name text, count integer, note text, " +
+                    "template_id integer secondary key, name text, short_name text, " +
+                    "completed integer default '0', count integer, note text, " +
                     "str_date text, dt datetime, enable bool default true)")
             self.query.clear()
         if 'components' not in self.con.tables():
@@ -67,7 +68,7 @@ class DBManager():
     def saveContract(self, contract):
         date = self.getDateTime()
         self.query.prepare("insert into contracts values(" +
-                           "null, :template_id, :name, :short_name, :count, :note, :str_date, :dt, True)")
+                           "null, :template_id, :name, :short_name, 0, :count, :note, :str_date, :dt, True)")
         self.query.bindValue(':template_id', contract['template_id'])
         self.query.bindValue(':name', contract['name'])
         self.query.bindValue(':short_name', contract['short_name'])
@@ -88,7 +89,6 @@ class DBManager():
         self.saveComponents(components)
 
     def saveComponents(self, components):
-        print(components.__repr__())
         if len(components):
             date = self.getDateTime()
             noteId = self.saveNote(components[0].get('note', ' '), date)
@@ -108,7 +108,6 @@ class DBManager():
         return 0
 
     def moveComponents(self, components):
-        print(components.__repr__())
         if len(components):
             self.saveComponents(components)
             for component in components:
@@ -192,7 +191,7 @@ class DBManager():
 
     def getContracts(self):
         self.query.exec("select contracts.id, contracts.template_id, contracts.name, contracts.short_name, " +
-                        "contracts.count, contracts.note, contracts.str_date, templates.name " +
+                        "contracts.completed, contracts.count, contracts.note, contracts.str_date, templates.name " +
                         "from contracts " +
                         "join templates on " +
                         "(templates.id = contracts.template_id) " +
@@ -207,6 +206,7 @@ class DBManager():
                         'name':         self.query.value('contracts.name'),
                         'template_name':self.query.value('templates.name'),
                         'short_name':   self.query.value('contracts.short_name'),
+                        'completed':    self.query.value('contracts.completed'),
                         'count':        self.query.value('contracts.count'),
                         'note':         self.query.value('contracts.note'),
                         'date':         self.query.value('contracts.str_date')})

@@ -60,7 +60,9 @@ class TableModel(QtGui.QStandardItemModel):
                 and self._data[index.row()]['count'] < self._data[index.row()]['needed']):
             return QtGui.QColor(self.getColorByRelative(float(self._data[index.row()]['count'] / self._data[index.row()]['needed'])))
     def getColorByRelative(self, val):
-        return f"#ff{int(val * 255):02X}{int(val * 255):02X}"
+        """ takes float value from 0 to 1, returns string such as #ee5555 """
+        return f"#ee{int(val * 200 + 55):02X}{int(val * 200 + 55):02X}"
 
     def reloadData(self, data):
+        """ reload table data """
         self._data = data
