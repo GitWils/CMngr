@@ -9,11 +9,9 @@ class Contract(CustomTable):
 
     def loadData(self, contracts):
         self.contracts = contracts
-        #print(contracts.__repr__())
         self.reset()
         self.sti.clear()
         rowCnt = 0
-        print(contracts.__repr__())
         for contract in contracts:
             item0 = QtGui.QStandardItem(str(contract['id']))
             item1 = QtGui.QStandardItem(contract['name'])

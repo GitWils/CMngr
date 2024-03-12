@@ -48,6 +48,7 @@ class FindMenu:
         self.lv.setEditTriggers(QtWidgets.QListView.EditTrigger.NoEditTriggers)
         self.lv.setSpacing(2)
         self.reload()
+        self.update()
 
     def reload(self, contracts=None):
         """ reload must be use when table templates changed """

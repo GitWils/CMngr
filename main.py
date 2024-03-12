@@ -12,14 +12,11 @@ from FindMenu import FindMenu
 from LoggerView import Logger
 import sys
 
-
-class Project(QtWidgets.QWidget):
+class mainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.db = DBManager()
-        self.__filter = dict({
-            'contracts': []
-        })
+        self.pr = Project()
+        self.setCentralWidget(self.pr)
         self.initUI()
 
     def initUI(self):
@@ -27,9 +24,23 @@ class Project(QtWidgets.QWidget):
         self.setWindowIcon(ico)
         self.setGeometry(50, 50, 974, 690)
         self.centerWindow()
-        self.initMenu()
         self.setWindowTitle('Облік договорів, комплектуючих')
-        self.show()
+
+        menuBar = QtWidgets.QMenuBar(self)
+        file_menu = QtWidgets.QMenu("&Файл", self)
+        file_menu.addAction(QtGui.QAction("&Експорт...", self))
+        file_menu.addAction(QtGui.QAction("&Друк", self))
+        view_menu = QtWidgets.QMenu("&Вигляд", self)
+        menuBar.addMenu(file_menu)
+        menuBar.addMenu(view_menu)
+        self.setMenuBar(menuBar)
+
+    def centerWindow(self):
+        """ centering the main window in the center of the screen"""
+        qr = self.frameGeometry()
+        cp = self.screen().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
     def event(self, e) -> QtWidgets.QWidget.event:
         if e.type() == QtCore.QEvent.Type.WindowDeactivate:
@@ -40,10 +51,18 @@ class Project(QtWidgets.QWidget):
             self.close()
         return QtWidgets.QWidget.event(self, e)
 
+class Project(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.db = DBManager()
+        self.__filter = dict({
+            'contracts': []
+        })
+        self.initMenu()
+
     def initMenu(self):
         self.vMenu = QtWidgets.QGridLayout()
         self.fMenu = FindMenu(self, self.vMenu, self.db.getContracts())
-        self.fMenu.update()
         self.__initLayout1()
         self.__initLayout0()
 
@@ -60,6 +79,19 @@ class Project(QtWidgets.QWidget):
         self.vbox.setStretch(0, 3)
         self.vbox.setStretch(1, 1)
         self.setLayout(self.vbox)
+
+    def __initLayout1(self):
+        self.innerbox = QtWidgets.QHBoxLayout()
+        self.innerbox.addLayout(self.vMenu)
+        mainArea = QtWidgets.QVBoxLayout()
+        mainArea.setContentsMargins(0, 18, 10, 0)
+        tab = QtWidgets.QTabWidget()
+        tab.addTab(self.createDesignerTab(), "Конструктор виробів")
+        tab.addTab(self.createContractsTab(), "Договори")
+        tab.addTab(self.createComponentsTab(), "Поставлено")
+        tab.addTab(self.createReportTab(), "Звітні дані")
+        mainArea.addWidget(tab)
+        self.innerbox.addLayout(mainArea,  QtCore.Qt.AlignmentFlag.AlignCenter)
 
     def createDesignerTab(self) -> QtWidgets.QWidget:
         tab = QtWidgets.QWidget()
@@ -353,27 +385,6 @@ class Project(QtWidgets.QWidget):
         """ move components button clicked """
         dlg = ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems(), True)
 
-    def __initLayout1(self):
-        self.innerbox = QtWidgets.QHBoxLayout()
-        self.innerbox.addLayout(self.vMenu)
-        mainArea = QtWidgets.QVBoxLayout()
-        mainArea.setContentsMargins(0, 10, 10, 0)
-
-        tab = QtWidgets.QTabWidget()
-        tab.addTab(self.createDesignerTab(), "Конструктор виробів")
-        tab.addTab(self.createContractsTab(), "Договори")
-        tab.addTab(self.createComponentsTab(), "Поставлено")
-        tab.addTab(self.createReportTab(), "Звітні дані")
-        mainArea.addWidget(tab)
-        self.innerbox.addLayout(mainArea,  QtCore.Qt.AlignmentFlag.AlignCenter)
-
-    def centerWindow(self):
-        """ centering the main window in the center of the screen"""
-        qr = self.frameGeometry()
-        cp = self.screen().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
-
     def getFilter(self):
         return self.__filter
 
@@ -383,7 +394,8 @@ def main():
     app.setWindowIcon(ico)
     with open("style0.css", "r") as file:
         app.setStyleSheet(file.read())
-    pr = Project()
+    window = mainWindow()
+    window.show()
     sys.exit(app.exec())
 
 # Press the green button in the gutter to run the script.

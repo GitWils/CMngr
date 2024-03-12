@@ -125,9 +125,6 @@ QHeaderView::section {
     alternate-background-color: "#63717";
 }
 
-QTableView::item:alternate {
-}
-
 QTableView::item:selected {
     color: #F0F5F9;
     background-color: #e95420;
@@ -138,7 +135,6 @@ QTableCornerButton::section {
 }
 
 QTableView::item:hover {
-
 }
 
 QTableView::item:focus {
@@ -160,14 +156,14 @@ QTabBar:top {
 }
 
 QTabBar:tab:top {
-    min-width: 165px;
+    min-width: 168px;
 }
 
 QTabBar::tab {
     background-color: #282a2c;
     font-size: 16px;
     color: #F0F5F9;
-    height: 25px;
+    height: 27px;
     border: 1px solid #424446;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
@@ -223,3 +219,28 @@ QComboBox QAbstractItemView {
     background-color: #F0F5F9;
     color: #323335;
 }
+
+/********************************* QMenuBarUI settings ***************************************/
+QMenuBar {
+    color: #F0F5F9;
+    background-color: #52616B;
+    border: 1px solid #1E2022;
+    font-size: 16px;
+}
+
+/*QMenuBar:selected {
+    background-color: #e95420;
+}*/
+
+QMenu {
+    background-color: #52616B;
+    border: 1px solid #1E2022;
+    font-size: 16px;
+    color: #F0F5F9;
+}
+
+QMenu::item:selected, QMenuBar::item:selected, QMenuBar::item:hover {
+    color: #F0F5F9;
+    background-color: #e95420;
+}
+/********************************* QMenuBarUI settings ***************************************/
