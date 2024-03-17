@@ -8,7 +8,7 @@ QWidget {
 }
 /********************************* Main UI settings ***************************************/
 
-/********************************* Buttons UI settings ***************************************/
+/********************************* Buttons UIQPushButton settings ***************************************/
 .QPushButton#vmenu {
     font-size: 16px;
     color: "#F0F5F9";
@@ -17,18 +17,26 @@ QWidget {
     min-height: 40px;
     min-width: 207px;
 }
+
 .QPushButton#vmenu:pressed {
     font-size: 16px;
     color: "#F0F5F9";
     background-color: "#52616B"
 }
+
 .QPushButton#vmenu:hover {
     border: 2px solid "#e95420";
 }
+
 .QPushButton#vmenu:disabled {
     font-size: 16px;
     color: "#888";
     background-color: "#32414B"
+}
+
+QToolTip {
+    color: #1E2022;
+    background-color: #F0F5F9;
 }
 /********************************* Buttons UI settings ***************************************/
 
@@ -183,8 +191,28 @@ QTabWidget::item {
 
 QSpinBox {
     background-color: #F0F5F9;
-    color: #323335;
+    color: "#323335";
     font-size: 16px;
+    border-radius: 2px;
+    height: 25px;
+}
+
+QSpinBox::up-button, QSpinBox::down-button {
+    width: 20px;
+    height: 12px;
+    background-color: #52616B;
+}
+
+QSpinBox::up-arrow {
+    image: url(img/actdown.png) no-repeat center;
+    width: 9px;
+    height: 9px;
+}
+
+QSpinBox::down-arrow {
+    image: url(img/actdown.png) no-repeat center;
+    width: 9px;
+    height: 9px;
 }
 
 QComboBox {
