@@ -143,7 +143,7 @@ class DBManager():
         self.query.clear()
 
     def getTemplates(self):
-        self.query.exec("select * from templates order by id")
+        self.query.exec("select * from templates where enable=True order by id")
         lst = []
         if self.query.isActive():
             self.query.first()
@@ -182,9 +182,17 @@ class DBManager():
         self.query.clear()
         return items
 
+    def getCntItemsByContractId(self, contractId):
+        self.query.exec("select count(*) as count from components where contract_id={} and enable=True and count != 0".format(contractId))
+        cnt = 0
+        if self.query.next():
+            cnt = self.query.value("count")
+        self.query.clear()
+        return cnt
+
     def getContractsByTemplateId(self, templateId) -> []:
         """ returns list of contracts with same template_id values """
-        self.query.exec("select * from contracts where template_id={} order by id".format(templateId))
+        self.query.exec("select * from contracts where template_id={} and enable=True order by id".format(templateId))
         items = []
         if self.query.isActive():
             self.query.first()
@@ -198,7 +206,7 @@ class DBManager():
         return items
 
     def getAllTemplateItems(self):
-        self.query.exec("select * from items_template order by id")
+        self.query.exec("select * from items_template where enable=True  order by id")
         items = []
         if self.query.isActive():
             self.query.first()
@@ -218,6 +226,7 @@ class DBManager():
                         "from contracts " +
                         "join templates on " +
                         "(templates.id = contracts.template_id) " +
+                        " where contracts.enable=True "
                         "order by contracts.id")
         lst = []
         if self.query.isActive():
@@ -266,7 +275,7 @@ class DBManager():
                         " (templates.id = components.template_id) " +
                         " join notes on " +
                         " (components.note_id = notes.id) " +
-                        " where components.count != 0 " + where +
+                        " where components.count != 0 and components.enable=True " + where +
                         " order by components.id")
         lst = []
         if self.query.isActive():
@@ -298,7 +307,8 @@ class DBManager():
                         " join templates on " +
                         " (templates.id = components.template_id) "
                         " join items_template on " +
-                        " (items_template.id = components.item_template_id) " + where +
+                        " (items_template.id = components.item_template_id) " +
+                        " where components.enable=True " + where +
                         " group by components.contract_id, components.item_template_id")
         lst = []
         if self.query.isActive():
@@ -321,6 +331,10 @@ class DBManager():
     def delTemplate(self, id):
         self.query.exec("delete from templates where id={}".format(id))
         self.query.clear()
+
+    def delContract(self, id):
+        self.query.exec("update components set enable=False where contract_id={}".format(id))
+        self.query.exec("update contracts set enable=False where id={}".format(id))
 
     def delItemsByTemplateId(self, templateId):
         self.query.exec("delete from items_template where template_id={}".format(templateId))

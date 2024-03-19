@@ -34,5 +34,18 @@ class Contract(CustomTable):
         header.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         #header.setMaximumWidth(300)
 
+    def getContractsCount(self):
+        return len(self.contracts)
+
+    def getSelectedRowId(self):
+        index = self.currentIndex()
+        NewIndex = self.model().index(index.row(), 0)
+        return self.model().data(NewIndex)
+
+    def getSelectedRowName(self):
+        index = self.currentIndex()
+        NewIndex = self.model().index(index.row(), 1)
+        return self.model().data(NewIndex)
+
     def getSize(self):
         return len(self.contracts)

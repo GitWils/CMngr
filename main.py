@@ -240,6 +240,14 @@ class Project(QtWidgets.QWidget):
         self.reportsLt.setStretch(1, 1)
         return tab
 
+    def reloadAllData(self):
+        self.designer.loadData(self.db.getTemplates())
+        self.contracts.loadData(self.db.getContracts())
+        self.components.loadData(self.db.getComponents(self.getFilter()))
+        self.reports.loadData(self.db.getReports(self.getFilter()))
+
+        self.logArea.showContent(self.db.getLogs())
+
     def itemDesignClicked(self) -> None:
         """ new template mode save button clicked """
         self.editDesBtn.setActive(True)
@@ -256,7 +264,7 @@ class Project(QtWidgets.QWidget):
 
     def newTemplateSave(self, name: str, items: list) -> None:
         """ new template mode save button clicked """
-        if len(name) == 0 or items[0]['name'] == '':
+        if len(name) == 0 or len(items) == 0:
             return
         self.db.saveTemplate(name, items)
         self.designer.loadData(self.db.getTemplates())
@@ -390,15 +398,40 @@ class Project(QtWidgets.QWidget):
                 self.db.delItemsByTemplateId(templateId)
                 self.db.saveLogMsg('видалено шаблон для виробу <span style="text-decoration: underline">{}</span>'
                                    .format(self.designer.getSelectedRowName()))
-                self.designer.loadData(self.db.getTemplates())
-                self.logArea.showContent(self.db.getLogs())
+                self.reloadAllData()
+                # self.designer.loadData(self.db.getTemplates())
+                # self.logArea.showContent(self.db.getLogs())
                 if self.designer.getTemplatesCount() == 0:
                     self.designer.hide()
                     self.desLbl.show()
                     self.desLayout.replaceWidget(self.designer, self.desLbl)
 
     def delContractClicked(self):
-        pass
+        contractId = self.contracts.getSelectedRowId()
+        cntItems = self.db.getCntItemsByContractId(contractId)
+        msg_box = QtWidgets.QMessageBox()
+        msg_box.setWindowTitle("Увага")
+        if cntItems:
+            msg_box.setText("""Буде видалено контракт і {} записів переміщення комплектуючих.""".format(cntItems))
+            msg_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel)
+            msg_box.button(QtWidgets.QMessageBox.StandardButton.Ok).setText("Видалити")
+            msg_box.button(QtWidgets.QMessageBox.StandardButton.Cancel).setText("Скасувати")
+            msg_box.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+            result = msg_box.exec()
+            if result == QtWidgets.QMessageBox.StandardButton.Cancel:
+                return
+        self.db.delContract(contractId)
+        self.db.saveLogMsg('видалено контракт <span style="text-decoration: underline">{}</span>'
+                           .format(self.designer.getSelectedRowName()))
+        self.reloadAllData()
+        # self.contracts.loadData(self.db.getContracts())
+        # self.logArea.showContent(self.db.getLogs())
+        print(self.contracts.getContractsCount())
+        if self.contracts.getContractsCount() == 0:
+            self.contracts.hide()
+            self.contractLbl.show()
+            self.desLayout.replaceWidget(self.contracts, self.contractLbl)
+        print("{} has {} items".format(contractId, cntItems))
 
     # def delComponentsClicked(self):
     #     pass

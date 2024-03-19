@@ -122,9 +122,11 @@ class TemplateDialog(QtWidgets.QDialog):
                                        'id': self.items[i]['id']}))
             self.parent.updateTemplate(self.name.text(), items)
         else:
+            #print(self.additionalWgts.__repr__())
             for i in range(0, self.itemsCnt):
-                items.append(dict({'name': self.additionalWgts[i]['edit_name'].text(),
-                                   'count': self.additionalWgts[i]['spin_cnt'].value()}))
+                if len(self.additionalWgts[i]['edit_name'].text()):
+                    items.append(dict({'name': self.additionalWgts[i]['edit_name'].text(),
+                                       'count': self.additionalWgts[i]['spin_cnt'].value()}))
             self.parent.newTemplateSave(self.name.text(), items)
         self.accept()
 
