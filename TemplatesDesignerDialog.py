@@ -42,6 +42,7 @@ class TemplateDialog(QtWidgets.QDialog):
         self.show()
 
     def plusMinusMenu(self):
+        """ add element or remove element from dialog """
         self.btnAdd.clicked.connect(self.addItemField)
         self.btnRem.clicked.connect(self.removeItemField)
         hbox = QtWidgets.QHBoxLayout()
@@ -54,6 +55,7 @@ class TemplateDialog(QtWidgets.QDialog):
         return hwidget
 
     def fillValues(self):
+        """ filling edit fields """
         i = 0
         self.name.setText(self.templateName)
         for item in self.items:
@@ -69,9 +71,9 @@ class TemplateDialog(QtWidgets.QDialog):
         bbox = QtWidgets.QDialogButtonBox()
         bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok |
                                 QtWidgets.QDialogButtonBox.StandardButton.Cancel)
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('vmenu')
+        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('dlgBtn')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('vmenu')
+        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('dlgBtn')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
         if sys.platform == 'win32':
             bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
@@ -112,11 +114,17 @@ class TemplateDialog(QtWidgets.QDialog):
     def save(self):
         """ Save button click reaction """
         items = []
-        for i in range(0, self.itemsCnt):
-            items.append(dict({'name': self.additionalWgts[i]['edit_name'].text(), 'count': self.additionalWgts[i]['spin_cnt'].value()}))
         if self.editMode:
+            for i in range(0, self.itemsCnt):
+                if (self.additionalWgts[i]['spin_cnt'].value() != self.items[i]['count']):
+                    items.append(dict({'name': self.additionalWgts[i]['edit_name'].text(),
+                                       'count': self.additionalWgts[i]['spin_cnt'].value(),
+                                       'id': self.items[i]['id']}))
             self.parent.updateTemplate(self.name.text(), items)
         else:
+            for i in range(0, self.itemsCnt):
+                items.append(dict({'name': self.additionalWgts[i]['edit_name'].text(),
+                                   'count': self.additionalWgts[i]['spin_cnt'].value()}))
             self.parent.newTemplateSave(self.name.text(), items)
         self.accept()
 

@@ -61,9 +61,17 @@ class DBManager():
             self.query.exec()
             self.query.clear()
 
-    def updateItemsByTemplateId(self, templateId, items):
-        print("id = {}".format(templateId))
-        #print(items.__repr__())
+    def updateItemsByTemplateId(self, templateId, items) -> bool:
+        """ updating items int template by id """
+        if not len(items):
+            return False
+        for item in items:
+            self.query.prepare("update items_template set count = :count where id = :id")
+            self.query.bindValue(':count', item['count'])
+            self.query.bindValue(':id', item['id'])
+            self.query.exec()
+            self.query.clear()
+        return True
 
     def saveContract(self, contract):
         date = self.getDateTime()
@@ -162,6 +170,21 @@ class DBManager():
 
     def getItemsByTemplateId(self, templateId):
         self.query.exec("select * from items_template where template_id={} order by id".format(templateId))
+        items = []
+        if self.query.isActive():
+            self.query.first()
+            while self.query.isValid():
+                res = dict({'id': self.query.value('id'),
+                            'name': self.query.value('name'),
+                            'count': self.query.value('count')})
+                items.append(res)
+                self.query.next()
+        self.query.clear()
+        return items
+
+    def getContractsByTemplateId(self, templateId) -> []:
+        """ returns list of contracts with same template_id values """
+        self.query.exec("select * from contracts where template_id={} order by id".format(templateId))
         items = []
         if self.query.isActive():
             self.query.first()

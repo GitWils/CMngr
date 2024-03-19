@@ -58,9 +58,9 @@ class ContractDlg(QtWidgets.QDialog):
         bbox = QtWidgets.QDialogButtonBox()
         bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok |
                                 QtWidgets.QDialogButtonBox.StandardButton.Cancel)
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('vmenu')
+        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('dlgBtn')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('vmenu')
+        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('dlgBtn')
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
         if sys.platform == 'win32':
             bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)

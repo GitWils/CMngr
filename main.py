@@ -20,31 +20,37 @@ class mainWindow(QtWidgets.QMainWindow):
         self.initUI()
 
     def initUI(self):
+        """ user interface initialisation"""
         ico = QtGui.QIcon("img/logo.png")
         self.setWindowIcon(ico)
         self.setGeometry(50, 50, 974, 690)
         self.centerWindow()
         self.setWindowTitle('Облік договорів, комплектуючих')
+        self.setMenuBar(self._createMenuBar())
 
+    def _createMenuBar(self) -> QtWidgets.QMenuBar:
+        """ top menu bar creating """
         menuBar = QtWidgets.QMenuBar(self)
         file_menu = QtWidgets.QMenu("&Файл", self)
         file_menu.addAction(QtGui.QAction("&Експорт...", self))
         file_menu.addAction(QtGui.QAction("&Друк", self))
         view_menu = QtWidgets.QMenu("&Вигляд", self)
+        view_menu.addAction(QtGui.QAction("&Налаштування", self))
         menuBar.addMenu(file_menu)
         menuBar.addMenu(view_menu)
-        self.setMenuBar(menuBar)
+        return menuBar
 
     def centerWindow(self):
-        """ centering the main window in the center of the screen"""
+        """ centering the main window in the center of the screen """
         qr = self.frameGeometry()
         cp = self.screen().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
     def event(self, e) -> QtWidgets.QWidget.event:
+        """ hotkey handling """
         if e.type() == QtCore.QEvent.Type.WindowDeactivate:
-            self.setWindowOpacity(0.85)
+            self.setWindowOpacity(0.80)
         elif e.type() == QtCore.QEvent.Type.WindowActivate:
             self.setWindowOpacity(1)
         elif e.type() == QtCore.QEvent.Type.KeyPress and e.key() == QtCore.Qt.Key.Key_Escape:
@@ -52,6 +58,7 @@ class mainWindow(QtWidgets.QMainWindow):
         return QtWidgets.QWidget.event(self, e)
 
 class Project(QtWidgets.QWidget):
+    """ widget fills main window """
     def __init__(self):
         super().__init__()
         self.db = DBManager()
@@ -63,10 +70,10 @@ class Project(QtWidgets.QWidget):
     def initMenu(self):
         self.vMenu = QtWidgets.QGridLayout()
         self.fMenu = FindMenu(self, self.vMenu, self.db.getContracts())
-        self.__initLayout1()
-        self.__initLayout0()
+        self._initLayout1()
+        self._initLayout0()
 
-    def __initLayout0(self):
+    def _initLayout0(self):
         lblLog = QtWidgets.QLabel("Журнал подій:")
         self.logArea = Logger()
         self.logArea.showContent(self.db.getLogs())
@@ -80,7 +87,7 @@ class Project(QtWidgets.QWidget):
         self.vbox.setStretch(1, 1)
         self.setLayout(self.vbox)
 
-    def __initLayout1(self):
+    def _initLayout1(self):
         self.innerbox = QtWidgets.QHBoxLayout()
         self.innerbox.addLayout(self.vMenu)
         mainArea = QtWidgets.QVBoxLayout()
@@ -329,11 +336,11 @@ class Project(QtWidgets.QWidget):
 
     def updateTemplate(self, name: str, items: list):
         """ edit template mode save edit button clicked """
-        self.db.updateItemsByTemplateId(self.designer.getSelectedRowId(), items)
-        self.designer.loadData(self.db.getTemplates())
-        msg = 'оновлено шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
-        self.db.saveLogMsg(msg)
-        self.logArea.showContent(self.db.getLogs())
+        if self.db.updateItemsByTemplateId(self.designer.getSelectedRowId(), items):
+            self.designer.loadData(self.db.getTemplates())
+            msg = 'оновлено шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
+            self.db.saveLogMsg(msg)
+            self.logArea.showContent(self.db.getLogs())
 
     def updateContract(self):
         """ edit contract mode save edit button clicked """
@@ -354,26 +361,41 @@ class Project(QtWidgets.QWidget):
         dlg = TemplateDialog(self, template['name'], self.db.getItemsByTemplateId(templateId))
 
     def editContractClicked(self):
+
         print("edit clicked")
 
     def editComponentsClicked(self):
         print("edit clicked")
 
     def delDesignClicked(self):
-        #TODO checking for template usage
         templateId = self.designer.getSelectedRowId()
-        print(templateId)
-        return
-        self.db.delTemplate(templateId)
-        self.db.delItemsByTemplateId(templateId)
-        self.designer.loadData(self.db.getTemplates())
-        self.db.saveLogMsg('видалено шаблон <span style="text-decoration: underline">{}</span>'
-                           .format(self.designer.getSelectedRowName()))
-        self.logArea.showContent(self.db.getLogs())
-        if self.designer.getTemplatesCount() == 0:
-            self.designer.hide()
-            self.desLbl.show()
-            self.desLayout.replaceWidget(self.designer, self.desLbl)
+        msg_box = QtWidgets.QMessageBox()
+        msg_box.setWindowTitle("Увага")
+        cntItems = len(self.db.getContractsByTemplateId(templateId))
+        if cntItems:
+            msg_box.setText("""Неможливо видалити шаблон, який уже викори-\nстовується у {} договорах(і). 
+            Для видалення шаблону необхідно видалити всі договори, які його використовують.""".format(cntItems))
+            msg_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok) #| QtWidgets.QMessageBox.StandardButton.Cancel
+            msg_box.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+            #really not worked for some reason
+            msg_box.button(QtWidgets.QMessageBox.StandardButton.Ok).setObjectName('dlgBtn')
+            msg_box.exec()
+        else:
+            msg_box.setText("Ви дійсно хочете видалити шаблон?")
+            msg_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel)
+            msg_box.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+            result = msg_box.exec()
+            if result == QtWidgets.QMessageBox.StandardButton.Ok:
+                self.db.delTemplate(templateId)
+                self.db.delItemsByTemplateId(templateId)
+                self.db.saveLogMsg('видалено шаблон для виробу <span style="text-decoration: underline">{}</span>'
+                                   .format(self.designer.getSelectedRowName()))
+                self.designer.loadData(self.db.getTemplates())
+                self.logArea.showContent(self.db.getLogs())
+                if self.designer.getTemplatesCount() == 0:
+                    self.designer.hide()
+                    self.desLbl.show()
+                    self.desLayout.replaceWidget(self.designer, self.desLbl)
 
     def delContractClicked(self):
         pass

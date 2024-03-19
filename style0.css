@@ -9,7 +9,7 @@ QWidget {
 /********************************* Main UI settings ***************************************/
 
 /********************************* Buttons UIQPushButton settings ***************************************/
-.QPushButton#vmenu {
+#dlgBtn, QMessageBox QPushButton {
     font-size: 16px;
     color: "#F0F5F9";
     background-color: "#52616B";
@@ -18,17 +18,17 @@ QWidget {
     min-width: 207px;
 }
 
-.QPushButton#vmenu:pressed {
+#dlgBtn:pressed, QMessageBox QPushButton:pressed {
     font-size: 16px;
     color: "#F0F5F9";
     background-color: "#52616B"
 }
 
-.QPushButton#vmenu:hover {
+#dlgBtn:hover, QMessageBox QPushButton:hover {
     border: 2px solid "#e95420";
 }
 
-.QPushButton#vmenu:disabled {
+#dlgBtn:disabled {
     font-size: 16px;
     color: "#888";
     background-color: "#32414B"
@@ -194,7 +194,7 @@ QSpinBox {
     color: "#323335";
     font-size: 16px;
     border-radius: 2px;
-    height: 25px;
+    height: 26px;
 }
 
 QSpinBox::up-button, QSpinBox::down-button {
@@ -204,15 +204,15 @@ QSpinBox::up-button, QSpinBox::down-button {
 }
 
 QSpinBox::up-arrow {
-    image: url(img/actdown.png) no-repeat center;
-    width: 9px;
-    height: 9px;
+    image: url(img/actup.png) no-repeat top;
+    width: 10px;
+    height: 10px;
 }
 
 QSpinBox::down-arrow {
-    image: url(img/actdown.png) no-repeat center;
-    width: 9px;
-    height: 9px;
+    image: url(img/actdown.png) no-repeat bottom;
+    width: 10px;
+    height: 10px;
 }
 
 QComboBox {
