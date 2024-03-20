@@ -1,6 +1,6 @@
 import sys
 from PyQt6 import QtGui, QtWidgets, QtCore
-from CustomWidgets import EditBtn
+from CustomWidgets import DialogGrid
 
 class ContractDlg(QtWidgets.QDialog):
     def __init__(self, parent, templates):
@@ -15,10 +15,7 @@ class ContractDlg(QtWidgets.QDialog):
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(600, 300)
 
-        self.grid = QtWidgets.QGridLayout()
-        self.grid.setContentsMargins(40, 40, 40, 40)
-        self.grid.setSpacing(25)
-
+        self.grid = DialogGrid()
         contractName = QtWidgets.QLabel("Назва договору:")
         self.name = QtWidgets.QLineEdit()
         contractShortName = QtWidgets.QLabel("Коротка назва (№ХХ):")

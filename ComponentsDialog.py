@@ -1,4 +1,5 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
+from CustomWidgets import DialogGrid
 import sys
 
 class ComponentsDlg(QtWidgets.QDialog):
@@ -23,10 +24,7 @@ class ComponentsDlg(QtWidgets.QDialog):
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(600, 300)
 
-        self.grid = QtWidgets.QGridLayout()
-        self.grid.setContentsMargins(40, 40, 40, 40)
-        self.grid.setSpacing(25)
-
+        self.grid = DialogGrid()
         self.cBoxContract = QtWidgets.QComboBox()
         for contract in self.contracts:
             self.cBoxContract.addItem(contract['name'], str(contract['id']))
@@ -42,7 +40,7 @@ class ComponentsDlg(QtWidgets.QDialog):
         self.lblWarning = QtWidgets.QLabel(
             '<p class="orange">Переміщення комплектуючих можливе<br/> тільки між договорами з однаковими виробами!</p>')
         self.lblWarning.setObjectName('orange')
-        self.lblWarning.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.lblWarning.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignTop)
         self.lblWarning.hide()
         self.grid.addWidget(self.lblWarning, 1, 0, 1, 4)
         self.grid.addWidget(lblContractName, 2, 0, 1, 1)
@@ -146,6 +144,9 @@ class ComponentsDlg(QtWidgets.QDialog):
 
     def save(self):
         """ Save button click reaction """
+        if self.isMovement and self.cBoxToContract.currentData() == None:
+            self.accept()
+            return
         res = []
         for widget in self.additionalWgts:
             #print("id = {} {}pcs".format(widget['item_template_id'], widget['spin_cnt'].value()))

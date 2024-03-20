@@ -6,6 +6,7 @@ from TemplatesDesignerDialog import TemplateDialog
 from ComponentsView import Components
 from ReportsView import Reports
 from ComponentsDialog import ComponentsDlg
+from ProduceDialog import ProduceDlg
 from ContractsView import Contract
 from ContractDialog import ContractDlg
 from FindMenu import FindMenu
@@ -62,7 +63,7 @@ class Project(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.db = DBManager()
-        self.__filter = dict({
+        self._filter = dict({
             'contracts': []
         })
         self.initMenu()
@@ -190,6 +191,7 @@ class Project(QtWidgets.QWidget):
         self.editCompBtn = EditBtn('edit.png', False, 'Забракувати, перемістити')
         #self.delCompBtn = EditBtn('del.png', False)
         self.newCompBtn.clicked.connect(self.newComponentsClicked)
+        self.produceCompBtn.clicked.connect(self.produceItemsClicked)
         self.moveCompBtn.clicked.connect(self.moveComponentsClicked)
         self.editCompBtn.clicked.connect(self.editComponentsClicked)
         #self.delCompBtn.clicked.connect(self.delComponentsClicked)
@@ -228,6 +230,7 @@ class Project(QtWidgets.QWidget):
         self.produceRepBtn = EditBtn('produce.png', True, 'Зібрати вироби')
         self.moveRepBtn = EditBtn('move.png', True, 'Перемістити в інший договір')
         self.newRepBtn.clicked.connect(self.newComponentsClicked)
+        self.produceRepBtn.clicked.connect(self.produceItemsClicked)
         self.moveRepBtn.clicked.connect(self.moveComponentsClicked)
         btnLayout.addWidget(self.newRepBtn)
         btnLayout.addWidget(self.produceRepBtn)
@@ -241,6 +244,7 @@ class Project(QtWidgets.QWidget):
         return tab
 
     def reloadAllData(self):
+        """ load all data from database """
         self.designer.loadData(self.db.getTemplates())
         self.contracts.loadData(self.db.getContracts())
         self.components.loadData(self.db.getComponents(self.getFilter()))
@@ -278,9 +282,9 @@ class Project(QtWidgets.QWidget):
 
     def setFindFilter(self, contracts, dates):
         """ filter for components and reports tabs """
-        self.__filter['contracts'] = contracts
-        self.__filter['from'] = dates['from']
-        self.__filter['to'] = dates['to']
+        self._filter['contracts'] = contracts
+        self._filter['from'] = dates['from']
+        self._filter['to'] = dates['to']
         if hasattr(self, 'components'):
             self.components.loadData(self.db.getComponents(self.getFilter()))
         if hasattr(self, 'reports'):
@@ -436,12 +440,15 @@ class Project(QtWidgets.QWidget):
     # def delComponentsClicked(self):
     #     pass
 
+    def produceItemsClicked(self):
+        ProduceDlg(self, self.db.getContracts(), self.db.getReports(self._filter))
+
     def moveComponentsClicked(self):
         """ move components button clicked """
         dlg = ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems(), True)
 
     def getFilter(self):
-        return self.__filter
+        return self._filter
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

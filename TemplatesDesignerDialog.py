@@ -1,6 +1,6 @@
 import sys
 from PyQt6 import QtWidgets, QtCore
-from CustomWidgets import EditBtn
+from CustomWidgets import EditBtn, DialogGrid
 
 class TemplateDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, name='', items=()):
@@ -16,11 +16,9 @@ class TemplateDialog(QtWidgets.QDialog):
         """ setup dialog widgets """
         self.setWindowTitle("Конфігурація виробу")
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
-        self.resize(600, 300)
+        self.resize(600, 270)
 
-        self.grid = QtWidgets.QGridLayout()
-        self.grid.setContentsMargins(40, 40, 40, 40)
-        self.grid.setSpacing(25)
+        self.grid = DialogGrid()
         deviceName = QtWidgets.QLabel("Назва виробу:")
         self.name = QtWidgets.QLineEdit()
         self.additionalWgts = []

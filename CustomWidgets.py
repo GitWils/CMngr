@@ -47,3 +47,9 @@ class CustomTable(QtWidgets.QTableView):
         #header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         #header.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.setColumnHidden(0, True)
+
+class DialogGrid(QtWidgets.QGridLayout):
+    def __init__(self):
+        super().__init__()
+        self.setContentsMargins(30, 30, 30, 30)
+        self.setSpacing(20)
