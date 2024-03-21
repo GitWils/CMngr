@@ -27,15 +27,16 @@ class TemplateDialog(QtWidgets.QDialog):
         self.btnRem = EditBtn('minus', True, 'Видалити поле')
         bbox = self.initButtonBox()
 
-        self.grid.addWidget(deviceName, 0, 0, 1, 1)
-        self.grid.addWidget(self.name, 0, 1, 1, 3)
+        self.grid.addWidget(deviceName,             0, 0, 1, 1)
+        self.grid.addWidget(self.name,              0, 1, 1, 3)
         self.grid.addWidget(self.plusMinusMenu(), 100, 0, 1, 4)
-        self.grid.addWidget(bbox, 101, 0, 1, 4)
+        self.grid.addWidget(bbox,                 101, 0, 1, 4)
         self.grid.setAlignment(bbox, QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.grid)
         self.setTaborders()
         if self.editMode:
             self.fillValues()
+            self.btnAdd.setActive(False)
             self.btnRem.setActive(False)
         self.show()
 
@@ -82,10 +83,10 @@ class TemplateDialog(QtWidgets.QDialog):
         self.additionalWgts[self.itemsCnt]['spin_cnt'].setValue(1)
         self.additionalWgts[self.itemsCnt]['spin_cnt'].setMaximum(100000)
         self.itemsCnt += 1
-        self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['lbl_name'], self.itemsCnt, 0, 1, 1)
+        self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['lbl_name'],  self.itemsCnt, 0, 1, 1)
         self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['edit_name'], self.itemsCnt, 1, 1, 1)
-        self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['spin_cnt'], self.itemsCnt, 3, 1, 1)
-        self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['lbl_cnt'], self.itemsCnt, 2, 1, 1)
+        self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['lbl_cnt'],   self.itemsCnt, 2, 1, 1)
+        self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['spin_cnt'],  self.itemsCnt, 3, 1, 1)
         self.additionalWgts[self.itemsCnt - 1]['edit_name'].setFocus()
 
     def removeItemField(self):

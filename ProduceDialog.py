@@ -27,17 +27,27 @@ class ProduceDlg(QtWidgets.QDialog):
         self.cBoxContract.currentIndexChanged.connect(self.fillItemslist)
         self.additionalWgts = []
         self.tableWidget = Table(self.components)
+        self.lblProduceName = QtWidgets.QLabel('Назва виробу:')
+        self.editProductName = QtWidgets.QLineEdit()
+        self.editProductName.setReadOnly(True)
+        self.lblProduceCnt = QtWidgets.QLabel('Зібрати:')
+        self.lblCnt = QtWidgets.QLabel('шт.')
+        self.spinCnt = QtWidgets.QSpinBox()
+        self.spinCnt.setValue(1)
         self.fillItemslist()
         bbox = self.initButtonBox()
-
-        self.grid.addWidget(lblContractName, 2, 0, 1, 1)
-        self.grid.addWidget(self.cBoxContract, 2, 1, 1, 4)
-        self.grid.addWidget(self.tableWidget, 3, 0, 1, 5)
-
-        self.grid.addWidget(bbox, 202, 0, 1, 5)
+        self.grid.addWidget(lblContractName,      2, 0, 1, 1)
+        self.grid.addWidget(self.cBoxContract,    2, 1, 1, 4)
+        self.grid.addWidget(self.tableWidget,     3, 0, 1, 5)
+        self.grid.addWidget(self.lblProduceName,  4, 0, 1, 1)
+        self.grid.addWidget(self.editProductName, 4, 1, 1, 1)
+        self.grid.addWidget(self.lblProduceCnt,   4, 2, 1, 1)
+        self.grid.addWidget(self.spinCnt,         4, 3, 1, 1)
+        self.grid.addWidget(self.lblCnt,          4, 4, 1, 1)
+        self.grid.addWidget(bbox,                 9, 0, 1, 5)
         self.grid.setAlignment(bbox, QtCore.Qt.AlignmentFlag.AlignCenter)
-
         self.setLayout(self.grid)
+        self.setTaborders()
         self.show()
 
     def fillItemslist(self):
@@ -47,8 +57,8 @@ class ProduceDlg(QtWidgets.QDialog):
         self.curContract = int(self.cBoxContract.currentData())
         self.curComponents()
         self.tableWidget.loadData(self.components)
-        #self.adjustSize()
-        #self.resize(600, 300)
+        self.editProductName.setText(self.components[0]['device'])
+        self.resize(600, 300)
 
     def curComponents(self):
         """ filtering all compo """
@@ -88,7 +98,7 @@ class ProduceDlg(QtWidgets.QDialog):
         #         res.append(item)
         msg_box = QtWidgets.QMessageBox()
         msg_box.setWindowTitle("Увага")
-        msg_box.setText("""Недостатньо компонуючих деталей""")
+        msg_box.setText("""Недостатньо комплектуючих деталей""")
         msg_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
         msg_box.setIcon(QtWidgets.QMessageBox.Icon.Warning)
         msg_box.button(QtWidgets.QMessageBox.StandardButton.Ok).setObjectName('dlgBtn')
@@ -102,6 +112,12 @@ class ProduceDlg(QtWidgets.QDialog):
                 return contract['template_id']
         return 0
 
+    def setTaborders(self):
+        """ change focus when tab button pressed """
+        self.cBoxContract.setFocus()
+        QtWidgets.QWidget.setTabOrder(self.cBoxContract, self.spinCnt)
+
+
     def event(self, e):
         if e.type() == QtCore.QEvent.Type.KeyPress and e.key() == QtCore.Qt.Key.Key_Escape:
             self.close()
@@ -113,7 +129,6 @@ class Table(CustomTable):
         self.reports = reports
         self.sti = TableModel(reports)
         self.loadData(self.reports)
-        print(len(self.reports))
         self.setFixedHeight(self.getSize() * 31 + 60)
 
     def loadData(self, reports):
@@ -122,11 +137,14 @@ class Table(CustomTable):
         self.reset()
         self.sti.clear()
         self.sti.setHorizontalHeaderLabels(
-            ['Id', 'Назва деталі', 'Виріб', 'Наявність', 'Очікується', 'Всього\nнеобхідно'])
+            ['Id', 'Назва деталі', 'Наявність', 'Необхідно\nна 1 виріб', 'Всього\nнеобхідно'])
         self.sti.setRowCount(len(self.reports))
         self.setModel(self.sti)
         self.setColumnStyles()
         self.setFixedHeight(self.getSize() * 31 + 60)
+        # self.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Fixed)
+        # self.horizontalHeader().resizeSection(1, 200)
+        #self.setColumnWidth(1, 300)
 
     def getSize(self):
         return len(self.reports)
@@ -135,7 +153,6 @@ class TableModel(QtGui.QStandardItemModel):
     def __init__(self, data):
         super(TableModel, self).__init__()
         self._data = data
-        print(data.__repr__())
 
     def data(self, index, role):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
@@ -143,17 +160,15 @@ class TableModel(QtGui.QStandardItemModel):
                 case 1:
                     return self._data[index.row()]['product']
                 case 2:
-                    return self._data[index.row()]['device']
-                case 3:
                     return self._data[index.row()]['count']
+                case 3:
+                    return -1
                 case 4:
-                    return self._data[index.row()]['needed'] - self._data[index.row()]['count']
-                case 5:
                     return self._data[index.row()]['needed']
             return 1
 
         if (role == QtCore.Qt.ItemDataRole.BackgroundRole and
-                index.column() == 3 and
+                index.column() == 2 and
                 self._data[index.row()]['count'] <= 0):
             return QtGui.QColor('#d99')
     @staticmethod

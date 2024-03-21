@@ -38,16 +38,14 @@ class CustomTable(QtWidgets.QTableView):
         self.setAlternatingRowColors(True)
         self.setSortingEnabled(True)
         self.setEditTriggers(QtWidgets.QListView.EditTrigger.NoEditTriggers)
-        #self.setColumnWidth(0, 200)
-        #self.setColumnWidth(1, 400)
         header = self.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        #header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        #header.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+
         self.setColumnHidden(0, True)
+        #header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
 
 class ButtonBox(QtWidgets.QDialogButtonBox):
     def __init__(self, doubleBtnMode):
