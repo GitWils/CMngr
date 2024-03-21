@@ -1,3 +1,4 @@
+import sys
 from PyQt6 import QtGui, QtWidgets, QtCore
 
 class EditBtn(QtWidgets.QPushButton):
@@ -29,7 +30,7 @@ class CustomTable(QtWidgets.QTableView):
     def __init__(self):
         self.setColumnStyles()
         self.setSortingEnabled(True)
-        self.setObjectName("table")
+        #self.setObjectName("table")
 
     def setColumnStyles(self):
         #self.setMinimumWidth(800)
@@ -47,6 +48,23 @@ class CustomTable(QtWidgets.QTableView):
         #header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         #header.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.setColumnHidden(0, True)
+
+class ButtonBox(QtWidgets.QDialogButtonBox):
+    def __init__(self, doubleBtnMode):
+        super().__init__()
+        if(doubleBtnMode):
+            self.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Cancel |
+                                QtWidgets.QDialogButtonBox.StandardButton.Ok)
+            self.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('dlgBtn')
+            self.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
+        else:
+            self.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok)
+        self.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('dlgBtn')
+        self.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
+        if sys.platform == 'win32':
+            self.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
+        else:
+            self.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
 
 class DialogGrid(QtWidgets.QGridLayout):
     def __init__(self):

@@ -1,6 +1,6 @@
 import sys
 from PyQt6 import QtWidgets, QtCore
-from CustomWidgets import EditBtn, DialogGrid
+from CustomWidgets import EditBtn, DialogGrid, ButtonBox
 
 class TemplateDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, name='', items=()):
@@ -66,17 +66,7 @@ class TemplateDialog(QtWidgets.QDialog):
 
     def initButtonBox(self):
         """ create widget with "Cancel" and "Save" buttons """
-        bbox = QtWidgets.QDialogButtonBox()
-        bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok |
-                                QtWidgets.QDialogButtonBox.StandardButton.Cancel)
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('dlgBtn')
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('dlgBtn')
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
-        if sys.platform == 'win32':
-            bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
-        else:
-            bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
+        bbox = ButtonBox(True)
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
         return bbox

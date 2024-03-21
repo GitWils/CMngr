@@ -10,20 +10,10 @@ class Reports(CustomTable):
         self.loadData(self.reports)
 
     def loadData(self, reports):
-        self.reports = reports
+        self.reports = list(reports)
         self.sti.reloadData(reports)
         self.reset()
         self.sti.clear()
-        # for report in reports:
-        #     item0 = QtGui.QStandardItem(str(1))
-        #     item1 = QtGui.QStandardItem(report['product'])
-        #     item2 = QtGui.QStandardItem(report['device'])
-        #     item3 = QtGui.QStandardItem(report['contract'])
-        #     item4 = QtGui.QStandardItem(str(report['count']))
-        #     item5 = QtGui.QStandardItem(str(report['needed'] - report['count']))
-        #     item6 = QtGui.QStandardItem(str(report['needed']))
-        #     #item7 = QtGui.QStandardItem(report['date'][5:])
-        #     self.sti.appendRow([item0, item1, item2, item3, item4, item5, item6])
         self.sti.setHorizontalHeaderLabels(
             ['Id', 'Назва деталі', 'Виріб', 'Договір', 'Наявність', 'Очікується', 'Всього\nнеобхідно'])
         self.sti.setRowCount(len(self.reports))
@@ -65,4 +55,4 @@ class TableModel(QtGui.QStandardItemModel):
 
     def reloadData(self, data):
         """ reload table data """
-        self._data = data
+        self._data = list(data)

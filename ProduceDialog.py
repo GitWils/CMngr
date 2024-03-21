@@ -1,19 +1,19 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
-from CustomWidgets import DialogGrid
+from CustomWidgets import DialogGrid, CustomTable, ButtonBox
 import sys
 
 class ProduceDlg(QtWidgets.QDialog):
     def __init__(self, parent, contracts, components):
         super(ProduceDlg, self).__init__(parent)
         self.contracts = contracts
-        self.components = components
-        self.itemsCnt = 0
+        self.allComponents = components
+        self.components = []
+        self.curContract = 0
         self.init()
 
     def init(self):
         """ initialize dialog components """
-        print(self.components.__repr__())
-        self.setWindowTitle("Конструктор виробів")
+        self.setWindowTitle("Збирання виробів")
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(600, 300)
 
@@ -22,17 +22,21 @@ class ProduceDlg(QtWidgets.QDialog):
         self.cBoxContract = QtWidgets.QComboBox()
         for contract in self.contracts:
             self.cBoxContract.addItem(contract['name'], str(contract['id']))
+        self.curContract = int(self.cBoxContract.currentData())
+        self.curComponents()
         self.cBoxContract.currentIndexChanged.connect(self.fillItemslist)
         self.additionalWgts = []
+        self.tableWidget = Table(self.components)
+        self.fillItemslist()
         bbox = self.initButtonBox()
 
         self.grid.addWidget(lblContractName, 2, 0, 1, 1)
-        self.grid.addWidget(self.cBoxContract, 2, 1, 1, 3)
+        self.grid.addWidget(self.cBoxContract, 2, 1, 1, 4)
+        self.grid.addWidget(self.tableWidget, 3, 0, 1, 5)
 
         self.grid.addWidget(bbox, 202, 0, 1, 5)
         self.grid.setAlignment(bbox, QtCore.Qt.AlignmentFlag.AlignCenter)
 
-        self.fillItemslist()
         self.setLayout(self.grid)
         self.show()
 
@@ -40,47 +44,23 @@ class ProduceDlg(QtWidgets.QDialog):
         """ filling component fields """
         if len(self.contracts) == 0:
             return
-
-        self.clearItemsList()
-        print(self.cBoxContract.currentData())
-
-        for component in self.components:
-            if component['contract_id'] == int(self.cBoxContract.currentData()):
-                self.additionalWgts.append({
-                    #'lbl_name': QtWidgets.QLabel('Деталь №{}: '.format(self.itemsCnt + 1)),
-                    'lbl_name': QtWidgets.QLabel("{} - в наявності {}шт.".format(component['product'], component['count'])),
-                    #'lbl_cnt': QtWidgets.QLabel("в наявності {}шт.".format(component['count'])),
-                })
-                self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_name'], self.itemsCnt + 5, 0, 1, 5)
-
-                self.grid.setAlignment(self.additionalWgts[self.itemsCnt]['lbl_name'], QtCore.Qt.AlignmentFlag.AlignCenter)
-                #self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_cnt'], self.itemsCnt + 5, 1, 1, 4)
-                self.itemsCnt += 1
-        self.adjustSize()
+        self.curContract = int(self.cBoxContract.currentData())
+        self.curComponents()
+        self.tableWidget.loadData(self.components)
+        #self.adjustSize()
         #self.resize(600, 300)
-        print(self.components.__repr__())
 
-    def clearItemsList(self):
-        """ cleaning the list of components """
-        for i in range(self.itemsCnt, 0, -1):
-            if self.itemsCnt:
-                self.itemsCnt -= 1
-                self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['lbl_name'])
-                self.additionalWgts.pop()
+    def curComponents(self):
+        """ filtering all compo """
+        self.components.clear()
+        for component in self.allComponents:
+            if component['contract_id'] == self.curContract:
+                self.components.append(component)
 
     def initButtonBox(self):
         """ create widget with "Cancel" and "Save" buttons """
-        bbox = QtWidgets.QDialogButtonBox()
-        bbox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Cancel |
-                                QtWidgets.QDialogButtonBox.StandardButton.Ok)
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('dlgBtn')
+        bbox = ButtonBox(True)
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зібрати')
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setObjectName('dlgBtn')
-        bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText('Скасувати')
-        if sys.platform == 'win32':
-            bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
-        else:
-            bbox.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
         return bbox
@@ -106,7 +86,14 @@ class ProduceDlg(QtWidgets.QDialog):
         #             item['count'] *= -1
         #             item['to_contract_id'] = self.cBoxToContract.currentData()
         #         res.append(item)
-        self.accept()
+        msg_box = QtWidgets.QMessageBox()
+        msg_box.setWindowTitle("Увага")
+        msg_box.setText("""Недостатньо компонуючих деталей""")
+        msg_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
+        msg_box.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+        msg_box.button(QtWidgets.QMessageBox.StandardButton.Ok).setObjectName('dlgBtn')
+        msg_box.exec()
+        #self.accept()
 
     def getTemplateIdByContractId(self, id):
         id = int(id)
@@ -119,3 +106,61 @@ class ProduceDlg(QtWidgets.QDialog):
         if e.type() == QtCore.QEvent.Type.KeyPress and e.key() == QtCore.Qt.Key.Key_Escape:
             self.close()
         return QtWidgets.QWidget.event(self, e)
+
+class Table(CustomTable):
+    def __init__(self, reports):
+        QtWidgets.QTableView.__init__(self)
+        self.reports = reports
+        self.sti = TableModel(reports)
+        self.loadData(self.reports)
+        print(len(self.reports))
+        self.setFixedHeight(self.getSize() * 31 + 60)
+
+    def loadData(self, reports):
+        self.reports = list(reports)
+        self.sti.reloadData(reports)
+        self.reset()
+        self.sti.clear()
+        self.sti.setHorizontalHeaderLabels(
+            ['Id', 'Назва деталі', 'Виріб', 'Наявність', 'Очікується', 'Всього\nнеобхідно'])
+        self.sti.setRowCount(len(self.reports))
+        self.setModel(self.sti)
+        self.setColumnStyles()
+        self.setFixedHeight(self.getSize() * 31 + 60)
+
+    def getSize(self):
+        return len(self.reports)
+
+class TableModel(QtGui.QStandardItemModel):
+    def __init__(self, data):
+        super(TableModel, self).__init__()
+        self._data = data
+        print(data.__repr__())
+
+    def data(self, index, role):
+        if role == QtCore.Qt.ItemDataRole.DisplayRole:
+            match index.column():
+                case 1:
+                    return self._data[index.row()]['product']
+                case 2:
+                    return self._data[index.row()]['device']
+                case 3:
+                    return self._data[index.row()]['count']
+                case 4:
+                    return self._data[index.row()]['needed'] - self._data[index.row()]['count']
+                case 5:
+                    return self._data[index.row()]['needed']
+            return 1
+
+        if (role == QtCore.Qt.ItemDataRole.BackgroundRole and
+                index.column() == 3 and
+                self._data[index.row()]['count'] <= 0):
+            return QtGui.QColor('#d99')
+    @staticmethod
+    def getColorByRelative(val):
+        """ takes float value from 0 to 1, returns string such as #ee5555 """
+        return f"#ee{int(val * 200 + 55):02X}{int(val * 200 + 55):02X}"
+
+    def reloadData(self, data):
+        """ reload table data """
+        self._data = list(data)
