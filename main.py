@@ -6,7 +6,7 @@ from TemplatesDesignerDialog import TemplateDialog
 from ComponentsView import Components
 from ReportsView import Reports
 from ComponentsDialog import ComponentsDlg
-from ProduceDialog import ProduceDlg
+from AssembleDialog import AssembleDlg
 from ContractsView import Contract
 from ContractDialog import ContractDlg
 from FindMenu import FindMenu
@@ -191,7 +191,7 @@ class Project(QtWidgets.QWidget):
         self.editCompBtn = EditBtn('edit.png', False, 'Забракувати, перемістити')
         #self.delCompBtn = EditBtn('del.png', False)
         self.newCompBtn.clicked.connect(self.newComponentsClicked)
-        self.produceCompBtn.clicked.connect(self.produceItemsClicked)
+        self.produceCompBtn.clicked.connect(self.assembleItemsClicked)
         self.moveCompBtn.clicked.connect(self.moveComponentsClicked)
         self.editCompBtn.clicked.connect(self.editComponentsClicked)
         #self.delCompBtn.clicked.connect(self.delComponentsClicked)
@@ -230,7 +230,7 @@ class Project(QtWidgets.QWidget):
         self.produceRepBtn = EditBtn('produce.png', True, 'Зібрати вироби')
         self.moveRepBtn = EditBtn('move.png', True, 'Перемістити в інший договір')
         self.newRepBtn.clicked.connect(self.newComponentsClicked)
-        self.produceRepBtn.clicked.connect(self.produceItemsClicked)
+        self.produceRepBtn.clicked.connect(self.assembleItemsClicked)
         self.moveRepBtn.clicked.connect(self.moveComponentsClicked)
         btnLayout.addWidget(self.newRepBtn)
         btnLayout.addWidget(self.produceRepBtn)
@@ -346,6 +346,17 @@ class Project(QtWidgets.QWidget):
             self.componentsLt.replaceWidget(self.componentsLbl, self.components)
             self.components.show()
 
+    def assembleProduct(self, id, count):
+        """ assembling product from components """
+        contract = self.db.getContractById(id)
+        if self.db.addAssembled(id, count):
+            self.reloadAllData()
+            msg = (("зібрано {} виробів <span style='text-decoration: underline'>{}</span> " +
+                   "згідно договору <span style='text-decoration: underline'>{}</span> ")
+                   .format(count, contract['product'], contract['name']))
+            self.db.saveLogMsg(msg)
+            self.logArea.showContent(self.db.getLogs())
+
     def updateTemplate(self, name: str, items: list):
         """ edit template mode save edit button clicked """
         if self.db.updateItemsByTemplateId(self.designer.getSelectedRowId(), items):
@@ -373,7 +384,6 @@ class Project(QtWidgets.QWidget):
         dlg = TemplateDialog(self, template['name'], self.db.getItemsByTemplateId(templateId))
 
     def editContractClicked(self):
-
         print("edit clicked")
 
     def editComponentsClicked(self):
@@ -440,8 +450,8 @@ class Project(QtWidgets.QWidget):
     # def delComponentsClicked(self):
     #     pass
 
-    def produceItemsClicked(self):
-        ProduceDlg(self, self.db.getContracts(), self.db.getReports(self._filter))
+    def assembleItemsClicked(self):
+        AssembleDlg(self, self.db.getContracts(), self.db.getReports(self._filter))
 
     def moveComponentsClicked(self):
         """ move components button clicked """

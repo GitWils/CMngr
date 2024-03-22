@@ -87,7 +87,7 @@ class DBManager():
         self.query.exec()
         contractId = self.query.lastInsertId()
         self.query.clear()
-        #TODO fill components table with zero count fields
+        #filling components table with zero count fields needed for reports
         components = self.getItemsByTemplateId(contract['template_id'])
         for component in components:
             component['contract_id'] = contractId
@@ -95,6 +95,12 @@ class DBManager():
             component['template_id'] = contract['template_id']
             component['count'] = 0
         self.saveComponents(components)
+
+    def addAssembled(self, templateId, count) -> bool:
+        """ adding assembled items in contracts table """
+        self.query.exec("update contracts set completed = completed + {} where id = {}".format(count, templateId))
+        self.query.clear()
+        return True
 
     def saveComponents(self, components):
         if len(components):
@@ -189,6 +195,22 @@ class DBManager():
             cnt = self.query.value("count")
         self.query.clear()
         return cnt
+
+    def getContractById(self, contractId) -> {}:
+        """ returns dict with contract paremeters """
+        res = {}
+        self.query.exec("select contracts.id, contracts.name, contracts.completed, templates.name " +
+                        " from contracts join templates on (templates.id = contracts.template_id)" +
+                        " where contracts.id = {}".format(contractId))
+        if self.query.isActive():
+            self.query.first()
+            if self.query.isValid():
+                res = dict({'id': self.query.value('contracts.id'),
+                            'name': self.query.value('contracts.name'),
+                            'completed': self.query.value('contracts.completed'),
+                            'product': self.query.value('templates.name')
+                })
+        return res
 
     def getContractsByTemplateId(self, templateId) -> []:
         """ returns list of contracts with same template_id values """
@@ -300,7 +322,8 @@ class DBManager():
         self.query.exec(" select components.contract_id, components.item_template_id, " +
                         " sum(components.count) as count, " +
                         " components.str_date,  contracts.short_name as contract, templates.name as device, " +
-                        " items_template.name as product,  items_template.count * contracts.count as needed " +
+                        " items_template.name as product, items_template.count * contracts.count as needed, " +
+                        " items_template.count as need_for_one " +
                         " from components " +
                         " join contracts on " +
                         " (contracts.id = components.contract_id) " +
@@ -321,6 +344,7 @@ class DBManager():
                     'item_template_id': self.query.value('item_template_id'),
                     'product':          self.query.value('product'),
                     'count':            self.query.value('count'),
+                    'need_for_one':     self.query.value('need_for_one'),
                     'needed':           self.query.value('needed'),
                     'date':             self.query.value('str_date')})
                 lst.append(arr)
@@ -334,7 +358,9 @@ class DBManager():
 
     def delContract(self, id):
         self.query.exec("update components set enable=False where contract_id={}".format(id))
+        self.query.clear()
         self.query.exec("update contracts set enable=False where id={}".format(id))
+        self.query.clear()
 
     def delItemsByTemplateId(self, templateId):
         self.query.exec("delete from items_template where template_id={}".format(templateId))

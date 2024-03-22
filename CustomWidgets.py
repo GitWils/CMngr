@@ -44,8 +44,17 @@ class CustomTable(QtWidgets.QTableView):
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
 
+
         self.setColumnHidden(0, True)
         #header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
+
+class CustomSpinBox(QtWidgets.QSpinBox):
+    def __init__(self):
+        super().__init__()
+        self.setValue(1)
+        self.setMaximum(100000)
+        self.setSuffix('шт.')
+
 
 class ButtonBox(QtWidgets.QDialogButtonBox):
     def __init__(self, doubleBtnMode):
