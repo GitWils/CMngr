@@ -1,6 +1,5 @@
-import sys
 from PyQt6 import QtGui, QtWidgets, QtCore
-from CustomWidgets import DialogGrid, ButtonBox
+import CustomWidgets
 
 class ContractDlg(QtWidgets.QDialog):
     def __init__(self, parent, templates):
@@ -15,7 +14,7 @@ class ContractDlg(QtWidgets.QDialog):
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(600, 300)
 
-        self.grid = DialogGrid()
+        self.grid = CustomWidgets.DialogGrid()
         contractName = QtWidgets.QLabel("Назва договору:")
         self.name = QtWidgets.QLineEdit()
         contractShortName = QtWidgets.QLabel("Коротка назва (№ХХ):")
@@ -26,10 +25,7 @@ class ContractDlg(QtWidgets.QDialog):
         for template in self.templates:
             self.cBoxTemplate.addItem(template[1], template[0])
         lbl_cnt = QtWidgets.QLabel("кількість:")
-        self.spinCnt = QtWidgets.QSpinBox()
-        self.spinCnt.setValue(1)
-        self.spinCnt.setMaximum(100000)
-
+        self.spinCnt = CustomWidgets.CustomSpinBox()
         contractNoteLbl = QtWidgets.QLabel("Примітка:")
         self.contractNote = QtWidgets.QTextEdit()
         bbox = self.initButtonBox()
@@ -52,7 +48,7 @@ class ContractDlg(QtWidgets.QDialog):
 
     def initButtonBox(self):
         """ create widget with "Cancel" and "Save" buttons """
-        bbox = ButtonBox(True)
+        bbox = CustomWidgets.ButtonBox(True)
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
         return bbox

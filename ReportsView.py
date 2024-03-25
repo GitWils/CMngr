@@ -1,12 +1,11 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
-from CustomWidgets import CustomTable
+import CustomWidgets
 
-class Reports(CustomTable):
+class Reports(CustomWidgets.CustomTable):
     def __init__(self, reports):
         QtWidgets.QTableView.__init__(self)
         self.reports = reports
         self.sti = TableModel(reports)
-        #self.sti = QtGui.QStandardItemModel(parent=self)
         self.loadData(self.reports)
 
     def loadData(self, reports):
@@ -29,6 +28,7 @@ class TableModel(QtGui.QStandardItemModel):
         self._data = data
 
     def data(self, index, role):
+        """ class used for align and coloring cells  """
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             match index.column():
                 case 1:
@@ -38,17 +38,26 @@ class TableModel(QtGui.QStandardItemModel):
                 case 3:
                     return self._data[index.row()]['contract']
                 case 4:
-                    return self._data[index.row()]['count']
+                    completed = self._data[index.row()]['need_for_one'] * self._data[index.row()]['completed']
+                    return self._data[index.row()]['count'] - completed
                 case 5:
+                    completed = self._data[index.row()]['need_for_one'] * self._data[index.row()]['completed']
                     return self._data[index.row()]['needed'] - self._data[index.row()]['count']
                 case 6:
-                    return self._data[index.row()]['needed']
+                    completed = self._data[index.row()]['need_for_one'] * self._data[index.row()]['completed']
+                    #return self._data[index.row()]['needed']
+                    return (self._data[index.row()]['needed'] - completed)
             return 1
 
         if (role == QtCore.Qt.ItemDataRole.BackgroundRole
                 and index.column() == 5
                 and self._data[index.row()]['count'] < self._data[index.row()]['needed']):
-            return QtGui.QColor(self.getColorByRelative(float(self._data[index.row()]['count'] / self._data[index.row()]['needed'])))
+            completed = self._data[index.row()]['need_for_one'] * self._data[index.row()]['completed']
+            return QtGui.QColor(self.getColorByRelative(float((self._data[index.row()]['count'] - completed) / (self._data[index.row()]['needed'] - completed))))
+
+        if (role == QtCore.Qt.ItemDataRole.TextAlignmentRole and index.column() != 1):
+            return QtCore.Qt.AlignmentFlag.AlignCenter
+
     def getColorByRelative(self, val):
         """ takes float value from 0 to 1, returns string such as #ee5555 """
         return f"#ee{int(val * 200 + 55):02X}{int(val * 200 + 55):02X}"

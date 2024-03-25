@@ -1,8 +1,7 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
-from CustomWidgets import CustomTable
+import CustomWidgets
 
-
-class Components(CustomTable):
+class Components(CustomWidgets.CustomTable):
     def __init__(self, components):
         QtWidgets.QTableView.__init__(self)
         self.components = components
@@ -31,7 +30,7 @@ class Components(CustomTable):
         self.setColumnStyles()
 
     def setColumnStyles(self):
-        CustomTable.setColumnStyles(self)
+        CustomWidgets.CustomTable.setColumnStyles(self)
         header = self.horizontalHeader()
         #header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
@@ -65,6 +64,9 @@ class TableModel(QtGui.QStandardItemModel):
                 index.column() == 4 and
                 self._data[index.row()]['count'] < 0):
             return QtGui.QColor('#d99')
+
+        if (role == QtCore.Qt.ItemDataRole.TextAlignmentRole and index.column() != 1):
+            return QtCore.Qt.AlignmentFlag.AlignCenter
 
     def reloadData(self, data):
         self._data = data

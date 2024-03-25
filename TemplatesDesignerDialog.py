@@ -1,6 +1,6 @@
-import sys
 from PyQt6 import QtWidgets, QtCore
-from CustomWidgets import EditBtn, DialogGrid, ButtonBox
+import CustomWidgets
+
 
 class TemplateDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, name='', items=()):
@@ -18,13 +18,13 @@ class TemplateDialog(QtWidgets.QDialog):
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(600, 270)
 
-        self.grid = DialogGrid()
+        self.grid = CustomWidgets.DialogGrid()
         deviceName = QtWidgets.QLabel("Назва виробу:")
         self.name = QtWidgets.QLineEdit()
         self.additionalWgts = []
         self.addItemField()
-        self.btnAdd = EditBtn("new", True, 'Добавити поле')
-        self.btnRem = EditBtn('minus', True, 'Видалити поле')
+        self.btnAdd = CustomWidgets.EditBtn("new", True, 'Добавити поле')
+        self.btnRem = CustomWidgets.EditBtn('minus', True, 'Видалити поле')
         bbox = self.initButtonBox()
 
         self.grid.addWidget(deviceName,             0, 0, 1, 1)
@@ -67,7 +67,7 @@ class TemplateDialog(QtWidgets.QDialog):
 
     def initButtonBox(self):
         """ create widget with "Cancel" and "Save" buttons """
-        bbox = ButtonBox(True)
+        bbox = CustomWidgets.ButtonBox(True)
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
         return bbox
@@ -78,10 +78,8 @@ class TemplateDialog(QtWidgets.QDialog):
             'lbl_name': QtWidgets.QLabel('Назва деталі №{}:'.format(self.itemsCnt + 1)),
             'edit_name': QtWidgets.QLineEdit(),
             'lbl_cnt': QtWidgets.QLabel("кількість:"),
-            'spin_cnt': QtWidgets.QSpinBox()
+            'spin_cnt': CustomWidgets.CustomSpinBox()
         })
-        self.additionalWgts[self.itemsCnt]['spin_cnt'].setValue(1)
-        self.additionalWgts[self.itemsCnt]['spin_cnt'].setMaximum(100000)
         self.itemsCnt += 1
         self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['lbl_name'],  self.itemsCnt, 0, 1, 1)
         self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['edit_name'], self.itemsCnt, 1, 1, 1)

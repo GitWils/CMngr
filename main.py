@@ -370,18 +370,18 @@ class Project(QtWidgets.QWidget):
         pass
 
     def newDesignClicked(self):
-        dlg = TemplateDialog(self)
+        TemplateDialog(self)
 
     def newContractClicked(self):
-        dlg = ContractDlg(self, self.db.getTemplates())
+        ContractDlg(self, self.db.getTemplates())
 
     def newComponentsClicked(self):
-        dlg = ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems())
+        ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems())
 
     def editDesignClicked(self):
         templateId = self.designer.getSelectedRowId()
         template = self.db.getTemplateById(templateId)
-        dlg = TemplateDialog(self, template['name'], self.db.getItemsByTemplateId(templateId))
+        TemplateDialog(self, template['name'], self.db.getItemsByTemplateId(templateId))
 
     def editContractClicked(self):
         print("edit clicked")
@@ -440,12 +440,10 @@ class Project(QtWidgets.QWidget):
         self.reloadAllData()
         # self.contracts.loadData(self.db.getContracts())
         # self.logArea.showContent(self.db.getLogs())
-        print(self.contracts.getContractsCount())
         if self.contracts.getContractsCount() == 0:
             self.contracts.hide()
             self.contractLbl.show()
             self.desLayout.replaceWidget(self.contracts, self.contractLbl)
-        print("{} has {} items".format(contractId, cntItems))
 
     # def delComponentsClicked(self):
     #     pass

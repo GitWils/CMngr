@@ -323,7 +323,7 @@ class DBManager():
                         " sum(components.count) as count, " +
                         " components.str_date,  contracts.short_name as contract, templates.name as device, " +
                         " items_template.name as product, items_template.count * contracts.count as needed, " +
-                        " items_template.count as need_for_one " +
+                        " items_template.count as need_for_one, contracts.completed as completed " +
                         " from components " +
                         " join contracts on " +
                         " (contracts.id = components.contract_id) " +
@@ -346,6 +346,7 @@ class DBManager():
                     'count':            self.query.value('count'),
                     'need_for_one':     self.query.value('need_for_one'),
                     'needed':           self.query.value('needed'),
+                    'completed':        self.query.value('completed'),
                     'date':             self.query.value('str_date')})
                 lst.append(arr)
                 self.query.next()

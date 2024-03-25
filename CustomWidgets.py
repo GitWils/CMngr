@@ -53,7 +53,7 @@ class CustomSpinBox(QtWidgets.QSpinBox):
         super().__init__()
         self.setValue(1)
         self.setMaximum(100000)
-        self.setSuffix('шт.')
+        self.setSuffix(' шт.')
 
 
 class ButtonBox(QtWidgets.QDialogButtonBox):

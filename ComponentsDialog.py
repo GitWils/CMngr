@@ -1,6 +1,6 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
-from CustomWidgets import DialogGrid, ButtonBox
-import sys
+import CustomWidgets
+
 
 class ComponentsDlg(QtWidgets.QDialog):
     def __init__(self, parent, contracts, components, isMovement = False):
@@ -24,7 +24,7 @@ class ComponentsDlg(QtWidgets.QDialog):
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(600, 300)
 
-        self.grid = DialogGrid()
+        self.grid = CustomWidgets.DialogGrid()
         self.cBoxContract = QtWidgets.QComboBox()
         for contract in self.contracts:
             self.cBoxContract.addItem(contract['name'], str(contract['id']))
@@ -92,12 +92,10 @@ class ComponentsDlg(QtWidgets.QDialog):
                     'lbl_cnt': QtWidgets.QLabel("кількість:"),
                     'item_template_id': component['id'],
                     'template_id': component['template_id'],
-                    'spin_cnt': QtWidgets.QSpinBox()
+                    'spin_cnt': CustomWidgets.CustomSpinBox()
                 })
                 self.additionalWgts[self.itemsCnt]['spin_cnt'].setValue(0)
-                self.additionalWgts[self.itemsCnt]['spin_cnt'].setMaximum(100000)
                 self.additionalWgts[self.itemsCnt]['edit_name'].setText(component['name'])
-                #print("{} - {}".format(self.itemsCnt, component['name']))
                 self.additionalWgts[self.itemsCnt]['edit_name'].setReadOnly(True)
                 self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_name'],  self.itemsCnt + 5, 0, 1, 1)
                 self.grid.addWidget(self.additionalWgts[self.itemsCnt]['edit_name'], self.itemsCnt + 5, 1, 1, 1)
@@ -127,7 +125,7 @@ class ComponentsDlg(QtWidgets.QDialog):
 
     def initButtonBox(self):
         """ create widget with "Cancel" and "Save" buttons """
-        bbox = ButtonBox(True)
+        bbox = CustomWidgets.ButtonBox(True)
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
         return bbox

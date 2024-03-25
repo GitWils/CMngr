@@ -1,8 +1,5 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
-
 import CustomWidgets
-from CustomWidgets import DialogGrid, CustomTable, ButtonBox
-import sys
 
 class AssembleDlg(QtWidgets.QDialog):
     def __init__(self, parent, contracts, components):
@@ -20,7 +17,7 @@ class AssembleDlg(QtWidgets.QDialog):
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(600, 300)
 
-        self.grid = DialogGrid()
+        self.grid = CustomWidgets.DialogGrid()
         lblContractName = QtWidgets.QLabel('Назва договору:')
         self.cBoxContract = QtWidgets.QComboBox()
         for contract in self.contracts:
@@ -70,7 +67,7 @@ class AssembleDlg(QtWidgets.QDialog):
 
     def initButtonBox(self):
         """ create widget with "Cancel" and "Save" buttons """
-        bbox = ButtonBox(True)
+        bbox = CustomWidgets.ButtonBox(True)
         bbox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зібрати')
         bbox.accepted.connect(self.save)
         bbox.rejected.connect(self.reject)
@@ -113,7 +110,7 @@ class AssembleDlg(QtWidgets.QDialog):
             self.close()
         return QtWidgets.QWidget.event(self, e)
 
-class Table(CustomTable):
+class Table(CustomWidgets.CustomTable):
     def __init__(self, reports):
         QtWidgets.QTableView.__init__(self)
         self.reports = reports
@@ -126,7 +123,7 @@ class Table(CustomTable):
 
     def loadData(self, reports, num = 0):
         self.reports = list(reports)
-        self.sti.reloadData(reports, num)
+        self.sti.reloadData(reports)
         self.reset()
         self.sti.clear()
         self.sti.setHorizontalHeaderLabels(
@@ -143,10 +140,10 @@ class Table(CustomTable):
         return len(self.reports)
 
 class TableModel(QtGui.QStandardItemModel):
-    def __init__(self, data, cntItems = 0):
+    def __init__(self, data):
         super(TableModel, self).__init__()
         self._data = data
-        self._num = cntItems
+        print(data.__repr__())
 
     def data(self, index, role):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
@@ -154,7 +151,7 @@ class TableModel(QtGui.QStandardItemModel):
                 case 1:
                     return self._data[index.row()]['product']
                 case 2:
-                    return self._data[index.row()]['count'] - self._cntItems * self._data[index.row()]['need_for_one']
+                    return self._data[index.row()]['count'] - self._data[index.row()]['completed'] * self._data[index.row()]['need_for_one']
                 case 3:
                     return self._data[index.row()]['need_for_one']
                 case 4:
@@ -163,7 +160,7 @@ class TableModel(QtGui.QStandardItemModel):
 
         if (role == QtCore.Qt.ItemDataRole.BackgroundRole and
                 index.column() == 2 and
-                self._data[index.row()]['count'] - self._cntItems * self._data[index.row()]['need_for_one'] <= 0):
+                self._data[index.row()]['count'] - self._data[index.row()]['completed'] * self._data[index.row()]['need_for_one'] <= 0):
             return QtGui.QColor('#d99')
 
         if (role == QtCore.Qt.ItemDataRole.TextAlignmentRole and index.column() != 1):
@@ -174,7 +171,6 @@ class TableModel(QtGui.QStandardItemModel):
         """ takes float value from 0 to 1, returns string such as #ee5555 """
         return f"#ee{int(val * 200 + 55):02X}{int(val * 200 + 55):02X}"
 
-    def reloadData(self, data, cntItems):
+    def reloadData(self, data):
         """ reload table data """
         self._data = list(data)
-        self._cntItems = cntItems
