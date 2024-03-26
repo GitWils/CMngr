@@ -50,7 +50,7 @@ class AssembleDlg(QtWidgets.QDialog):
 
     def fillItemslist(self):
         """ filling component fields """
-        if len(self.contracts) == 0:
+        if len(self.contracts) == 0 or len(self.components) == 0:
             return
         self.curContract = int(self.cBoxContract.currentData())
         self.curComponents()
@@ -59,7 +59,7 @@ class AssembleDlg(QtWidgets.QDialog):
         self.resize(600, 300)
 
     def curComponents(self):
-        """ filtering all compo """
+        """ filtering all components """
         self.components.clear()
         for component in self.allComponents:
             if component['contract_id'] == self.curContract:
@@ -111,7 +111,7 @@ class AssembleDlg(QtWidgets.QDialog):
         return QtWidgets.QWidget.event(self, e)
 
 class Table(CustomWidgets.CustomTable):
-    def __init__(self, reports):
+    def __init__(self, reports, ):
         QtWidgets.QTableView.__init__(self)
         self.reports = reports
         self.sti = TableModel(reports)
@@ -123,7 +123,7 @@ class Table(CustomWidgets.CustomTable):
 
     def loadData(self, reports, num = 0):
         self.reports = list(reports)
-        self.sti.reloadData(reports)
+        self.sti.reloadData(reports, num)
         self.reset()
         self.sti.clear()
         self.sti.setHorizontalHeaderLabels(
@@ -143,7 +143,7 @@ class TableModel(QtGui.QStandardItemModel):
     def __init__(self, data):
         super(TableModel, self).__init__()
         self._data = data
-        print(data.__repr__())
+        self._spinCnt = 0
 
     def data(self, index, role):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
@@ -151,17 +151,21 @@ class TableModel(QtGui.QStandardItemModel):
                 case 1:
                     return self._data[index.row()]['product']
                 case 2:
-                    return self._data[index.row()]['count'] - self._data[index.row()]['completed'] * self._data[index.row()]['need_for_one']
+                    return self._data[index.row()]['count'] - \
+                        self._data[index.row()]['completed'] * self._data[index.row()]['need_for_one'] - \
+                        self._spinCnt * self._data[index.row()]['need_for_one']
                 case 3:
                     return self._data[index.row()]['need_for_one']
                 case 4:
                     return self._data[index.row()]['needed']
             return 1
 
-        if (role == QtCore.Qt.ItemDataRole.BackgroundRole and
-                index.column() == 2 and
-                self._data[index.row()]['count'] - self._data[index.row()]['completed'] * self._data[index.row()]['need_for_one'] <= 0):
-            return QtGui.QColor('#d99')
+        if (role == QtCore.Qt.ItemDataRole.BackgroundRole and index.column() == 2):
+            val = self._data[index.row()]['count'] - \
+                self._data[index.row()]['completed'] * self._data[index.row()]['need_for_one'] - \
+                self._spinCnt * self._data[index.row()]['need_for_one']
+            if val < 0:
+                return QtGui.QColor('#d99')
 
         if (role == QtCore.Qt.ItemDataRole.TextAlignmentRole and index.column() != 1):
             return QtCore.Qt.AlignmentFlag.AlignCenter
@@ -171,6 +175,7 @@ class TableModel(QtGui.QStandardItemModel):
         """ takes float value from 0 to 1, returns string such as #ee5555 """
         return f"#ee{int(val * 200 + 55):02X}{int(val * 200 + 55):02X}"
 
-    def reloadData(self, data):
+    def reloadData(self, data, count):
         """ reload table data """
         self._data = list(data)
+        self._spinCnt = count

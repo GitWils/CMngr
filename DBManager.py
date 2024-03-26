@@ -233,10 +233,10 @@ class DBManager():
         if self.query.isActive():
             self.query.first()
             while self.query.isValid():
-                res = dict({'id': self.query.value('id'),
-                            'template_id': self.query.value('template_id'),
-                            'name': self.query.value('name'),
-                            'count': self.query.value('count')})
+                res = dict({'id':           self.query.value('id'),
+                            'template_id':  self.query.value('template_id'),
+                            'name':         self.query.value('name'),
+                            'count':        self.query.value('count')})
                 items.append(res)
                 self.query.next()
         self.query.clear()
@@ -317,7 +317,7 @@ class DBManager():
         self.query.clear()
         return lst
 
-    def getReports(self, filter):
+    def getReports(self, filter = ()):
         where = self.getWhereFromFilter(filter)
         self.query.exec(" select components.contract_id, components.item_template_id, " +
                         " sum(components.count) as count, " +

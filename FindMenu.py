@@ -69,6 +69,13 @@ class FindMenu:
             lst.append(self.contracts[index.row()]['id'])
         return lst
 
+    def getAllContractsId(self):
+        """ get all id's of contracts"""
+        res = []
+        for contract in self.contracts:
+            res.append(contract['id'])
+        return res
+
     def getDateFilter(self):
         """ get date filter values """
         arr = dict({'from': None, 'to': None})

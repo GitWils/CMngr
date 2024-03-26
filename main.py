@@ -449,11 +449,12 @@ class Project(QtWidgets.QWidget):
     #     pass
 
     def assembleItemsClicked(self):
-        AssembleDlg(self, self.db.getContracts(), self.db.getReports(self._filter))
+        """ filter nonsensitive for now """
+        AssembleDlg(self, self.db.getContracts(), self.db.getReports({'contracts': self.fMenu.getAllContractsId()}))
 
     def moveComponentsClicked(self):
         """ move components button clicked """
-        dlg = ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems(), True)
+        ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems(), True)
 
     def getFilter(self):
         return self._filter
