@@ -80,7 +80,7 @@ class AssembleDlg(QtWidgets.QDialog):
         if self.spinCnt.value() <= 0:
             return
         for component in self.components:
-            if component['count'] < component['need_for_one'] * assembledCnt:
+            if component['not_assembled'] < component['need_for_one'] * assembledCnt:
                 msg_box = QtWidgets.QMessageBox()
                 msg_box.setWindowTitle("Увага")
                 msg_box.setText("""Недостатньо комплектуючих деталей""")
@@ -117,7 +117,7 @@ class Table(CustomWidgets.CustomTable):
         self.sti = TableModel(reports)
         self.loadData(self.reports)
         self.setFixedHeight(self.getSize() * 31 + 60)
-        self.horizontalHeader().setMinimumSectionSize(131)
+        self.horizontalHeader().setMinimumSectionSize(130)
         self.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         #self.setColumnWidth(1, 250)
 
@@ -132,9 +132,6 @@ class Table(CustomWidgets.CustomTable):
         self.setModel(self.sti)
         self.setColumnStyles()
         self.setFixedHeight(self.getSize() * 31 + 60)
-        # self.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Fixed)
-        # self.horizontalHeader().resizeSection(1, 200)
-        #self.setColumnWidth(1, 300)
 
     def getSize(self):
         return len(self.reports)
@@ -146,24 +143,21 @@ class TableModel(QtGui.QStandardItemModel):
         self._spinCnt = 0
 
     def data(self, index, role):
+        """ function used for align and coloring cells  """
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             match index.column():
                 case 1:
                     return self._data[index.row()]['product']
                 case 2:
-                    return self._data[index.row()]['count'] - \
-                        self._data[index.row()]['completed'] * self._data[index.row()]['need_for_one'] - \
-                        self._spinCnt * self._data[index.row()]['need_for_one']
+                    return self._data[index.row()]['not_assembled'] - self._spinCnt * self._data[index.row()]['need_for_one']
                 case 3:
                     return self._data[index.row()]['need_for_one']
                 case 4:
-                    return self._data[index.row()]['needed']
+                    return self._data[index.row()]['needed'] - self._data[index.row()]['completed'] * self._data[index.row()]['need_for_one']
             return 1
 
         if (role == QtCore.Qt.ItemDataRole.BackgroundRole and index.column() == 2):
-            val = self._data[index.row()]['count'] - \
-                self._data[index.row()]['completed'] * self._data[index.row()]['need_for_one'] - \
-                self._spinCnt * self._data[index.row()]['need_for_one']
+            val = self._data[index.row()]['not_assembled'] - self._spinCnt * self._data[index.row()]['need_for_one']
             if val < 0:
                 return QtGui.QColor('#d99')
 

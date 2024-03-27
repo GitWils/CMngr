@@ -14,7 +14,7 @@ class Reports(CustomWidgets.CustomTable):
         self.reset()
         self.sti.clear()
         self.sti.setHorizontalHeaderLabels(
-            ['Id', 'Назва деталі', 'Виріб', 'Договір', 'Наявність', 'Очікується', 'Всього\nнеобхідно'])
+            ['Id', 'Назва деталі', 'Виріб', 'Договір', 'Наявність', 'Очікується', 'Залишилось\nзібрати'])
         self.sti.setRowCount(len(self.reports))
         self.setModel(self.sti)
         self.setColumnStyles()
@@ -28,7 +28,7 @@ class TableModel(QtGui.QStandardItemModel):
         self._data = data
 
     def data(self, index, role):
-        """ class used for align and coloring cells  """
+        """ function used for align and coloring cells  """
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             match index.column():
                 case 1:
@@ -45,7 +45,6 @@ class TableModel(QtGui.QStandardItemModel):
                     return self._data[index.row()]['needed'] - self._data[index.row()]['count']
                 case 6:
                     completed = self._data[index.row()]['need_for_one'] * self._data[index.row()]['completed']
-                    #return self._data[index.row()]['needed']
                     return (self._data[index.row()]['needed'] - completed)
             return 1
 

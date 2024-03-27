@@ -37,6 +37,7 @@ QWidget {
 QToolTip {
     color: #1E2022;
     background-color: #F0F5F9;
+    font-size: 16px;
 }
 /********************************* Buttons UI settings ***************************************/
 
@@ -164,7 +165,7 @@ QTabBar:top {
 }
 
 QTabBar:tab:top {
-    min-width: 168px;
+    min-width: 166px;
 }
 
 QTabBar::tab {

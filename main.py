@@ -186,17 +186,14 @@ class Project(QtWidgets.QWidget):
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
         self.newCompBtn = EditBtn('new.png', True, 'Поставка комплектуючих')
-        self.produceCompBtn = EditBtn('produce.png', True, 'Зібрати вироби')
         self.moveCompBtn = EditBtn('move.png', True, 'Перемістити в інший договір')
         self.editCompBtn = EditBtn('edit.png', False, 'Забракувати, перемістити')
         #self.delCompBtn = EditBtn('del.png', False)
         self.newCompBtn.clicked.connect(self.newComponentsClicked)
-        self.produceCompBtn.clicked.connect(self.assembleItemsClicked)
         self.moveCompBtn.clicked.connect(self.moveComponentsClicked)
         self.editCompBtn.clicked.connect(self.editComponentsClicked)
         #self.delCompBtn.clicked.connect(self.delComponentsClicked)
         btnLayout.addWidget(self.newCompBtn)
-        btnLayout.addWidget(self.produceCompBtn)
         btnLayout.addWidget(self.moveCompBtn)
         btnLayout.addWidget(self.editCompBtn)
         #btnLayout.addWidget(self.delCompBtn)
@@ -249,7 +246,8 @@ class Project(QtWidgets.QWidget):
         self.contracts.loadData(self.db.getContracts())
         self.components.loadData(self.db.getComponents(self.getFilter()))
         self.reports.loadData(self.db.getReports(self.getFilter()))
-
+        self.fMenu.reload(self.db.getContracts())
+        self.fMenu.setAllSelected()
         self.logArea.showContent(self.db.getLogs())
 
     def itemDesignClicked(self) -> None:

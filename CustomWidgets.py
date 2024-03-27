@@ -68,6 +68,7 @@ class ButtonBox(QtWidgets.QDialogButtonBox):
             self.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok)
         self.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('dlgBtn')
         self.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
+        print(sys.platform)
         if sys.platform == 'win32':
             self.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
         else:

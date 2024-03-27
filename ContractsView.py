@@ -23,7 +23,7 @@ class Contract(CustomTable):
             item6 = QtGui.QStandardItem(contract['note'])
             self.sti.appendRow([item0, item1, item2, item3, item4, item5, item6])
             rowCnt += 1
-        self.sti.setHorizontalHeaderLabels(['Id', 'Договір', 'Назва\nвиробу', 'Зібрано','Необхідна\nкількість', 'Дата\nстворення', 'Примітка'])
+        self.sti.setHorizontalHeaderLabels(['Id', 'Договір', 'Назва\nвиробу', 'Зібрано','Необхідно\nзібрати', 'Дата\nстворення', 'Примітка'])
         self.sti.setRowCount(rowCnt)
         self.setModel(self.sti)
         self.setColumnStyles()

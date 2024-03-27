@@ -337,6 +337,7 @@ class DBManager():
         if self.query.isActive():
             self.query.first()
             while self.query.isValid():
+                notAssembled = self.query.value('count') - self.query.value('completed') * self.query.value('need_for_one')
                 arr = dict({
                     'contract':         self.query.value('contract'),
                     'contract_id':      self.query.value('contract_id'),
@@ -345,6 +346,7 @@ class DBManager():
                     'product':          self.query.value('product'),
                     'count':            self.query.value('count'),
                     'need_for_one':     self.query.value('need_for_one'),
+                    'not_assembled':    notAssembled,
                     'needed':           self.query.value('needed'),
                     'completed':        self.query.value('completed'),
                     'date':             self.query.value('str_date')})
