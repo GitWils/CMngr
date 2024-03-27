@@ -1,26 +1,36 @@
 from PyQt6 import QtGui, QtWidgets, QtCore
 import CustomWidgets
+from enum import Enum
 
+class Mode(Enum):
+    MoveMode = 1
+    CopyMode = 2
+    SendMode = 3
 
 class ComponentsDlg(QtWidgets.QDialog):
-    def __init__(self, parent, contracts, components, isMovement = False):
+    def __init__(self, parent, contracts, templateItems, components, movement):
         super(ComponentsDlg, self).__init__(parent)
         self.parent = parent
+        self.templateItems = templateItems #components from templates
         self.components = components
         self.contracts = contracts
-        self.isMovement = isMovement
+        self.movement = movement
         self.itemsCnt = 0
         self.init()
 
     def init(self):
-        if self.isMovement:
-            self.setWindowTitle("Переміщення комплектуючих")
-            lblContractName = QtWidgets.QLabel('З договору:')
-            self.qTextNote = QtWidgets.QTextEdit("Лист №")
-        else:
-            self.setWindowTitle("Поставка комплектуючих")
-            lblContractName = QtWidgets.QLabel('Назва договору:')
-            self.qTextNote = QtWidgets.QTextEdit("Лист №")
+        match self.movement:
+            case Mode.CopyMode:
+                self.setWindowTitle("Переміщення комплектуючих")
+                lblContractName = QtWidgets.QLabel('З договору:')
+            case Mode.MoveMode:
+                self.setWindowTitle("Поставка комплектуючих")
+                lblContractName = QtWidgets.QLabel('Назва договору:')
+            case Mode.SendMode:
+                self.setWindowTitle("Відправка комплектуючих")
+                lblContractName = QtWidgets.QLabel('З договору:')
+
+        self.qTextNote = QtWidgets.QTextEdit("Лист №")
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.resize(600, 300)
 
@@ -45,7 +55,7 @@ class ComponentsDlg(QtWidgets.QDialog):
         self.grid.addWidget(self.lblWarning, 1, 0, 1, 4)
         self.grid.addWidget(lblContractName, 2, 0, 1, 1)
         self.grid.addWidget(self.cBoxContract, 2, 1, 1, 3)
-        if self.isMovement:
+        if self.movement == Mode.CopyMode:
             lblToContractName = QtWidgets.QLabel('В договір:')
             self.cBoxToContract = QtWidgets.QComboBox()
             self.grid.addWidget(lblToContractName, 3, 0, 1, 1)
@@ -73,7 +83,7 @@ class ComponentsDlg(QtWidgets.QDialog):
                 self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['lbl_cnt'])
                 self.grid.removeWidget(self.additionalWgts[self.itemsCnt]['spin_cnt'])
                 self.additionalWgts.pop()
-        if self.isMovement:
+        if self.movement == Mode.CopyMode:
             self.cBoxToContract.clear()
 
     def fillItemslist(self):
@@ -82,20 +92,24 @@ class ComponentsDlg(QtWidgets.QDialog):
             return
 
         self.clearItemsList()
-        self.templateName.setText(self.getTemplateByContractId(int(self.cBoxContract.currentData())))
+        contractId = int(self.cBoxContract.currentData())
+        self.templateName.setText(self.getTemplateByContractId(contractId))
         currTemplateId = self.getTemplateIdByContractId(self.cBoxContract.currentData())
-        for component in self.components:
-            if component['template_id'] == currTemplateId:
+        for item in self.templateItems:
+            if item['template_id'] == currTemplateId:
                 self.additionalWgts.append({
                     'lbl_name': QtWidgets.QLabel('Деталь №{}: '.format(self.itemsCnt + 1)),
                     'edit_name': QtWidgets.QLineEdit(),
                     'lbl_cnt': QtWidgets.QLabel("кількість:"),
-                    'item_template_id': component['id'],
-                    'template_id': component['template_id'],
+                    'item_template_id': item['id'],
+                    'template_id': item['template_id'],
                     'spin_cnt': CustomWidgets.CustomSpinBox()
                 })
+                if self.movement == Mode.SendMode or self.movement == Mode.CopyMode:
+                    cnt = self.findCountInComponents(contractId, item['id'])
+                    self.additionalWgts[self.itemsCnt]['spin_cnt'].setRange(0, cnt)
                 self.additionalWgts[self.itemsCnt]['spin_cnt'].setValue(0)
-                self.additionalWgts[self.itemsCnt]['edit_name'].setText(component['name'])
+                self.additionalWgts[self.itemsCnt]['edit_name'].setText(item['name'])
                 self.additionalWgts[self.itemsCnt]['edit_name'].setReadOnly(True)
                 self.grid.addWidget(self.additionalWgts[self.itemsCnt]['lbl_name'],  self.itemsCnt + 5, 0, 1, 1)
                 self.grid.addWidget(self.additionalWgts[self.itemsCnt]['edit_name'], self.itemsCnt + 5, 1, 1, 1)
@@ -103,7 +117,7 @@ class ComponentsDlg(QtWidgets.QDialog):
                 self.grid.addWidget(self.additionalWgts[self.itemsCnt]['spin_cnt'],  self.itemsCnt + 5, 3, 1, 1)
                 self.itemsCnt += 1
 
-        if self.isMovement:
+        if self.movement == Mode.CopyMode:
             isAdded = False
             for contract in self.contracts:
                 if currTemplateId == contract['template_id'] and int(self.cBoxContract.currentData()) != contract['id']:
@@ -114,8 +128,15 @@ class ComponentsDlg(QtWidgets.QDialog):
             else:
                 self.showWarning(False)
 
+    def findCountInComponents(self, contractId, templateId) -> int:
+        """ function returns count of items not assembled in components """
+        for component in self.components:
+            if component['contract_id'] == contractId and component['item_template_id'] == templateId:
+                return component['not_assembled']
+        return 0
+
     def showWarning(self, show=True):
-        """ show warning message on the top of dialog """
+        """ function shows warning message on the top of dialog """
         if show:
             self.lblWarning.show()
         elif not self.lblWarning.isHidden():
@@ -132,7 +153,7 @@ class ComponentsDlg(QtWidgets.QDialog):
 
     def save(self):
         """ Save button click reaction """
-        if self.isMovement and self.cBoxToContract.currentData() == None:
+        if self.movement == Mode.CopyMode and self.cBoxToContract.currentData() == None:
             self.accept()
             return
         res = []
@@ -147,14 +168,22 @@ class ComponentsDlg(QtWidgets.QDialog):
                             'contract_name': self.getContractNameById(int(self.cBoxContract.currentData())),
                             'note': self.qTextNote.toPlainText()
                              })
-                if self.isMovement:
+                if self.movement == Mode.CopyMode:
                     item['count'] *= -1
                     item['to_contract_id'] = self.cBoxToContract.currentData()
                 res.append(item)
-        if self.isMovement:
-            self.parent.moveComponents(res)
-        else:
-            self.parent.newComponentsSave(res)
+        match self.movement:
+            case Mode.CopyMode:
+                self.parent.moveComponents(res)
+            case Mode.MoveMode:
+                self.parent.newComponentsSave(res)
+            case Mode.SendMode:
+                self.parent.sendComponents(res)
+
+        # if self.movement == Mode.CopyMode:
+        #     self.parent.moveComponents(res)
+        # else:
+        #     self.parent.newComponentsSave(res)
         self.accept()
 
     def getTemplateByContractId(self, id):

@@ -32,7 +32,6 @@ class Components(CustomWidgets.CustomTable):
     def setColumnStyles(self):
         CustomWidgets.CustomTable.setColumnStyles(self)
         header = self.horizontalHeader()
-        #header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         #header.setMaximumWidth(300)
 

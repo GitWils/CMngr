@@ -5,7 +5,7 @@ from TempatesDesignerView import Designer
 from TemplatesDesignerDialog import TemplateDialog
 from ComponentsView import Components
 from ReportsView import Reports
-from ComponentsDialog import ComponentsDlg
+from ComponentsDialog import ComponentsDlg, Mode
 from AssembleDialog import AssembleDlg
 from ContractsView import Contract
 from ContractDialog import ContractDlg
@@ -186,17 +186,14 @@ class Project(QtWidgets.QWidget):
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
         self.newCompBtn = EditBtn('new.png', True, 'Поставка комплектуючих')
-        self.moveCompBtn = EditBtn('move.png', True, 'Перемістити в інший договір')
-        self.editCompBtn = EditBtn('edit.png', False, 'Забракувати, перемістити')
-        #self.delCompBtn = EditBtn('del.png', False)
+        self.moveCompBtn = EditBtn('copy.png', True, 'Перемістити в інший договір')
+        self.sendCompBtn = EditBtn('move.png', True, 'Відправити / забракувати')
         self.newCompBtn.clicked.connect(self.newComponentsClicked)
         self.moveCompBtn.clicked.connect(self.moveComponentsClicked)
-        self.editCompBtn.clicked.connect(self.editComponentsClicked)
-        #self.delCompBtn.clicked.connect(self.delComponentsClicked)
+        self.sendCompBtn.clicked.connect(self.sendComponentsClicked)
         btnLayout.addWidget(self.newCompBtn)
         btnLayout.addWidget(self.moveCompBtn)
-        btnLayout.addWidget(self.editCompBtn)
-        #btnLayout.addWidget(self.delCompBtn)
+        btnLayout.addWidget(self.sendCompBtn)
         btns.setLayout(btnLayout)
         btnLayout.addStretch(40)
         btnLayout.setSpacing(40)
@@ -224,14 +221,17 @@ class Project(QtWidgets.QWidget):
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
         self.newRepBtn = EditBtn('new.png', True, 'Поставка комплектуючих')
+        self.moveRepBtn = EditBtn('copy.png', True, 'Перемістити в інший договір')
+        self.sendRepBtn = EditBtn('move.png', True, 'Відправити / забракувати')
         self.produceRepBtn = EditBtn('produce.png', True, 'Зібрати вироби')
-        self.moveRepBtn = EditBtn('move.png', True, 'Перемістити в інший договір')
         self.newRepBtn.clicked.connect(self.newComponentsClicked)
-        self.produceRepBtn.clicked.connect(self.assembleItemsClicked)
         self.moveRepBtn.clicked.connect(self.moveComponentsClicked)
+        self.sendRepBtn.clicked.connect(self.sendComponentsClicked)
+        self.produceRepBtn.clicked.connect(self.assembleItemsClicked)
         btnLayout.addWidget(self.newRepBtn)
-        btnLayout.addWidget(self.produceRepBtn)
         btnLayout.addWidget(self.moveRepBtn)
+        btnLayout.addWidget(self.sendRepBtn)
+        btnLayout.addWidget(self.produceRepBtn)
         btns.setLayout(btnLayout)
         btnLayout.addStretch(40)
         btnLayout.setSpacing(40)
@@ -328,21 +328,34 @@ class Project(QtWidgets.QWidget):
             self.components.show()
 
     def moveComponents(self, components: list):
-        """ move components save button clicked """
+        """ move components when save button clicked """
         if len(components) == 0:
             return
         self.db.moveComponents(components)
-        self.reports.loadData(self.db.getReports(self.getFilter()))
-        self.components.loadData(self.db.getComponents(self.getFilter()))
+        # self.reports.loadData(self.db.getReports(self.getFilter()))
+        # self.components.loadData(self.db.getComponents(self.getFilter()))
+
         msg = """переміщено комплектуючі до виробу <span style='text-decoration: underline'>{}</span>,
                          з договору <span style='text-decoration: underline'>{}</span>"""
         msg = msg.format(components[0]['template_name'], components[0]['contract_name'])
         self.db.saveLogMsg(msg)
-        self.logArea.showContent(self.db.getLogs())
+        #self.logArea.showContent(self.db.getLogs())
+        self.reloadAllData()
         if not self.componentsLbl.isHidden() and self.components.getSize() > 0:
             self.componentsLbl.hide()
             self.componentsLt.replaceWidget(self.componentsLbl, self.components)
             self.components.show()
+
+    def sendComponents(self, components: list):
+        """ send components when save button clicked """
+        if len(components) == 0:
+            return
+        self.db.sendComponents(components)
+        msg = """відправлено комплектуючі до виробу <span style='text-decoration: underline'>{}</span>,
+                                 з договору <span style='text-decoration: underline'>{}</span>"""
+        msg = msg.format(components[0]['template_name'], components[0]['contract_name'])
+        self.db.saveLogMsg(msg)
+        self.reloadAllData()
 
     def assembleProduct(self, id, count):
         """ assembling product from components """
@@ -374,7 +387,7 @@ class Project(QtWidgets.QWidget):
         ContractDlg(self, self.db.getTemplates())
 
     def newComponentsClicked(self):
-        ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems())
+        ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems(), self.db.getReports({'contracts': self.fMenu.getAllContractsId()}), Mode.MoveMode)
 
     def editDesignClicked(self):
         templateId = self.designer.getSelectedRowId()
@@ -451,8 +464,13 @@ class Project(QtWidgets.QWidget):
         AssembleDlg(self, self.db.getContracts(), self.db.getReports({'contracts': self.fMenu.getAllContractsId()}))
 
     def moveComponentsClicked(self):
+        """ copy components button clicked """
+        ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems(), self.db.getReports(self.getFilter()), Mode.CopyMode)
+
+    def sendComponentsClicked(self):
         """ move components button clicked """
-        ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems(), True)
+        ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems(), self.db.getReports(self.getFilter()), Mode.SendMode)
+        #SendDlg(self)
 
     def getFilter(self):
         return self._filter

@@ -121,13 +121,25 @@ class DBManager():
             return noteId
         return 0
 
-    def moveComponents(self, components):
+    def moveComponents(self, components) ->bool:
+        """ move components from one to another contract """
         if len(components):
             self.saveComponents(components)
             for component in components:
                 component['contract_id'] = component['to_contract_id']
                 component['count'] *= -1
             self.saveComponents(components)
+            return True
+        return False
+
+    def sendComponents(self, components) -> bool:
+        """ send components to another place """
+        if len(components):
+            for component in components:
+                component['count'] *= -1
+            self.saveComponents(components)
+            return True
+        return False
 
     def saveNote(self, msg, date):
         self.query.prepare("insert into notes values (null, :note, :str_date, :dt, True)")
