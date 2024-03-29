@@ -33,6 +33,8 @@ class Contract(CustomTable):
         header = self.horizontalHeader()
         header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.setSortingEnabled(True)
+        #self.sortByColumn(2, QtCore.Qt.SortOrder.DescendingOrder)
         #header.setMaximumWidth(300)
 
     def getContractsCount(self):

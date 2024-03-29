@@ -29,10 +29,15 @@ class DBManager():
                     "item_template_id integer secondary key, " +
                     "template_id integer, note_id integer, count integer, "
                     "str_date text, dt datetime, enable bool default true)")
-        if 'acts' not in self.con.tables():
-            self.query.exec("create table acts(id integer primary key autoincrement, " +
-                    "contract_id integer secondary key, name text, " +
-                    "str_date text, dt datetime, enable bool default true)")
+        # if 'acts' not in self.con.tables():
+        #     self.query.exec("create table acts(id integer primary key autoincrement, " +
+        #             "contract_id integer secondary key, name text, " +
+        #             "str_date text, dt datetime, enable bool default true)")
+        if 'assembling' not in self.con.tables():
+            self.query.exec("create table assembling (id integer primary key autoincrement, " +
+                            " contract_id integer secondary key, " +
+                            " count integer, " +
+                            " str_date text, dt datetime)")
         if 'notes' not in self.con.tables():
             self.query.exec("create table notes(id integer primary key autoincrement, " +
                     " note text, " +
@@ -96,9 +101,17 @@ class DBManager():
             component['count'] = 0
         self.saveComponents(components)
 
-    def addAssembled(self, templateId, count) -> bool:
+    def addAssembled(self, contractId, count) -> bool:
         """ adding assembled items in contracts table """
-        self.query.exec("update contracts set completed = completed + {} where id = {}".format(count, templateId))
+        # self.query.exec("update contracts set completed = completed + {} where id = {}".format(count, templateId))
+        # self.query.clear()
+        date = self.getDateTime()
+        self.query.prepare("insert into assembling values(null, :contract_id, :count, :str_date, :dt)")
+        self.query.bindValue(':contract_id', contractId)
+        self.query.bindValue(':count', count)
+        self.query.bindValue(':str_date', date['s_date'])
+        self.query.bindValue(':dt', date['datetime'])
+        self.query.exec()
         self.query.clear()
         return True
 
@@ -255,13 +268,17 @@ class DBManager():
         return items
 
     def getContracts(self):
-        self.query.exec("select contracts.id, contracts.template_id, contracts.name, contracts.short_name, " +
-                        "contracts.completed, contracts.count, contracts.note, contracts.str_date, templates.name " +
-                        "from contracts " +
-                        "join templates on " +
-                        "(templates.id = contracts.template_id) " +
-                        " where contracts.enable=True "
-                        "order by contracts.id")
+        self.query.exec(" select contracts.id, contracts.template_id, contracts.name, contracts.short_name, " +
+                        " contracts.count, contracts.note, contracts.str_date, templates.name, " +
+                        " coalesce (sum(assembling.count), 0) as completed " +
+                        " from contracts " +
+                        " join templates on " +
+                        " (templates.id = contracts.template_id) " +
+                        " left join assembling on " +
+                        " (contracts.id = assembling.contract_id ) " +
+                        " where contracts.enable=True " +
+                        " group by assembling.contract_id, contracts.id " +
+                        " order by contracts.id")
         lst = []
         if self.query.isActive():
             self.query.first()
@@ -272,13 +289,14 @@ class DBManager():
                         'name':         self.query.value('contracts.name'),
                         'template_name':self.query.value('templates.name'),
                         'short_name':   self.query.value('contracts.short_name'),
-                        'completed':    self.query.value('contracts.completed'),
+                        'completed':    self.query.value('completed'),
                         'count':        self.query.value('contracts.count'),
                         'note':         self.query.value('contracts.note'),
                         'date':         self.query.value('contracts.str_date')})
                 lst.append(arr)
                 self.query.next()
         self.query.clear()
+        print(lst.__repr__())
         return lst
 
     def getWhereFromFilter(self, filter):

@@ -86,7 +86,7 @@ class FindMenu:
         return arr
 
     def update(self):
-        """ on change any filter values"""
+        """ on change any filter values """
         self.parent.setFindFilter(self.getSelected(), self.getDateFilter())
 
     def setAllSelected(self):

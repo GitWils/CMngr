@@ -29,7 +29,6 @@ class EditBtn(QtWidgets.QPushButton):
 class CustomTable(QtWidgets.QTableView):
     def __init__(self):
         self.setColumnStyles()
-        self.setSortingEnabled(True)
         #self.setObjectName("table")
 
     def setColumnStyles(self):

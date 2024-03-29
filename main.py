@@ -70,13 +70,19 @@ class Project(QtWidgets.QWidget):
 
     def initMenu(self):
         self.vMenu = QtWidgets.QGridLayout()
+        self.designer = Designer(self.db.getTemplates())
+        self.contracts = Contract(self.db.getContracts())
+        self.components = Components(self.db.getComponents(self.getFilter()))
+        self.reports = Reports(self.db.getReports(self.getFilter()))
+        self.logArea = Logger()
         self.fMenu = FindMenu(self, self.vMenu, self.db.getContracts())
+
+
         self._initLayout1()
         self._initLayout0()
 
     def _initLayout0(self):
         lblLog = QtWidgets.QLabel("Журнал подій:")
-        self.logArea = Logger()
         self.logArea.showContent(self.db.getLogs())
         self.vbox = QtWidgets.QVBoxLayout()
         self.vbox.addLayout(self.innerbox)
@@ -107,12 +113,10 @@ class Project(QtWidgets.QWidget):
         self.desLayout = QtWidgets.QVBoxLayout()
         self.desLayout.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.desLayout)
-        lst = self.db.getTemplates()
-        self.designer = Designer(lst)
         self.designer.clicked.connect(self.itemDesignClicked)
         self.desLbl = QtWidgets.QLabel("Список шаблонів пустий")
         self.desLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.desLayout.addWidget(self.designer) if len(lst) else self.desLayout.addWidget(self.desLbl)
+        self.desLayout.addWidget(self.designer) if self.designer.getTemplatesCount() else self.desLayout.addWidget(self.desLbl)
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
@@ -139,12 +143,10 @@ class Project(QtWidgets.QWidget):
         self.contractLt = QtWidgets.QVBoxLayout()
         self.contractLt.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.contractLt)
-        lst = self.db.getContracts()
-        self.contracts = Contract(lst)
         self.contracts.clicked.connect(self.itemContractClicked)
         self.contractLbl = QtWidgets.QLabel("Список договорів пустий")
         self.contractLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        if len(lst):
+        if self.contracts.getContractsCount():
             self.contractLt.addWidget(self.contracts)
         else:
             self.contractLt.addWidget(self.contractLbl)
@@ -174,11 +176,9 @@ class Project(QtWidgets.QWidget):
         self.componentsLt = QtWidgets.QVBoxLayout()
         self.componentsLt.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.componentsLt)
-        lst = self.db.getComponents(self.getFilter())
-        self.components = Components(lst)
         self.componentsLbl = QtWidgets.QLabel("Список комплектуючих пустий")
         self.componentsLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        if len(lst):
+        if self.components.getSize():
             self.componentsLt.addWidget(self.components)
         else:
             self.componentsLt.addWidget(self.componentsLbl)
@@ -208,12 +208,10 @@ class Project(QtWidgets.QWidget):
         self.reportsLt = QtWidgets.QVBoxLayout()
         self.reportsLt.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.reportsLt)
-        lst = self.db.getReports(self.getFilter())
-        self.reports = Reports(lst)
         self.reports.clicked.connect(self.itemReportsClicked)
         self.reportsLbl = QtWidgets.QLabel("Список комплектуючих пустий")
         self.reportsLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        if len(lst):
+        if self.reports.getSize():
             self.reportsLt.addWidget(self.reports)
         else:
             self.reportsLt.addWidget(self.reportsLbl)
@@ -242,12 +240,13 @@ class Project(QtWidgets.QWidget):
 
     def reloadAllData(self):
         """ load all data from database """
+        print("reloading data...")
         self.designer.loadData(self.db.getTemplates())
         self.contracts.loadData(self.db.getContracts())
         self.components.loadData(self.db.getComponents(self.getFilter()))
         self.reports.loadData(self.db.getReports(self.getFilter()))
-        self.fMenu.reload(self.db.getContracts())
-        self.fMenu.setAllSelected()
+        #self.fMenu.reload(self.db.getContracts())
+        #self.fMenu.setAllSelected()
         self.logArea.showContent(self.db.getLogs())
 
     def itemDesignClicked(self) -> None:
@@ -284,9 +283,7 @@ class Project(QtWidgets.QWidget):
         self._filter['from'] = dates['from']
         self._filter['to'] = dates['to']
         if hasattr(self, 'components'):
-            self.components.loadData(self.db.getComponents(self.getFilter()))
-        if hasattr(self, 'reports'):
-            self.reports.loadData(self.db.getReports(self.getFilter()))
+            self.reloadAllData()
 
     def newContractSave(self, contract: dict):
         """ new contract save button clicked """
