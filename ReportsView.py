@@ -16,7 +16,10 @@ class Reports(CustomWidgets.CustomTable):
         self.sti.setHorizontalHeaderLabels(
             ['Id', 'Назва деталі', 'Виріб', 'Договір', 'Наявність', 'Очікується', 'Залишилось\nзібрати'])
         self.sti.setRowCount(len(self.reports))
-        self.setModel(self.sti)
+        proxy_model = CustomSortFilterProxyModel()
+        proxy_model.setSourceModel(self.sti)
+        # self.setModel(self.sti)
+        self.setModel(proxy_model)
         self.setColumnStyles()
 
     def getSize(self):
@@ -64,3 +67,21 @@ class TableModel(QtGui.QStandardItemModel):
     def reloadData(self, data):
         """ reload table data """
         self._data = list(data)
+
+class CustomSortFilterProxyModel(QtCore.QSortFilterProxyModel):
+    def lessThan(self, left_index, right_index):
+        left_data = self.sourceModel().data(left_index, QtCore.Qt.ItemDataRole.DisplayRole)
+        right_data = self.sourceModel().data(right_index, QtCore.Qt.ItemDataRole.DisplayRole)
+        #print(left_index.column().__repr__())
+        if left_data is None and right_data is None:
+            return False
+        elif left_data is None:
+            return True
+        elif right_data is None:
+            return False
+        else:
+            # if (left_index.column() == 4):
+            #     #removing suffix".шт"
+            #     left_data = int(left_data[:-4])
+            #     right_data = int(right_data[:-4])
+            return left_data > right_data

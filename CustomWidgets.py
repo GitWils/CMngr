@@ -31,6 +31,7 @@ class CustomTable(QtWidgets.QTableView):
         self.setColumnStyles()
         #self.setObjectName("table")
 
+
     def setColumnStyles(self):
         #self.setMinimumWidth(800)
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
@@ -42,8 +43,6 @@ class CustomTable(QtWidgets.QTableView):
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-
-
         self.setColumnHidden(0, True)
         #header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
 
