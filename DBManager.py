@@ -1,6 +1,6 @@
 import sys
 import datetime
-from PyQt6 import QtWidgets, QtSql
+from PyQt6 import QtCore, QtSql
 
 class DBManager():
     def __init__(self):
@@ -14,7 +14,7 @@ class DBManager():
             self.query.clear()
         if 'items_template' not in self.con.tables():
             self.query.exec("create table items_template(id integer primary key autoincrement, " +
-                    "template_id integer secondary key, name text, count integer, " +
+                    "template_id integer secondary key, name text, count integer, units integer, " +
                     "editable bool, str_date text, dt datetime, enable bool default true)")
             self.query.clear()
         if 'contracts' not in self.con.tables():
@@ -29,10 +29,6 @@ class DBManager():
                     "item_template_id integer secondary key, " +
                     "template_id integer, note_id integer, count integer, "
                     "str_date text, dt datetime, enable bool default true)")
-        # if 'acts' not in self.con.tables():
-        #     self.query.exec("create table acts(id integer primary key autoincrement, " +
-        #             "contract_id integer secondary key, name text, " +
-        #             "str_date text, dt datetime, enable bool default true)")
         if 'assembling' not in self.con.tables():
             self.query.exec("create table assembling (id integer primary key autoincrement, " +
                             " contract_id integer secondary key, " +
@@ -57,7 +53,7 @@ class DBManager():
         templateId = self.query.lastInsertId()
         self.query.clear()
         for item in items:
-            self.query.prepare("insert into items_template values(null, :template_id, :name, :count, True, :str_date, :dt, True)")
+            self.query.prepare("insert into items_template values(null, :template_id, :name, :count, 1, True, :str_date, :dt, True)")
             self.query.bindValue(':template_id', templateId)
             self.query.bindValue(':name', item['name'])
             self.query.bindValue(':count', item['count'])
@@ -296,7 +292,6 @@ class DBManager():
                 lst.append(arr)
                 self.query.next()
         self.query.clear()
-        print(lst.__repr__())
         return lst
 
     def getWhereFromFilter(self, filter):
@@ -348,12 +343,16 @@ class DBManager():
         return lst
 
     def getReports(self, filter = ()):
+        # timer = QtCore.QElapsedTimer()
+        # timer.start()
+
         where = self.getWhereFromFilter(filter)
         self.query.exec(" select components.contract_id, components.item_template_id, " +
                         " sum(components.count) as count, " +
                         " components.str_date,  contracts.short_name as contract, templates.name as device, " +
                         " items_template.name as product, items_template.count * contracts.count as needed, " +
-                        " items_template.count as need_for_one, contracts.completed as completed " +
+                        " items_template.count as need_for_one, " +
+                        " coalesce((select sum(assembling.count) from assembling where assembling.contract_id = contracts.id), 0) as completed " +
                         " from components " +
                         " join contracts on " +
                         " (contracts.id = components.contract_id) " +
@@ -383,6 +382,8 @@ class DBManager():
                 lst.append(arr)
                 self.query.next()
         self.query.clear()
+        # elapsed_time = timer.elapsed()
+        # print(f"getReports  тривав {elapsed_time} мсек")
         return lst
 
     def delTemplate(self, id):
@@ -400,6 +401,7 @@ class DBManager():
         self.query.clear()
 
     def getLogs(self):
+        #self.query.exec("select * from logs order by id limit 20")
         self.query.exec("select * from logs order by id")
         lst = []
         if self.query.isActive():

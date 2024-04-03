@@ -48,10 +48,10 @@ class FindMenu:
         self.lv.setEditTriggers(QtWidgets.QListView.EditTrigger.NoEditTriggers)
         self.lv.setSpacing(2)
         self.reload()
-        self.update()
+        self.update(False)
 
     def reload(self, contracts=None):
-        """ reload must be use when table templates changed """
+        """ reload must be used when table templates changed """
         if contracts:
             self.contracts = contracts
             self.sti.clear()
@@ -59,6 +59,7 @@ class FindMenu:
             item = QtGui.QStandardItem(contract['name'])
             self.sti.appendRow(item)
         if contracts is None:
+            #self.lv.selectAll()
             self.setAllSelected()
 
     def getSelected(self):
@@ -85,9 +86,9 @@ class FindMenu:
             arr['to'] = self.dateTo.dateTime().toString('yyyy-MM-dd hh:mm:ss')
         return arr
 
-    def update(self):
+    def update(self, reload = True):
         """ on change any filter values """
-        self.parent.setFindFilter(self.getSelected(), self.getDateFilter())
+        self.parent.setFindFilter(self.getSelected(), self.getDateFilter(), reload)
 
     def setAllSelected(self):
         """ set listview items all selected status """
@@ -105,7 +106,7 @@ class FindMenu:
         self.dateTo.dateChanged.connect(self.update)
 
     def addWidgets(self):
-        """ positioning widgets at grid """
+        """ positioning widgets at the grid """
         self.grid.addWidget(self.lblFrom, 1, 0, 1, 1)
         self.grid.addWidget(self.dateFrom, 1, 1, 1, 1)
         self.grid.addWidget(self.chckFrom, 1, 2, 1, 1)

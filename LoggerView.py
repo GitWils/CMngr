@@ -11,9 +11,10 @@ class Logger(QtWidgets.QTextEdit):
 
     def showContent(self, logs):
         self.clear()
-        for msg in logs:
-            self.addMessage(msg[0], msg[1])
-        #set vertical scroll at bottom position
+        msg = ''
+        for log in logs:
+            msg += '<br>' + log[1][0:5] + ' <span style="text-decoration: underline">' + log[1][7:] + '</span> ' + log[0]
+        self.insertHtml(msg[4:])
         self.ensureCursorVisible()
 
     def addMessage(self, msg, date):

@@ -24,7 +24,7 @@ class Contract(CustomTable):
             item6 = QtGui.QStandardItem(contract['note'])
             self.sti.appendRow([item0, item1, item2, item3, item4, item5, item6])
             rowCnt += 1
-        self.sti.setHorizontalHeaderLabels(['Id', 'Договір', 'Назва\nвиробу', 'Зібрано','Необхідно\nзібрати', 'Дата\nстворення', 'Примітка'])
+        self.sti.setHorizontalHeaderLabels(['Id', 'Договір', 'Назва\nвиробу', 'Зібрано','Всього\nпо договору', 'Дата\nстворення', 'Примітка'])
         self.sti.setRowCount(rowCnt)
         proxy_model = CustomSortFilterProxyModel()
         proxy_model.setSourceModel(self.sti)
@@ -47,17 +47,15 @@ class Contract(CustomTable):
     def getSelectedRowId(self):
         index = self.currentIndex()
         NewIndex = self.model().index(index.row(), 0)
-        return self.model().getSelectedRow(NewIndex)
-        #return self.model().data(NewIndex)
+        return self.sti.getSelectedRow(NewIndex)
 
     def getSelectedRowName(self):
         index = self.currentIndex()
         NewIndex = self.model().index(index.row(), 1)
-        return self.model().data(NewIndex)
+        return self.sti.getSelectedName(NewIndex)
 
     def getSize(self):
         return len(self.contracts)
-
 
 class TableModel(QtGui.QStandardItemModel):
     """ class used for align and coloring cells  """
@@ -89,6 +87,9 @@ class TableModel(QtGui.QStandardItemModel):
 
         if (role == QtCore.Qt.ItemDataRole.TextAlignmentRole and index.column() != 1):
             return QtCore.Qt.AlignmentFlag.AlignCenter
+
+    def getSelectedName(self, index):
+        return self._data[index.row()]['name']
 
     def getSelectedRow(self, index):
         return self._data[index.row()]['id']

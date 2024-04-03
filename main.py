@@ -70,13 +70,12 @@ class Project(QtWidgets.QWidget):
 
     def initMenu(self):
         self.vMenu = QtWidgets.QGridLayout()
-        self.designer = Designer(self.db.getTemplates())
-        self.contracts = Contract(self.db.getContracts())
-        self.components = Components(self.db.getComponents(self.getFilter()))
-        self.reports = Reports(self.db.getReports(self.getFilter()))
-        self.logArea = Logger()
         self.fMenu = FindMenu(self, self.vMenu, self.db.getContracts())
-
+        self.designerTbl = Designer(self.db.getTemplates())
+        self.contractsTbl = Contract(self.db.getContracts())
+        self.componentsTbl = Components(self.db.getComponents(self.getFilter()))
+        self.reportsTbl = Reports(self.db.getReports(self.getFilter()))
+        self.logArea = Logger()
 
         self._initLayout1()
         self._initLayout0()
@@ -113,10 +112,10 @@ class Project(QtWidgets.QWidget):
         self.desLayout = QtWidgets.QVBoxLayout()
         self.desLayout.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.desLayout)
-        self.designer.clicked.connect(self.itemDesignClicked)
+        self.designerTbl.clicked.connect(self.itemDesignClicked)
         self.desLbl = QtWidgets.QLabel("Список шаблонів пустий")
         self.desLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.desLayout.addWidget(self.designer) if self.designer.getTemplatesCount() else self.desLayout.addWidget(self.desLbl)
+        self.desLayout.addWidget(self.designerTbl) if self.designerTbl.getTemplatesCount() else self.desLayout.addWidget(self.desLbl)
         btns = QtWidgets.QTabWidget()
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
@@ -143,11 +142,11 @@ class Project(QtWidgets.QWidget):
         self.contractLt = QtWidgets.QVBoxLayout()
         self.contractLt.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.contractLt)
-        self.contracts.clicked.connect(self.itemContractClicked)
+        self.contractsTbl.clicked.connect(self.itemContractClicked)
         self.contractLbl = QtWidgets.QLabel("Список договорів пустий")
         self.contractLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        if self.contracts.getContractsCount():
-            self.contractLt.addWidget(self.contracts)
+        if self.contractsTbl.getContractsCount():
+            self.contractLt.addWidget(self.contractsTbl)
         else:
             self.contractLt.addWidget(self.contractLbl)
         btns = QtWidgets.QTabWidget()
@@ -178,8 +177,8 @@ class Project(QtWidgets.QWidget):
         tab.setLayout(self.componentsLt)
         self.componentsLbl = QtWidgets.QLabel("Список комплектуючих пустий")
         self.componentsLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        if self.components.getSize():
-            self.componentsLt.addWidget(self.components)
+        if self.componentsTbl.getSize():
+            self.componentsLt.addWidget(self.componentsTbl)
         else:
             self.componentsLt.addWidget(self.componentsLbl)
         btns = QtWidgets.QTabWidget()
@@ -208,11 +207,11 @@ class Project(QtWidgets.QWidget):
         self.reportsLt = QtWidgets.QVBoxLayout()
         self.reportsLt.setContentsMargins(0, 0, 0, 0)
         tab.setLayout(self.reportsLt)
-        self.reports.clicked.connect(self.itemReportsClicked)
+        self.reportsTbl.clicked.connect(self.itemReportsClicked)
         self.reportsLbl = QtWidgets.QLabel("Список комплектуючих пустий")
         self.reportsLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        if self.reports.getSize():
-            self.reportsLt.addWidget(self.reports)
+        if self.reportsTbl.getSize():
+            self.reportsLt.addWidget(self.reportsTbl)
         else:
             self.reportsLt.addWidget(self.reportsLbl)
         btns = QtWidgets.QTabWidget()
@@ -240,14 +239,17 @@ class Project(QtWidgets.QWidget):
 
     def reloadAllData(self):
         """ load all data from database """
-        print("reloading data...")
-        self.designer.loadData(self.db.getTemplates())
-        self.contracts.loadData(self.db.getContracts())
-        self.components.loadData(self.db.getComponents(self.getFilter()))
-        self.reports.loadData(self.db.getReports(self.getFilter()))
+        timer = QtCore.QElapsedTimer()
+        timer.start()
+        self.designerTbl.loadData(self.db.getTemplates())
+        self.contractsTbl.loadData(self.db.getContracts())
+        self.componentsTbl.loadData(self.db.getComponents(self.getFilter()))
+        self.reportsTbl.loadData(self.db.getReports(self.getFilter()))
         #self.fMenu.reload(self.db.getContracts())
         #self.fMenu.setAllSelected()
         self.logArea.showContent(self.db.getLogs())
+        elapsed_time = timer.elapsed()
+        print(f"обробка reloadAllData() тривала {elapsed_time} мсек")
 
     def itemDesignClicked(self) -> None:
         """ new template mode save button clicked """
@@ -268,21 +270,21 @@ class Project(QtWidgets.QWidget):
         if len(name) == 0 or len(items) == 0:
             return
         self.db.saveTemplate(name, items)
-        self.designer.loadData(self.db.getTemplates())
+        self.designerTbl.loadData(self.db.getTemplates())
         msg = 'створено шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
-        if self.designer.getTemplatesCount() == 1:
-            self.designer.show()
+        if self.designerTbl.getTemplatesCount() == 1:
+            self.designerTbl.show()
             self.desLbl.hide()
-            self.desLayout.replaceWidget(self.desLbl, self.designer)
+            self.desLayout.replaceWidget(self.desLbl, self.designerTbl)
 
-    def setFindFilter(self, contracts, dates):
+    def setFindFilter(self, contracts, dates, reload = True):
         """ filter for components and reports tabs """
         self._filter['contracts'] = contracts
         self._filter['from'] = dates['from']
         self._filter['to'] = dates['to']
-        if hasattr(self, 'components'):
+        if hasattr(self, 'componentsTbl'):
             self.reloadAllData()
 
     def newContractSave(self, contract: dict):
@@ -290,47 +292,47 @@ class Project(QtWidgets.QWidget):
         if contract['count'] == 0 or contract['name'] == '':
             return
         self.db.saveContract(contract)
-        self.contracts.loadData(self.db.getContracts())
+        self.contractsTbl.loadData(self.db.getContracts())
         self.fMenu.reload(self.db.getContracts())
-        self.reports.loadData(self.db.getReports(self.getFilter()))
+        self.reportsTbl.loadData(self.db.getReports(self.getFilter()))
         msg = """створено договір <span style='text-decoration: underline'>{}</span> на виготовлення виробів 
                 <span style='text-decoration: underline'>{}</span> кількістю {}шт."""
         msg = msg.format(contract['short_name'], contract['template_name'], str(contract['count']))
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
         self.fMenu.setAllSelected()
-        if self.contracts.getSize() == 1:
+        if self.contractsTbl.getSize() == 1:
             self.contractLbl.hide()
             self.reportsLbl.hide()
-            self.contractLt.replaceWidget(self.contractLbl, self.contracts)
-            self.reportsLt.replaceWidget(self.reportsLbl, self.reports)
-            self.contracts.show()
-            self.reports.show()
+            self.contractLt.replaceWidget(self.contractLbl, self.contractsTbl)
+            self.reportsLt.replaceWidget(self.reportsLbl, self.reportsTbl)
+            self.contractsTbl.show()
+            self.reportsTbl.show()
 
     def newComponentsSave(self, components: list):
         """ new components save button clicked """
         if len(components) == 0:
             return
         self.db.saveComponents(components)
-        self.reports.loadData(self.db.getReports(self.getFilter()))
-        self.components.loadData(self.db.getComponents(self.getFilter()))
+        self.reportsTbl.loadData(self.db.getReports(self.getFilter()))
+        self.componentsTbl.loadData(self.db.getComponents(self.getFilter()))
         msg = """поставлено комплектуючі до виробу <span style='text-decoration: underline'>{}</span>,
                  згідно договору <span style='text-decoration: underline'>{}</span>"""
         msg = msg.format(components[0]['template_name'], components[0]['contract_name'])
         self.db.saveLogMsg(msg)
         self.logArea.showContent(self.db.getLogs())
-        if not self.componentsLbl.isHidden() and self.components.getSize() > 0:
+        if not self.componentsLbl.isHidden() and self.componentsTbl.getSize() > 0:
             self.componentsLbl.hide()
-            self.componentsLt.replaceWidget(self.componentsLbl, self.components)
-            self.components.show()
+            self.componentsLt.replaceWidget(self.componentsLbl, self.componentsTbl)
+            self.componentsTbl.show()
 
     def moveComponents(self, components: list):
         """ move components when save button clicked """
         if len(components) == 0:
             return
         self.db.moveComponents(components)
-        # self.reports.loadData(self.db.getReports(self.getFilter()))
-        # self.components.loadData(self.db.getComponents(self.getFilter()))
+        # self.reportsTbl.loadData(self.db.getReports(self.getFilter()))
+        # self.componentsTbl.loadData(self.db.getComponents(self.getFilter()))
 
         msg = """переміщено комплектуючі до виробу <span style='text-decoration: underline'>{}</span>,
                          з договору <span style='text-decoration: underline'>{}</span>"""
@@ -338,10 +340,10 @@ class Project(QtWidgets.QWidget):
         self.db.saveLogMsg(msg)
         #self.logArea.showContent(self.db.getLogs())
         self.reloadAllData()
-        if not self.componentsLbl.isHidden() and self.components.getSize() > 0:
+        if not self.componentsLbl.isHidden() and self.componentsTbl.getSize() > 0:
             self.componentsLbl.hide()
-            self.componentsLt.replaceWidget(self.componentsLbl, self.components)
-            self.components.show()
+            self.componentsLt.replaceWidget(self.componentsLbl, self.componentsTbl)
+            self.componentsTbl.show()
 
     def sendComponents(self, components: list):
         """ send components when save button clicked """
@@ -367,8 +369,8 @@ class Project(QtWidgets.QWidget):
 
     def updateTemplate(self, name: str, items: list):
         """ edit template mode save edit button clicked """
-        if self.db.updateItemsByTemplateId(self.designer.getSelectedRowId(), items):
-            self.designer.loadData(self.db.getTemplates())
+        if self.db.updateItemsByTemplateId(self.designerTbl.getSelectedRowId(), items):
+            self.designerTbl.loadData(self.db.getTemplates())
             msg = 'оновлено шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
             self.db.saveLogMsg(msg)
             self.logArea.showContent(self.db.getLogs())
@@ -387,7 +389,7 @@ class Project(QtWidgets.QWidget):
         ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems(), self.db.getReports({'contracts': self.fMenu.getAllContractsId()}), Mode.MoveMode)
 
     def editDesignClicked(self):
-        templateId = self.designer.getSelectedRowId()
+        templateId = self.designerTbl.getSelectedRowId()
         template = self.db.getTemplateById(templateId)
         TemplateDialog(self, template['name'], self.db.getItemsByTemplateId(templateId))
 
@@ -398,7 +400,7 @@ class Project(QtWidgets.QWidget):
         print("edit clicked")
 
     def delDesignClicked(self):
-        templateId = self.designer.getSelectedRowId()
+        templateId = self.designerTbl.getSelectedRowId()
         msg_box = QtWidgets.QMessageBox()
         msg_box.setWindowTitle("Увага")
         cntItems = len(self.db.getContractsByTemplateId(templateId))
@@ -419,17 +421,17 @@ class Project(QtWidgets.QWidget):
                 self.db.delTemplate(templateId)
                 self.db.delItemsByTemplateId(templateId)
                 self.db.saveLogMsg('видалено шаблон для виробу <span style="text-decoration: underline">{}</span>'
-                                   .format(self.designer.getSelectedRowName()))
+                                   .format(self.designerTbl.getSelectedRowName()))
                 self.reloadAllData()
-                # self.designer.loadData(self.db.getTemplates())
+                # self.designerTbl.loadData(self.db.getTemplates())
                 # self.logArea.showContent(self.db.getLogs())
-                if self.designer.getTemplatesCount() == 0:
-                    self.designer.hide()
+                if self.designerTbl.getTemplatesCount() == 0:
+                    self.designerTbl.hide()
                     self.desLbl.show()
-                    self.desLayout.replaceWidget(self.designer, self.desLbl)
+                    self.desLayout.replaceWidget(self.designerTbl, self.desLbl)
 
     def delContractClicked(self):
-        contractId = self.contracts.getSelectedRowId()
+        contractId = self.contractsTbl.getSelectedRowId()
         cntItems = self.db.getCntItemsByContractId(contractId)
         msg_box = QtWidgets.QMessageBox()
         msg_box.setWindowTitle("Увага")
@@ -443,15 +445,17 @@ class Project(QtWidgets.QWidget):
             if result == QtWidgets.QMessageBox.StandardButton.Cancel:
                 return
         self.db.delContract(contractId)
-        self.db.saveLogMsg('видалено контракт <span style="text-decoration: underline">{}</span>'
-                           .format(self.designer.getSelectedRowName()))
+        self.db.saveLogMsg('видалено контракт на <span style="text-decoration: underline">{}</span>'
+                           .format(self.contractsTbl.getSelectedRowName()))
         self.reloadAllData()
-        # self.contracts.loadData(self.db.getContracts())
+        self.fMenu.reload(self.db.getContracts())
+        self.fMenu.setAllSelected()
+        # self.contractsTbl.loadData(self.db.getContracts())
         # self.logArea.showContent(self.db.getLogs())
-        if self.contracts.getContractsCount() == 0:
-            self.contracts.hide()
+        if self.contractsTbl.getContractsCount() == 0:
+            self.contractsTbl.hide()
             self.contractLbl.show()
-            self.desLayout.replaceWidget(self.contracts, self.contractLbl)
+            self.desLayout.replaceWidget(self.contractsTbl, self.contractLbl)
 
     # def delComponentsClicked(self):
     #     pass

@@ -20,7 +20,8 @@ class ContractDlg(QtWidgets.QDialog):
         contractShortName = QtWidgets.QLabel("Коротка назва (№ХХ):")
         self.shortName = QtWidgets.QLineEdit()
 
-        lbl_name = QtWidgets.QLabel('Назва деталі №{}:'.format(self.itemsCnt + 1))
+        #lbl_name = QtWidgets.QLabel('Назва деталі №{}:'.format(self.itemsCnt + 1))
+        lbl_name = QtWidgets.QLabel('Назва виробів')
         self.cBoxTemplate = QtWidgets.QComboBox()
         for template in self.templates:
             self.cBoxTemplate.addItem(template[1], template[0])
