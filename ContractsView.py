@@ -18,8 +18,8 @@ class Contract(CustomTable):
             item0 = QtGui.QStandardItem(str(contract['id']))
             item1 = QtGui.QStandardItem(contract['name'])
             item2 = QtGui.QStandardItem(contract['template_name'])
-            item3 = QtGui.QStandardItem(str(contract['completed']) + ' шт.')
-            item4 = QtGui.QStandardItem(str(contract['count']) + ' шт.')
+            item3 = QtGui.QStandardItem(contract['completed'])
+            item4 = QtGui.QStandardItem(contract['count'])
             item5 = QtGui.QStandardItem(contract['date'][5:])
             item6 = QtGui.QStandardItem(contract['note'])
             self.sti.appendRow([item0, item1, item2, item3, item4, item5, item6])
@@ -45,14 +45,10 @@ class Contract(CustomTable):
         return len(self.contracts)
 
     def getSelectedRowId(self):
-        index = self.currentIndex()
-        NewIndex = self.model().index(index.row(), 0)
-        return self.sti.getSelectedRow(NewIndex)
+        return self.model().data(self.model().index(self.currentIndex().row(), 0))
 
     def getSelectedRowName(self):
-        index = self.currentIndex()
-        NewIndex = self.model().index(index.row(), 1)
-        return self.sti.getSelectedName(NewIndex)
+        return self.model().data(self.model().index(self.currentIndex().row(), 1))
 
     def getSize(self):
         return len(self.contracts)
@@ -66,6 +62,8 @@ class TableModel(QtGui.QStandardItemModel):
     def data(self, index, role):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             match index.column():
+                case 0:
+                    return self._data[index.row()]['id']
                 case 1:
                     return self._data[index.row()]['name']
                 case 2:
@@ -88,8 +86,8 @@ class TableModel(QtGui.QStandardItemModel):
         if (role == QtCore.Qt.ItemDataRole.TextAlignmentRole and index.column() != 1):
             return QtCore.Qt.AlignmentFlag.AlignCenter
 
-    def getSelectedName(self, index):
-        return self._data[index.row()]['name']
+    # def getSelectedName(self, index):
+    #     return self._data[index.row()]['name']
 
     def getSelectedRow(self, index):
         return self._data[index.row()]['id']
@@ -107,7 +105,6 @@ class CustomSortFilterProxyModel(QtCore.QSortFilterProxyModel):
     def lessThan(self, left_index, right_index):
         left_data = self.sourceModel().data(left_index, QtCore.Qt.ItemDataRole.DisplayRole)
         right_data = self.sourceModel().data(right_index, QtCore.Qt.ItemDataRole.DisplayRole)
-        #print(left_index.column().__repr__())
         if left_data is None and right_data is None:
             return False
         elif left_data is None:

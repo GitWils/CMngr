@@ -78,7 +78,7 @@ class TemplateDialog(QtWidgets.QDialog):
             'lbl_name': QtWidgets.QLabel('Назва деталі №{}:'.format(self.itemsCnt + 1)),
             'edit_name': QtWidgets.QLineEdit(),
             'lbl_cnt': QtWidgets.QLabel("кількість:"),
-            'spin_cnt': CustomWidgets.CustomSpinBox()
+            'spin_cnt': CustomWidgets.CustomDSpinBox()
         })
         self.itemsCnt += 1
         self.grid.addWidget(self.additionalWgts[self.itemsCnt - 1]['lbl_name'],  self.itemsCnt, 0, 1, 1)

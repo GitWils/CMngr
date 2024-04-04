@@ -46,13 +46,19 @@ class CustomTable(QtWidgets.QTableView):
         self.setColumnHidden(0, True)
         #header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
 
+class CustomDSpinBox(QtWidgets.QDoubleSpinBox):
+    def __init__(self):
+        super().__init__()
+        self.setValue(1)
+        self.setMaximum(100000)
+        self.setDecimals(2)
+
 class CustomSpinBox(QtWidgets.QSpinBox):
     def __init__(self):
         super().__init__()
         self.setValue(1)
         self.setMaximum(100000)
-        self.setSuffix(' шт.')
-
+        #self.setSuffix(' шт.')
 
 class ButtonBox(QtWidgets.QDialogButtonBox):
     def __init__(self, doubleBtnMode):
@@ -66,7 +72,6 @@ class ButtonBox(QtWidgets.QDialogButtonBox):
             self.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok)
         self.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setObjectName('dlgBtn')
         self.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText('Зберегти')
-        print(sys.platform)
         if sys.platform == 'win32' or sys.platform == 'win64':
             self.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
         else:

@@ -15,17 +15,7 @@ class Components(CustomWidgets.CustomTable):
         self.sti.reloadData(components)
         self.reset()
         self.sti.clear()
-        # for component in components:
-        #     item0 = QtGui.QStandardItem(str(component['id']))
-        #     item1 = QtGui.QStandardItem(component['name'])
-        #     item2 = QtGui.QStandardItem(component['device'])
-        #     item3 = QtGui.QStandardItem(component['contract'])
-        #     item4 = QtGui.QStandardItem(str(component['count']) + ' шт.')
-        #     item5 = QtGui.QStandardItem(component['date'][5:])
-        #     item6 = QtGui.QStandardItem(component['note'])
-        #     self.sti.appendRow([item0, item1, item2, item3, item4, item5, item6])
-
-        self.sti.setHorizontalHeaderLabels(['Id', 'Назва деталі', 'Виріб', 'Договір', 'Кількість', 'Дата\nнадходження', 'Примітка'])
+        self.sti.setHorizontalHeaderLabels(['Id', 'Назва деталі', 'Виріб', 'Договір', 'Кількість\n(шт або кг)', 'Дата\nнадходження', 'Примітка'])
         self.sti.setRowCount(len(self.components))
         proxy_model = CustomSortFilterProxyModel()
         proxy_model.setSourceModel(self.sti)
@@ -57,7 +47,7 @@ class TableModel(QtGui.QStandardItemModel):
                 case 3:
                     return self._data[index.row()]['contract']
                 case 4:
-                    return str(self._data[index.row()]['count']) + ' шт.'
+                    return self._data[index.row()]['count']
                 case 5:
                     return self._data[index.row()]['date'][5:]
                 case 6:
@@ -86,10 +76,10 @@ class CustomSortFilterProxyModel(QtCore.QSortFilterProxyModel):
         elif right_data is None:
             return False
         else:
-            if (left_index.column() == 4):
-                #removing suffix".шт"
-                left_data = int(left_data[:-4])
-                right_data = int(right_data[:-4])
+            # if (left_index.column() == 4):
+            #     #removing suffix".шт"
+            #     left_data = int(left_data[:-4])
+            #     right_data = int(right_data[:-4])
             #sorting date column
             if (left_index.column() == 5):
                 left_data = datetime.strptime(left_data, " %d.%m.%Y").date()

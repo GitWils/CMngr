@@ -190,7 +190,7 @@ QTabWidget::item {
 }
 /********************************* TabWidget UI settings ***************************************/
 
-QSpinBox {
+QSpinBox, QDoubleSpinBox {
     background-color: #F0F5F9;
     color: "#323335";
     font-size: 16px;
@@ -198,19 +198,19 @@ QSpinBox {
     height: 26px;
 }
 
-QSpinBox::up-button, QSpinBox::down-button {
+QSpinBox::up-button, QSpinBox::down-button, QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
     width: 20px;
     height: 12px;
     background-color: #52616B;
 }
 
-QSpinBox::up-arrow {
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
     image: url(img/actup.png) no-repeat top;
     width: 10px;
     height: 10px;
 }
 
-QSpinBox::down-arrow {
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
     image: url(img/actdown.png) no-repeat bottom;
     width: 10px;
     height: 10px;

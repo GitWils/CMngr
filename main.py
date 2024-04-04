@@ -51,7 +51,7 @@ class mainWindow(QtWidgets.QMainWindow):
     def event(self, e) -> QtWidgets.QWidget.event:
         """ hotkey handling """
         if e.type() == QtCore.QEvent.Type.WindowDeactivate:
-            self.setWindowOpacity(0.80)
+            self.setWindowOpacity(0.85)
         elif e.type() == QtCore.QEvent.Type.WindowActivate:
             self.setWindowOpacity(1)
         elif e.type() == QtCore.QEvent.Type.KeyPress and e.key() == QtCore.Qt.Key.Key_Escape:
@@ -447,18 +447,14 @@ class Project(QtWidgets.QWidget):
         self.db.delContract(contractId)
         self.db.saveLogMsg('видалено контракт на <span style="text-decoration: underline">{}</span>'
                            .format(self.contractsTbl.getSelectedRowName()))
-        self.reloadAllData()
+
         self.fMenu.reload(self.db.getContracts())
+        self.reloadAllData()
         self.fMenu.setAllSelected()
-        # self.contractsTbl.loadData(self.db.getContracts())
-        # self.logArea.showContent(self.db.getLogs())
         if self.contractsTbl.getContractsCount() == 0:
             self.contractsTbl.hide()
             self.contractLbl.show()
-            self.desLayout.replaceWidget(self.contractsTbl, self.contractLbl)
-
-    # def delComponentsClicked(self):
-    #     pass
+            self.contractLt.replaceWidget(self.contractsTbl, self.contractLbl)
 
     def assembleItemsClicked(self):
         """ filter nonsensitive for now """

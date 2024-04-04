@@ -14,7 +14,7 @@ class DBManager():
             self.query.clear()
         if 'items_template' not in self.con.tables():
             self.query.exec("create table items_template(id integer primary key autoincrement, " +
-                    "template_id integer secondary key, name text, count integer, units integer, " +
+                    "template_id integer secondary key, name text, count real, units integer, " +
                     "editable bool, str_date text, dt datetime, enable bool default true)")
             self.query.clear()
         if 'contracts' not in self.con.tables():
@@ -27,7 +27,7 @@ class DBManager():
             self.query.exec("create table components(id integer primary key autoincrement, " +
                     "contract_id integer secondary key, " +
                     "item_template_id integer secondary key, " +
-                    "template_id integer, note_id integer, count integer, "
+                    "template_id integer, note_id integer, count real, "
                     "str_date text, dt datetime, enable bool default true)")
         if 'assembling' not in self.con.tables():
             self.query.exec("create table assembling (id integer primary key autoincrement, " +

@@ -14,7 +14,7 @@ class Reports(CustomWidgets.CustomTable):
         self.reset()
         self.sti.clear()
         self.sti.setHorizontalHeaderLabels(
-            ['Id', 'Назва деталі', 'Виріб', 'Договір', 'Наявність', 'Очікується', 'Всього\nнеобхідно'])
+            ['Id', 'Назва деталі', 'Виріб', 'Договір', 'Наявність\n(шт або кг)', 'Очікується', 'Всього\nнеобхідно'])
         self.sti.setRowCount(len(self.reports))
         proxy_model = CustomSortFilterProxyModel()
         proxy_model.setSourceModel(self.sti)

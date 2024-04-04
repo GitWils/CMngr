@@ -52,15 +52,15 @@ class FindMenu:
 
     def reload(self, contracts=None):
         """ reload must be used when table templates changed """
-        if contracts:
+        if contracts != None:
             self.contracts = contracts
             self.sti.clear()
         for contract in self.contracts:
             item = QtGui.QStandardItem(contract['name'])
             self.sti.appendRow(item)
         if contracts is None:
-            #self.lv.selectAll()
             self.setAllSelected()
+
 
     def getSelected(self):
         """ get selected list values """

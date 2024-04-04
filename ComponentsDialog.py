@@ -103,7 +103,7 @@ class ComponentsDlg(QtWidgets.QDialog):
                     'lbl_cnt': QtWidgets.QLabel("кількість:"),
                     'item_template_id': item['id'],
                     'template_id': item['template_id'],
-                    'spin_cnt': CustomWidgets.CustomSpinBox()
+                    'spin_cnt': CustomWidgets.CustomDSpinBox()
                 })
                 if self.movement == Mode.SendMode or self.movement == Mode.CopyMode:
                     cnt = self.findCountInComponents(contractId, item['id'])

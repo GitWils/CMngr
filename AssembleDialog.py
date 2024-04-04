@@ -31,7 +31,7 @@ class AssembleDlg(QtWidgets.QDialog):
         self.editProductName = QtWidgets.QLineEdit()
         self.editProductName.setReadOnly(True)
         self.lblAssembleCnt = QtWidgets.QLabel('Зібрати:')
-        self.spinCnt = CustomWidgets.CustomSpinBox()
+        self.spinCnt = CustomWidgets.CustomDSpinBox()
         self.spinCnt.valueChanged.connect(self.fillItemslist)
         self.fillItemslist()
         bbox = self.initButtonBox()
