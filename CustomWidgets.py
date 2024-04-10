@@ -51,7 +51,7 @@ class CustomDSpinBox(QtWidgets.QDoubleSpinBox):
         super().__init__()
         self.setValue(1)
         self.setMaximum(100000)
-        self.setDecimals(2)
+        self.setDecimals(4)
 
 class CustomSpinBox(QtWidgets.QSpinBox):
     def __init__(self):

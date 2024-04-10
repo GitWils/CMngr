@@ -179,11 +179,6 @@ class ComponentsDlg(QtWidgets.QDialog):
                 self.parent.newComponentsSave(res)
             case Mode.SendMode:
                 self.parent.sendComponents(res)
-
-        # if self.movement == Mode.CopyMode:
-        #     self.parent.moveComponents(res)
-        # else:
-        #     self.parent.newComponentsSave(res)
         self.accept()
 
     def getTemplateByContractId(self, id):

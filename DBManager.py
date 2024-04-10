@@ -2,6 +2,8 @@ import sys
 import datetime
 from PyQt6 import QtCore, QtSql
 
+from pprint import pprint
+
 class DBManager():
     def __init__(self):
         self.con = QtSql.QSqlDatabase.addDatabase('QSQLITE')
@@ -32,8 +34,13 @@ class DBManager():
         if 'assembling' not in self.con.tables():
             self.query.exec("create table assembling (id integer primary key autoincrement, " +
                             " contract_id integer secondary key, " +
-                            " count integer, " +
-                            " str_date text, dt datetime)")
+                            " count integer, note text, " +
+                            " str_date text, dt datetime, enable bool default true)")
+        if 'sending' not in self.con.tables():
+            self.query.exec("create table sending (id integer primary key autoincrement, " +
+                            " contract_id integer secondary key, " +
+                            " count integer, note text, " +
+                            " str_date text, dt datetime, enable bool default true)")
         if 'notes' not in self.con.tables():
             self.query.exec("create table notes(id integer primary key autoincrement, " +
                     " note text, " +
@@ -98,18 +105,33 @@ class DBManager():
         self.saveComponents(components)
 
     def addAssembled(self, contractId, count) -> bool:
-        """ adding assembled items in contracts table """
+        """ records assembled items in the contracts table """
         # self.query.exec("update contracts set completed = completed + {} where id = {}".format(count, templateId))
         # self.query.clear()
         date = self.getDateTime()
-        self.query.prepare("insert into assembling values(null, :contract_id, :count, :str_date, :dt)")
+        self.query.prepare("insert into assembling values(null, :contract_id, :count, :note, :str_date, :dt, True)")
         self.query.bindValue(':contract_id', contractId)
         self.query.bindValue(':count', count)
+        self.query.bindValue(':note', "test")
         self.query.bindValue(':str_date', date['s_date'])
         self.query.bindValue(':dt', date['datetime'])
         self.query.exec()
         self.query.clear()
         return True
+
+    def addSending(self, contractId, count, note) -> bool:
+        """ records sended products in the sending table """
+        if(self.addAssembled(contractId, -1 * count)):
+            date = self.getDateTime()
+            self.query.prepare("insert into sending values(null, :contract_id, :count, :note, :str_date, :dt, True)")
+            self.query.bindValue(':contract_id', contractId)
+            self.query.bindValue(':count', count)
+            self.query.bindValue(':note', note)
+            self.query.bindValue(':str_date', date['s_date'])
+            self.query.bindValue(':dt', date['datetime'])
+            self.query.exec()
+            self.query.clear()
+            return True
 
     def saveComponents(self, components):
         if len(components):
@@ -181,6 +203,23 @@ class DBManager():
                 lst.append(arr)
                 self.query.next()
         self.query.clear()
+        return lst
+
+    def getSending(self, filter):
+        where = self.getWhereFromFilter(filter)
+        lst = []
+        self.query.exec("select * from sending where enable=True order by id")
+        if self.query.isActive():
+            self.query.first()
+            while self.query.isValid():
+                item = dict({'id': self.query.value('id'),
+                            'count': self.query.value('count'),
+                             'note': self.query.value('note')
+                })
+                lst.append(item)
+                self.query.next()
+        self.query.clear()
+        self.query.lastQuery()
         return lst
 
     def getTemplateById(self, id):

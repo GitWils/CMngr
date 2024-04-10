@@ -5,13 +5,17 @@ from TempatesDesignerView import Designer
 from TemplatesDesignerDialog import TemplateDialog
 from ComponentsView import Components
 from ReportsView import Reports
+from SendingView import Sending
 from ComponentsDialog import ComponentsDlg, Mode
 from AssembleDialog import AssembleDlg
 from ContractsView import Contract
 from ContractDialog import ContractDlg
+from SendDialog import SendDlg
 from FindMenu import FindMenu
 from LoggerView import Logger
 import sys
+
+from pprint import pprint
 
 class mainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -75,6 +79,7 @@ class Project(QtWidgets.QWidget):
         self.contractsTbl = Contract(self.db.getContracts())
         self.componentsTbl = Components(self.db.getComponents(self.getFilter()))
         self.reportsTbl = Reports(self.db.getReports(self.getFilter()))
+        self.sendingTbl = Sending(self.db.getSending(self.getFilter()))
         self.logArea = Logger()
 
         self._initLayout1()
@@ -99,10 +104,11 @@ class Project(QtWidgets.QWidget):
         mainArea = QtWidgets.QVBoxLayout()
         mainArea.setContentsMargins(0, 18, 10, 0)
         tab = QtWidgets.QTabWidget()
-        tab.addTab(self.createDesignerTab(), "Конструктор виробів")
+        tab.addTab(self.createDesignerTab(), "Конструктор")
         tab.addTab(self.createContractsTab(), "Договори")
         tab.addTab(self.createComponentsTab(), "Поставлено")
         tab.addTab(self.createReportTab(), "Звітні дані")
+        tab.addTab(self.createSendingTab(), "Відвантажено")
         mainArea.addWidget(tab)
         self.innerbox.addLayout(mainArea,  QtCore.Qt.AlignmentFlag.AlignCenter)
 
@@ -123,8 +129,8 @@ class Project(QtWidgets.QWidget):
         self.editDesBtn = EditBtn('edit.png', False, 'Редагувати шаблон')
         self.delDesBtn = EditBtn('del.png', False, 'Видалити шаблон')
         self.newDesBtn.clicked.connect(self.newDesignClicked)
-        self.editDesBtn.clicked.connect(self.editDesignClicked)
-        self.delDesBtn.clicked.connect(self.delDesignClicked)
+        self.editDesBtn.clicked.connect(self.editTemplateClicked)
+        self.delDesBtn.clicked.connect(self.delTemplateClicked)
         btnLayout.addWidget(self.newDesBtn)
         btnLayout.addWidget(self.editDesBtn)
         btnLayout.addWidget(self.delDesBtn)
@@ -237,14 +243,43 @@ class Project(QtWidgets.QWidget):
         self.reportsLt.setStretch(1, 1)
         return tab
 
+    def createSendingTab(self) -> QtWidgets.QWidget:
+        tab = QtWidgets.QWidget()
+        tab.setStyleSheet("border: 0px;")
+        self.sendingLt = QtWidgets.QVBoxLayout()
+        self.sendingLt.setContentsMargins(0, 0, 0, 0)
+        tab.setLayout(self.sendingLt)
+        #self.sendingTbl.clicked.connect(self.itemReportsClicked)
+        self.sendingLbl = QtWidgets.QLabel("Список відправок пустий")
+        self.sendingLbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        if self.sendingTbl.getSize():
+            self.sendingLt.addWidget(self.sendingTbl)
+        else:
+            self.sendingLt.addWidget(self.sendingLbl)
+        btns = QtWidgets.QTabWidget()
+        btnLayout = QtWidgets.QHBoxLayout()
+        btnLayout.setContentsMargins(40, 0, 0, 0)
+        self.newSendBtn = EditBtn('new.png', True, 'Відправка виробів')
+        self.newSendBtn.clicked.connect(self.newSendClicked)
+        btnLayout.addWidget(self.newSendBtn)
+        btns.setLayout(btnLayout)
+        btnLayout.addStretch(40)
+        btnLayout.setSpacing(40)
+        self.sendingLt.addWidget(btns)
+        self.sendingLt.setStretch(0, 8)
+        self.sendingLt.setStretch(1, 1)
+
+        return tab
+
     def reloadAllData(self):
-        """ load all data from database """
+        """ loading all data from the database """
         timer = QtCore.QElapsedTimer()
         timer.start()
         self.designerTbl.loadData(self.db.getTemplates())
         self.contractsTbl.loadData(self.db.getContracts())
         self.componentsTbl.loadData(self.db.getComponents(self.getFilter()))
         self.reportsTbl.loadData(self.db.getReports(self.getFilter()))
+        self.sendingTbl.loadData(self.db.getSending(self.getFilter()))
         #self.fMenu.reload(self.db.getContracts())
         #self.fMenu.setAllSelected()
         self.logArea.showContent(self.db.getLogs())
@@ -326,6 +361,22 @@ class Project(QtWidgets.QWidget):
             self.componentsLt.replaceWidget(self.componentsLbl, self.componentsTbl)
             self.componentsTbl.show()
 
+    def sendSave(self, items: dict):
+        """ send components save button clicked """
+        pprint(items)
+        if(items['contract_id'] == 0 or items['count'] == 0):
+            return
+        self.db.addSending(items['contract_id'], items['count'], items['note'])
+        msg = """поставлено {} виробів <span style='text-decoration: underline'>{}</span>,
+                         згідно договору <span style='text-decoration: underline'>{}</span>"""
+        msg = msg.format(items['count'], items['template'], items['contract_name'])
+        self.db.saveLogMsg(msg)
+        self.reloadAllData()
+        if not self.sendingLbl.isHidden() and self.sendingTbl.getSize() > 0:
+            self.sendingLbl.hide()
+            self.sendingLt.replaceWidget(self.sendingLbl, self.sendingTbl)
+            self.sendingTbl.show()
+
     def moveComponents(self, components: list):
         """ move components when save button clicked """
         if len(components) == 0:
@@ -365,7 +416,8 @@ class Project(QtWidgets.QWidget):
                    "згідно договору <span style='text-decoration: underline'>{}</span> ")
                    .format(count, contract['product'], contract['name']))
             self.db.saveLogMsg(msg)
-            self.logArea.showContent(self.db.getLogs())
+            self.reloadAllData()
+            #self.logArea.showContent(self.db.getLogs())
 
     def updateTemplate(self, name: str, items: list):
         """ edit template mode save edit button clicked """
@@ -373,7 +425,8 @@ class Project(QtWidgets.QWidget):
             self.designerTbl.loadData(self.db.getTemplates())
             msg = 'оновлено шаблон для виробу <span style="text-decoration: underline">{}</span>'.format(name)
             self.db.saveLogMsg(msg)
-            self.logArea.showContent(self.db.getLogs())
+            self.reloadAllData()
+            #self.logArea.showContent(self.db.getLogs())
 
     def updateContract(self):
         """ edit contract mode save edit button clicked """
@@ -388,7 +441,10 @@ class Project(QtWidgets.QWidget):
     def newComponentsClicked(self):
         ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems(), self.db.getReports({'contracts': self.fMenu.getAllContractsId()}), Mode.MoveMode)
 
-    def editDesignClicked(self):
+    def newSendClicked(self):
+        SendDlg(self, self.db.getContracts())
+
+    def editTemplateClicked(self):
         templateId = self.designerTbl.getSelectedRowId()
         template = self.db.getTemplateById(templateId)
         TemplateDialog(self, template['name'], self.db.getItemsByTemplateId(templateId))
@@ -399,7 +455,8 @@ class Project(QtWidgets.QWidget):
     def editComponentsClicked(self):
         print("edit clicked")
 
-    def delDesignClicked(self):
+    def delTemplateClicked(self):
+        """ delete template button clicked """
         templateId = self.designerTbl.getSelectedRowId()
         msg_box = QtWidgets.QMessageBox()
         msg_box.setWindowTitle("Увага")
@@ -431,6 +488,7 @@ class Project(QtWidgets.QWidget):
                     self.desLayout.replaceWidget(self.designerTbl, self.desLbl)
 
     def delContractClicked(self):
+        """ delete contract button clicked """
         contractId = self.contractsTbl.getSelectedRowId()
         cntItems = self.db.getCntItemsByContractId(contractId)
         msg_box = QtWidgets.QMessageBox()
