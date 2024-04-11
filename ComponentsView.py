@@ -68,7 +68,6 @@ class CustomSortFilterProxyModel(QtCore.QSortFilterProxyModel):
     def lessThan(self, left_index, right_index):
         left_data = self.sourceModel().data(left_index, QtCore.Qt.ItemDataRole.DisplayRole)
         right_data = self.sourceModel().data(right_index, QtCore.Qt.ItemDataRole.DisplayRole)
-        #print(left_index.column().__repr__())
         if left_data is None and right_data is None:
             return False
         elif left_data is None:

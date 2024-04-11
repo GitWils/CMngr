@@ -79,7 +79,7 @@ class Project(QtWidgets.QWidget):
         self.contractsTbl = Contract(self.db.getContracts())
         self.componentsTbl = Components(self.db.getComponents(self.getFilter()))
         self.reportsTbl = Reports(self.db.getReports(self.getFilter()))
-        self.sendingTbl = Sending(self.db.getSending(self.getFilter()))
+        self.sendingTbl = Sending(self.db.getSendedProducts(self.getFilter()))
         self.logArea = Logger()
 
         self._initLayout1()
@@ -159,13 +159,10 @@ class Project(QtWidgets.QWidget):
         btnLayout = QtWidgets.QHBoxLayout()
         btnLayout.setContentsMargins(40, 0, 0, 0)
         self.newConBtn = EditBtn('new.png', True, 'Створити договір')
-        self.editConBtn = EditBtn('edit.png', False, 'Редагувати договір')
         self.delConBtn = EditBtn('del.png', False, 'Видалити договір')
         self.newConBtn.clicked.connect(self.newContractClicked)
-        self.editConBtn.clicked.connect(self.editContractClicked)
         self.delConBtn.clicked.connect(self.delContractClicked)
         btnLayout.addWidget(self.newConBtn)
-        btnLayout.addWidget(self.editConBtn)
         btnLayout.addWidget(self.delConBtn)
         btns.setLayout(btnLayout)
         btnLayout.addStretch(40)
@@ -279,7 +276,7 @@ class Project(QtWidgets.QWidget):
         self.contractsTbl.loadData(self.db.getContracts())
         self.componentsTbl.loadData(self.db.getComponents(self.getFilter()))
         self.reportsTbl.loadData(self.db.getReports(self.getFilter()))
-        self.sendingTbl.loadData(self.db.getSending(self.getFilter()))
+        self.sendingTbl.loadData(self.db.getSendedProducts(self.getFilter()))
         #self.fMenu.reload(self.db.getContracts())
         #self.fMenu.setAllSelected()
         self.logArea.showContent(self.db.getLogs())
@@ -293,7 +290,6 @@ class Project(QtWidgets.QWidget):
 
     def itemContractClicked(self) -> None:
         """ new template mode save button clicked """
-        self.editConBtn.setActive(True)
         self.delConBtn.setActive(True)
 
     def itemReportsClicked(self) -> None:
@@ -362,8 +358,7 @@ class Project(QtWidgets.QWidget):
             self.componentsTbl.show()
 
     def sendSave(self, items: dict):
-        """ send components save button clicked """
-        pprint(items)
+        """ send products save button clicked """
         if(items['contract_id'] == 0 or items['count'] == 0):
             return
         self.db.addSending(items['contract_id'], items['count'], items['note'])
@@ -428,10 +423,6 @@ class Project(QtWidgets.QWidget):
             self.reloadAllData()
             #self.logArea.showContent(self.db.getLogs())
 
-    def updateContract(self):
-        """ edit contract mode save edit button clicked """
-        pass
-
     def newDesignClicked(self):
         TemplateDialog(self)
 
@@ -439,7 +430,10 @@ class Project(QtWidgets.QWidget):
         ContractDlg(self, self.db.getTemplates())
 
     def newComponentsClicked(self):
-        ComponentsDlg(self, self.db.getContracts(), self.db.getAllTemplateItems(), self.db.getReports({'contracts': self.fMenu.getAllContractsId()}), Mode.MoveMode)
+        ComponentsDlg(self, self.db.getContracts(),
+                      self.db.getAllTemplateItems(),
+                      self.db.getReports({'contracts': self.fMenu.getAllContractsId()}),
+                      Mode.MoveMode)
 
     def newSendClicked(self):
         SendDlg(self, self.db.getContracts())
@@ -448,12 +442,6 @@ class Project(QtWidgets.QWidget):
         templateId = self.designerTbl.getSelectedRowId()
         template = self.db.getTemplateById(templateId)
         TemplateDialog(self, template['name'], self.db.getItemsByTemplateId(templateId))
-
-    def editContractClicked(self):
-        print("edit clicked")
-
-    def editComponentsClicked(self):
-        print("edit clicked")
 
     def delTemplateClicked(self):
         """ delete template button clicked """

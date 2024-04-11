@@ -153,7 +153,7 @@ class TableModel(QtGui.QStandardItemModel):
                 case 3:
                     return self._data[index.row()]['need_for_one']
                 case 4:
-                    return self._data[index.row()]['needed'] - self._data[index.row()]['completed'] * self._data[index.row()]['need_for_one']
+                    return self._data[index.row()]['needed'] - self.getCompletedByRow(index.row()) - self.getSendedByRow(index.row())
             return 1
 
         if (role == QtCore.Qt.ItemDataRole.BackgroundRole and index.column() == 2):
@@ -163,6 +163,12 @@ class TableModel(QtGui.QStandardItemModel):
 
         if (role == QtCore.Qt.ItemDataRole.TextAlignmentRole and index.column() != 1):
             return QtCore.Qt.AlignmentFlag.AlignCenter
+
+    def getCompletedByRow(self, row):
+        return self._data[row]['need_for_one'] * self._data[row]['completed']
+
+    def getSendedByRow(self, row):
+        return self._data[row]['need_for_one'] * self._data[row]['sended']
 
     @staticmethod
     def getColorByRelative(val):

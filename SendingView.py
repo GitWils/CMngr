@@ -9,13 +9,12 @@ class Sending(CustomWidgets.CustomTable):
         self.loadData(self.items)
 
     def loadData(self, items):
-        print(items.__repr__())
         self.items = list(items)
         self.sti.reloadData(items)
         self.reset()
         self.sti.clear()
         self.sti.setHorizontalHeaderLabels(
-            ['Id', 'Виріб', 'Договір', 'Відвантажено', 'Примітка', 'Дата'])
+            ['Id', 'Виріб', 'Договір', 'Відвантажено', 'Всього\nпо договору', 'Дата\nвідвантаження', 'Примітка'])
         self.sti.setRowCount(len(self.items))
         proxy_model = CustomSortFilterProxyModel()
         proxy_model.setSourceModel(self.sti)
@@ -38,15 +37,17 @@ class TableModel(QtGui.QStandardItemModel):
                 case 0:
                     return self._data[index.row()]['id']
                 case 1:
-                    return 'виріб'# self._data[index.row()]['product']
+                    return self._data[index.row()]['product']
                 case 2:
-                    return 'договір' #self._data[index.row()]['device']
+                    return self._data[index.row()]['contract_name']
                 case 3:
-                    return self._data[index.row()]['count']
+                    return self._data[index.row()]['sended']
                 case 4:
-                    return self._data[index.row()]['note']
+                    return self._data[index.row()]['count']
                 case 5:
-                    return 'data'
+                    return self._data[index.row()]['str_date'][5:]
+                case 6:
+                    return self._data[index.row()]['note']
             return 1
 
         # if (role == QtCore.Qt.ItemDataRole.BackgroundRole

@@ -205,16 +205,28 @@ class DBManager():
         self.query.clear()
         return lst
 
-    def getSending(self, filter):
-        where = self.getWhereFromFilter(filter)
+    def getSendedProducts(self, filter):
+        where = self.getWhereFromFilter(filter, 'sending')
         lst = []
-        self.query.exec("select * from sending where enable=True order by id")
+        self.query.exec(" select sending.id, sending.count, sending.note, sending.str_date, " +
+                        " contracts.id, contracts.name, contracts.count, " +
+                        " templates.name "
+                        " from sending " +
+                        " join contracts on (contracts.id = sending.contract_id)" +
+                        " join templates on (contracts.template_id = templates.id)"
+                        " where sending.enable=True " + where +
+                        "order by sending.id ")
         if self.query.isActive():
             self.query.first()
             while self.query.isValid():
-                item = dict({'id': self.query.value('id'),
-                            'count': self.query.value('count'),
-                             'note': self.query.value('note')
+                item = dict({'id': self.query.value('sending.id'),
+                            'contract_name':self.query.value('contracts.name'),
+                            'contract_id':  self.query.value('contracts.id'),
+                            'product':      self.query.value('templates.name'),
+                            'count':        self.query.value('contracts.count'),
+                            'sended':       self.query.value('sending.count'),
+                            'note':         self.query.value('sending.note'),
+                            'str_date':     self.query.value('sending.str_date'),
                 })
                 lst.append(item)
                 self.query.next()
@@ -265,10 +277,10 @@ class DBManager():
         if self.query.isActive():
             self.query.first()
             if self.query.isValid():
-                res = dict({'id': self.query.value('contracts.id'),
-                            'name': self.query.value('contracts.name'),
-                            'completed': self.query.value('contracts.completed'),
-                            'product': self.query.value('templates.name')
+                res = dict({'id':       self.query.value('contracts.id'),
+                            'name':     self.query.value('contracts.name'),
+                            'completed':self.query.value('contracts.completed'),
+                            'product':  self.query.value('templates.name')
                 })
         return res
 
@@ -305,7 +317,8 @@ class DBManager():
     def getContracts(self):
         self.query.exec(" select contracts.id, contracts.template_id, contracts.name, contracts.short_name, " +
                         " contracts.count, contracts.note, contracts.str_date, templates.name, " +
-                        " coalesce (sum(assembling.count), 0) as completed " +
+                        " coalesce (sum(assembling.count), 0) as completed, " +
+                        " coalesce((select sum(sending.count) from sending where sending.contract_id = contracts.id), 0) as sended " +
                         " from contracts " +
                         " join templates on " +
                         " (templates.id = contracts.template_id) " +
@@ -325,6 +338,7 @@ class DBManager():
                         'template_name':self.query.value('templates.name'),
                         'short_name':   self.query.value('contracts.short_name'),
                         'completed':    self.query.value('completed'),
+                        'sended':       self.query.value('sended'),
                         'count':        self.query.value('contracts.count'),
                         'note':         self.query.value('contracts.note'),
                         'date':         self.query.value('contracts.str_date')})
@@ -333,23 +347,23 @@ class DBManager():
         self.query.clear()
         return lst
 
-    def getWhereFromFilter(self, filter):
+    def getWhereFromFilter(self, filter, prefix):
         where = ''
         if filter.get('contracts'):
             where = ' and ('
             for id in filter['contracts']:
-                where += ' components.contract_id = {} or '.format(id)
+                where += f' {prefix}.contract_id = {id} or '
             where = where[:-4] + ')'
         if filter.get('from'):
-            where += ' and(components.dt > "{}") '.format(filter['from'])
+            where += f' and({prefix}.dt > "{filter['from']}") '
         if filter.get('to'):
-            where += ' and(components.dt < "{}")'.format(filter['to'])
+            where += f' and({prefix}.dt < "{filter['to']}")'
         if where == '': #if need to find nothing
-            where = ' and (components.contract_id = 0)'
+            where = f' and ({prefix}.contract_id = 0)'
         return where
 
     def getComponents(self, filter):
-        where = self.getWhereFromFilter(filter)
+        where = self.getWhereFromFilter(filter, 'components')
         self.query.exec(" select components.id, components.count, components.contract_id, components.str_date," +
                         " items_template.name, contracts.short_name, templates.name as device, notes.note " +
                         " from components " +
@@ -385,13 +399,14 @@ class DBManager():
         # timer = QtCore.QElapsedTimer()
         # timer.start()
 
-        where = self.getWhereFromFilter(filter)
+        where = self.getWhereFromFilter(filter, 'components')
         self.query.exec(" select components.contract_id, components.item_template_id, " +
                         " sum(components.count) as count, " +
                         " components.str_date,  contracts.short_name as contract, templates.name as device, " +
                         " items_template.name as product, items_template.count * contracts.count as needed, " +
                         " items_template.count as need_for_one, " +
-                        " coalesce((select sum(assembling.count) from assembling where assembling.contract_id = contracts.id), 0) as completed " +
+                        " coalesce((select sum(assembling.count) from assembling where assembling.contract_id = contracts.id), 0) as completed, " +
+                        " coalesce((select sum(sending.count) from sending where sending.contract_id = contracts.id), 0) as sended " +
                         " from components " +
                         " join contracts on " +
                         " (contracts.id = components.contract_id) " +
@@ -405,7 +420,8 @@ class DBManager():
         if self.query.isActive():
             self.query.first()
             while self.query.isValid():
-                notAssembled = self.query.value('count') - self.query.value('completed') * self.query.value('need_for_one')
+                notAssembled = self.query.value('count') - self.query.value('completed') * self.query.value('need_for_one') - \
+                               self.query.value('sended') * self.query.value('need_for_one')
                 arr = dict({
                     'contract':         self.query.value('contract'),
                     'contract_id':      self.query.value('contract_id'),
@@ -417,6 +433,7 @@ class DBManager():
                     'not_assembled':    notAssembled,
                     'needed':           self.query.value('needed'),
                     'completed':        self.query.value('completed'),
+                    'sended':           self.query.value('sended'),
                     'date':             self.query.value('str_date')})
                 lst.append(arr)
                 self.query.next()

@@ -13,19 +13,8 @@ class Contract(CustomTable):
         self.sti.reloadData(contracts)
         self.reset()
         self.sti.clear()
-        rowCnt = 0
-        for contract in contracts:
-            item0 = QtGui.QStandardItem(str(contract['id']))
-            item1 = QtGui.QStandardItem(contract['name'])
-            item2 = QtGui.QStandardItem(contract['template_name'])
-            item3 = QtGui.QStandardItem(contract['completed'])
-            item4 = QtGui.QStandardItem(contract['count'])
-            item5 = QtGui.QStandardItem(contract['date'][5:])
-            item6 = QtGui.QStandardItem(contract['note'])
-            self.sti.appendRow([item0, item1, item2, item3, item4, item5, item6])
-            rowCnt += 1
-        self.sti.setHorizontalHeaderLabels(['Id', 'Договір', 'Назва\nвиробу', 'Зібрано','Всього\nпо договору', 'Дата\nстворення', 'Примітка'])
-        self.sti.setRowCount(rowCnt)
+        self.sti.setHorizontalHeaderLabels(['Id', 'Договір', 'Назва\nвиробу', 'Зібрано', 'Відвантажено', 'Всього\nпо договору', 'Дата\nстворення', 'Примітка'])
+        self.sti.setRowCount(len(contracts))
         proxy_model = CustomSortFilterProxyModel()
         proxy_model.setSourceModel(self.sti)
         # self.setModel(self.sti)
@@ -71,17 +60,19 @@ class TableModel(QtGui.QStandardItemModel):
                 case 3:
                     return self._data[index.row()]['completed']
                 case 4:
-                    return self._data[index.row()]['count']
+                    return self._data[index.row()]['sended']
                 case 5:
-                    return self._data[index.row()]['date'][5:]
+                    return self._data[index.row()]['count']
                 case 6:
+                    return self._data[index.row()]['date'][5:]
+                case 7:
                     return self._data[index.row()]['note']
             return 1
 
         if (role == QtCore.Qt.ItemDataRole.BackgroundRole
-                and index.column() == 3
-                and self._data[index.row()]['completed'] < self._data[index.row()]['count']):
-            return QtGui.QColor(TableModel.getColorByRelative(float(self._data[index.row()]['completed'] / self._data[index.row()]['count'])))
+                and index.column() == 4
+                and self._data[index.row()]['sended'] < self._data[index.row()]['count']):
+            return QtGui.QColor(TableModel.getColorByRelative(float(self._data[index.row()]['sended'] / self._data[index.row()]['count'])))
 
         if (role == QtCore.Qt.ItemDataRole.TextAlignmentRole and index.column() != 1):
             return QtCore.Qt.AlignmentFlag.AlignCenter
@@ -117,7 +108,7 @@ class CustomSortFilterProxyModel(QtCore.QSortFilterProxyModel):
             #     left_data = int(left_data[:-4])
             #     right_data = int(right_data[:-4])
             # #sorting date column
-            if (left_index.column() == 5):
+            if (left_index.column() == 6):
                 left_data = datetime.strptime(left_data, " %d.%m.%Y").date()
                 right_data = datetime.strptime(right_data, " %d.%m.%Y").date()
             return left_data > right_data
