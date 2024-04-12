@@ -13,6 +13,9 @@ from ContractDialog import ContractDlg
 from SendDialog import SendDlg
 from FindMenu import FindMenu
 from LoggerView import Logger
+from ExcelSaver import ExcelSaver
+import openpyxl
+
 import sys
 
 from pprint import pprint
@@ -37,7 +40,9 @@ class mainWindow(QtWidgets.QMainWindow):
         """ top menu bar creating """
         menuBar = QtWidgets.QMenuBar(self)
         file_menu = QtWidgets.QMenu("&Файл", self)
-        file_menu.addAction(QtGui.QAction("&Експорт...", self))
+        excellAct = QtGui.QAction("&Експорт в Excel", self)
+        excellAct.triggered.connect(self.pr.openSaveDlg)
+        file_menu.addAction(excellAct)
         file_menu.addAction(QtGui.QAction("&Друк", self))
         view_menu = QtWidgets.QMenu("&Вигляд", self)
         view_menu.addAction(QtGui.QAction("&Налаштування", self))
@@ -474,6 +479,12 @@ class Project(QtWidgets.QWidget):
                     self.designerTbl.hide()
                     self.desLbl.show()
                     self.desLayout.replaceWidget(self.designerTbl, self.desLbl)
+
+    def openSaveDlg(self):
+        file = QtWidgets.QFileDialog.getSaveFileName(self, "Зберегти в форматі excel",
+                                                     QtCore.QDir.currentPath(), "Excel files (*.xlsx);;All (*)")
+        saver = ExcelSaver(file[0])
+        saver.saveComponents(self.db.getComponents(self.getFilter()), 5)
 
     def delContractClicked(self):
         """ delete contract button clicked """
