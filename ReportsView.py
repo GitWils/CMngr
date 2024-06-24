@@ -42,19 +42,19 @@ class TableModel(QtGui.QStandardItemModel):
                     return self._data[index.row()]['contract']
                 case 4:
                     return self._data[index.row()]['not_assembled']
-                    #return self._data[index.row()]['count'] - self.getCompletedByRow(index.row()) - self.getSendedByRow(index.row())
                 case 5:
-                    return self._data[index.row()]['needed'] - self._data[index.row()]['count']
+                    return self._data[index.row()]['needed']
                 case 6:
-                    return self._data[index.row()]['needed'] - self.getCompletedByRow(index.row()) - self.getSendedByRow(index.row())
+                    return self._data[index.row()]['not_assembled'] + self._data[index.row()]['needed']
+                    #return self._data[index.row()]['all_needed'] - self.getCompletedByRow(index.row()) - self.getSendedByRow(index.row())
             return 1
 
         if (role == QtCore.Qt.ItemDataRole.BackgroundRole
                 and index.column() == 5
-                and self._data[index.row()]['count'] < self._data[index.row()]['needed']):
+                and self._data[index.row()]['count'] < self._data[index.row()]['all_needed']):
             completed = self.getCompletedByRow(index.row())# self._data[index.row()]['need_for_one'] * self._data[index.row()]['completed']
-            sended = self.getSendedByRow(index.row())  #self._data[index.row()]['need_for_one'] * self._data[index.row()]['sended']
-            return QtGui.QColor(self.getColorByRelative(float((self._data[index.row()]['count'] - completed - sended) / (self._data[index.row()]['needed'] - completed - sended))))
+            sended = self.getSendedByRow(index.row()) #self._data[index.row()]['need_for_one'] * self._data[index.row()]['sended']
+            return QtGui.QColor(self.getColorByRelative(float((self._data[index.row()]['count'] - completed - sended) / (self._data[index.row()]['all_needed'] - completed - sended))))
 
         if (role == QtCore.Qt.ItemDataRole.TextAlignmentRole and index.column() != 1):
             return QtCore.Qt.AlignmentFlag.AlignCenter

@@ -1,15 +1,27 @@
-import sys
 import datetime
 from PyQt6 import QtCore, QtSql
 
 from pprint import pprint
+
+
+class CustomQuerry(QtSql.QSqlQuery):
+    """ class used for catching sql errors """
+    def __init__(self):
+        super().__init__()
+
+    def clear(self):
+        error = self.lastError()
+        if error.isValid():
+            print(f"Помилка: {error.text()}")
+        super().clear()
 
 class DBManager():
     def __init__(self):
         self.con = QtSql.QSqlDatabase.addDatabase('QSQLITE')
         self.con.setDatabaseName('data.s')
         self.con.open()
-        self.query = QtSql.QSqlQuery()
+        # self.query = QtSql.QSqlQuery()
+        self.query = CustomQuerry()
         if 'templates' not in self.con.tables():
             self.query.exec("create table templates(id integer primary key autoincrement, " +
                     "name text, editable bool, str_date text, dt datetime, enable bool default true)")
@@ -403,7 +415,7 @@ class DBManager():
         self.query.exec(" select components.contract_id, components.item_template_id, " +
                         " sum(components.count) as count, " +
                         " components.str_date,  contracts.short_name as contract, templates.name as device, " +
-                        " items_template.name as product, items_template.count * contracts.count as needed, " +
+                        " items_template.name as product, items_template.count * contracts.count as all_needed, " +
                         " items_template.count as need_for_one, " +
                         " coalesce((select sum(assembling.count) from assembling where assembling.contract_id = contracts.id), 0) as completed, " +
                         " coalesce((select sum(sending.count) from sending where sending.contract_id = contracts.id), 0) as sended " +
@@ -420,8 +432,9 @@ class DBManager():
         if self.query.isActive():
             self.query.first()
             while self.query.isValid():
-                notAssembled = self.query.value('count') - self.query.value('completed') * self.query.value('need_for_one') - \
-                               self.query.value('sended') * self.query.value('need_for_one')
+                notAssembled = self.query.value('count') - self.query.value('need_for_one') * \
+                               (self.query.value('completed') + self.query.value('sended'))
+                needed = self.query.value('all_needed') - self.query.value('count')
                 arr = dict({
                     'contract':         self.query.value('contract'),
                     'contract_id':      self.query.value('contract_id'),
@@ -431,7 +444,8 @@ class DBManager():
                     'count':            self.query.value('count'),
                     'need_for_one':     self.query.value('need_for_one'),
                     'not_assembled':    notAssembled,
-                    'needed':           self.query.value('needed'),
+                    'all_needed':       self.query.value('all_needed'),
+                    'needed':           needed,
                     'completed':        self.query.value('completed'),
                     'sended':           self.query.value('sended'),
                     'date':             self.query.value('str_date')})
@@ -440,6 +454,35 @@ class DBManager():
         self.query.clear()
         # elapsed_time = timer.elapsed()
         # print(f"getReports  тривав {elapsed_time} мсек")
+        return lst
+
+    def getAssembled(self, filter = ()):
+        where = self.getWhereFromFilter(filter, 'assembling')
+        self.query.exec(" select assembling.count, assembling.note, assembling.contract_id,  assembling.str_date, " +
+                        " contracts.name, contracts.count, contracts.short_name," +
+                        " templates.name" +
+                        " from assembling" +
+                        " join contracts on " +
+                        " (contracts.id = assembling.contract_id) " +
+                        " join templates on " +
+                        " (templates.id = contracts.template_id) "
+                        " where assembling.enable=True and assembling.count > 0 " + where +
+                        " order by assembling.id")
+        lst = []
+        if self.query.isActive():
+            self.query.first()
+            while self.query.isValid():
+                arr = dict({
+                    'contract_id':      self.query.value('assembling.contract_id'),
+                    'name':             self.query.value('templates.name'),
+                    'contract_name':    self.query.value('contracts.name'),
+                    'contract_sname':   self.query.value('contracts.short_name'),
+                    'count':            self.query.value('assembling.count'),
+                    'note':             self.query.value('assembling.note'),
+                    'date':             self.query.value('assembling.str_date')})
+                lst.append(arr)
+                self.query.next()
+        self.query.clear()
         return lst
 
     def delTemplate(self, id):

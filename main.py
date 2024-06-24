@@ -1,3 +1,5 @@
+#! /usr/bin/python3
+
 from PyQt6 import QtGui, QtWidgets, QtCore
 from CustomWidgets import EditBtn
 from DBManager import DBManager
@@ -484,7 +486,11 @@ class Project(QtWidgets.QWidget):
         file = QtWidgets.QFileDialog.getSaveFileName(self, "Зберегти в форматі excel",
                                                      QtCore.QDir.currentPath(), "Excel files (*.xlsx);;All (*)")
         saver = ExcelSaver(file[0])
-        saver.saveComponents(self.db.getComponents(self.getFilter()), 5)
+        saver.writeComponents(self.db.getComponents(self.getFilter()), 0)
+        saver.writeReports(self.db.getReports(self.getFilter()), 7)
+        saver.writeAssemblings(self.db.getAssembled(self.getFilter()), 14)
+        saver.writeShipments(self.db.getSendedProducts(self.getFilter()), 20)
+        saver.saveToFile()
 
     def delContractClicked(self):
         """ delete contract button clicked """
